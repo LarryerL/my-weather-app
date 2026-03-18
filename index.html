@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- PWA / 移动端体验 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b1f4a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="温感" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+
+    <title>温感 · 个性化天气助手</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --gradient-warm: linear-gradient(135deg, #ff6b6b 0%, #ffe66d 100%);
+        --gradient-cool: linear-gradient(135deg, #4ecdc4 0%, #556fb5 100%);
+        --gradient-bg: linear-gradient(to bottom, #faf3e0, #e8f5e9);
+        --accent-orange: #ff9f1c;
+        --text-primary: #2d3436;
+        --text-secondary: #636e72;
+        --text-light: #b2bec3;
+        --white: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.75);
+        --glass-border: rgba(255, 255, 255, 0.18);
+        --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
+        --shadow-hover: 0 12px 48px rgba(31, 38, 135, 0.25);
+        --pwa-deep-blue: #0b1f4a;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        font-family: "DM Sans", -apple-system, sans-serif;
+        background: var(--gradient-bg);
+        min-height: 100vh;
+        color: var(--text-primary);
+        overflow-x: hidden;
+        overscroll-behavior: none;
+      }
+
+      /* 容器 */
+      .app-container {
+        max-width: 480px;
+        margin: 0 auto;
+        min-height: 100vh;
+        position: relative;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+      }
+
+      /* 顶部导航 */
+      .top-bar {
+        padding: calc(18px + env(safe-area-inset-top)) 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .app-title {
+        font-family: "Poppins", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        background: var(--gradient-warm);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.5px;
+      }
+
+      .location-badge {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
+      }
+
+      /* 内容区 */
+      .content {
+        padding: 0 20px;
+      }
+
+      /* 天气主卡片 */
+      .weather-hero {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-radius: 32px;
+        padding: 40px 32px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .weather-date {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .weather-main {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .temperature {
+        font-family: "Poppins", sans-serif;
+        font-size: 88px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -4px;
+        background: var(--gradient-warm);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+      }
+
+      .weather-condition {
+        font-size: 20px;
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .weather-icon {
+        font-size: 80px;
+      }
+
+      .weather-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      /* 体感反馈卡片 */
+      .feedback-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
+      }
+
+      .card-title {
+        font-family: "Poppins", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+      }
+
+      .card-subtitle {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .feedback-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .feedback-btn {
+        background: white;
+        border: 2px solid transparent;
+        border-radius: 16px;
+        padding: 20px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .feedback-btn .icon {
+        font-size: 32px;
+      }
+
+      .feedback-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* 底部导航 */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 480px;
+        width: 100%;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid var(--glass-border);
+        padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      .nav-items {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .nav-item {
+        background: transparent;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-family: "DM Sans", sans-serif;
+      }
+
+      .nav-item .nav-icon {
+        font-size: 24px;
+      }
+
+      .nav-item .nav-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+
+      .nav-item.active {
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-item.active .nav-label {
+        background: var(--gradient-warm);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* 页面切换 */
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+
+      @media (max-width: 400px) {
+        .temperature {
+          font-size: 72px;
+        }
+        .weather-icon {
+          font-size: 64px;
+        }
+        .feedback-buttons {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="top-bar">
+        <div class="app-title">温感</div>
+        <div class="location-badge">📍 唐山市</div>
+      </div>
+
+      <div class="page active" id="home-page">
+        <div class="content">
+          <div class="weather-hero">
+            <div class="weather-date" id="current-date">今天 · 星期四</div>
+            <div class="weather-main">
+              <div class="temp-display">
+                <div class="temperature" id="temperature">18°</div>
+                <div class="weather-condition" id="weather-condition">晴朗</div>
+              </div>
+              <div class="weather-icon">☀️</div>
+            </div>
+            <div class="weather-stats">
+              <div class="stat-item">
+                <div class="stat-label">湿度</div>
+                <div class="stat-value" id="humidity">65%</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">风速</div>
+                <div class="stat-value" id="wind">12 km/h</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">体感</div>
+                <div class="stat-value" id="feels-like">16°</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feedback-card">
+            <div class="card-title">今日体感如何？</div>
+            <div class="card-subtitle">您的反馈帮助我们更准确地理解您的温度偏好</div>
+            <div class="feedback-buttons">
+              <button class="feedback-btn" type="button">
+                <div class="icon">❄️</div>
+                <div>偏冷</div>
+              </button>
+              <button class="feedback-btn" type="button">
+                <div class="icon">✨</div>
+                <div>刚好</div>
+              </button>
+              <button class="feedback-btn" type="button">
+                <div class="icon">🔥</div>
+                <div>偏热</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="wardrobe-page">
+        <div class="content">
+          <div class="weather-hero">
+            <div class="card-title">衣柜</div>
+            <div class="card-subtitle">这里保留你原来的衣柜 UI（可继续完善）。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="settings-page">
+        <div class="content">
+          <div class="weather-hero">
+            <div class="card-title">设置</div>
+            <div class="card-subtitle">这里保留你原来的设置 UI（可继续完善）。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-items">
+          <button class="nav-item active" type="button" data-page="home">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">首页</div>
+          </button>
+          <button class="nav-item" type="button" data-page="wardrobe">
+            <div class="nav-icon">👔</div>
+            <div class="nav-label">衣柜</div>
+          </button>
+          <button class="nav-item" type="button" data-page="settings">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">设置</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 极简页面切换（PWA 体验更像 App）
+      document.querySelectorAll(".nav-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const page = btn.dataset.page;
+          document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
+          document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+          document.getElementById(page + "-page")?.classList.add("active");
+          btn.classList.add("active");
+        });
+      });
+
+      // 注册 Service Worker（需要通过 http(s) 或本地服务器访问文件才能生效；直接双击 file:// 不生效）
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>
