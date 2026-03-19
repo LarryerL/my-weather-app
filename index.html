@@ -245,10 +245,10 @@
         inset: 0;
         background: linear-gradient(
           180deg,
-          rgba(86, 170, 255, 0.85),
-          rgba(255, 153, 153, 0.45)
+          rgba(255, 153, 153, 0.7),
+          rgba(86, 170, 255, 0.85)
         );
-        transform-origin: bottom;
+        transform-origin: top;
         transform: scaleY(var(--h, 0.3));
       }
 
@@ -767,46 +767,16 @@
         color: var(--text-light);
       }
 
-      .history-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .history-item {
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(255, 255, 255, 0.55);
-        border-radius: 18px;
-        padding: 12px 12px;
-        box-shadow: 0 10px 26px rgba(31, 38, 135, 0.08);
-      }
-
-      .history-top {
+      .trend-hours {
+        margin-top: 6px;
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 10px;
-      }
-
-      .history-feel {
-        font-weight: 900;
-        color: rgba(45, 52, 54, 0.88);
-      }
-
-      .history-time {
-        font-size: 12px;
+        gap: 6px;
+        font-size: 10px;
         font-weight: 800;
         color: rgba(99, 110, 114, 0.75);
-      }
-
-      .history-meta {
-        margin-top: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        color: rgba(99, 110, 114, 0.8);
-        line-height: 1.5;
+        letter-spacing: 0.2px;
+        user-select: none;
       }
 
       /* Lucide icon base */
@@ -889,6 +859,7 @@
                 <div class="trend-label">今天 24 小时</div>
                 <div class="trend-strip" id="today-trend"></div>
               </div>
+              <div class="trend-hours" id="today-hours" aria-hidden="true"></div>
               <div class="trend-row">
                 <div class="trend-label">前后几天</div>
                 <div class="trend-strip" id="days-trend"></div>
@@ -976,16 +947,6 @@
         </div>
       </div>
 
-      <div class="page" id="history-page">
-        <div class="content">
-          <div class="settings-section">
-            <div class="settings-title">🧾 反馈记录</div>
-            <div class="settings-desc">这里会保存你每次点“偏冷/刚好/偏热”的记录。</div>
-            <ul class="history-list" id="history-list"></ul>
-          </div>
-        </div>
-      </div>
-
       <div class="bottom-nav">
         <div class="nav-items">
           <button class="nav-item active" onclick="switchPage('home', event)">
@@ -995,10 +956,6 @@
           <button class="nav-item" onclick="switchPage('wardrobe', event)">
             <i class="i" data-lucide="shirt" aria-hidden="true"></i>
             <div class="nav-label">衣柜</div>
-          </button>
-          <button class="nav-item" onclick="switchPage('history', event)">
-            <i class="i" data-lucide="history" aria-hidden="true"></i>
-            <div class="nav-label">记录</div>
           </button>
           <button class="nav-item" onclick="switchPage('settings', event)">
             <i class="i" data-lucide="settings" aria-hidden="true"></i>
@@ -1274,6 +1231,13 @@
             return `<div class="trend-hour" style="--h:${h.toFixed(2)}"></div>`;
           })
           .join("");
+
+        // 小时刻度（每 3 小时一个）
+        const hoursEl = document.getElementById("today-hours");
+        if (hoursEl) {
+          const ticks = [0, 3, 6, 9, 12, 15, 18, 21];
+          hoursEl.innerHTML = ticks.map((h) => `<span>${h}</span>`).join("");
+        }
       }
 
       function renderDayBars(container, days) {
@@ -1368,56 +1332,9 @@
 
         if (pageName === "wardrobe") renderWardrobe();
         if (pageName === "settings") updateSettings();
-        if (pageName === "history") renderHistory();
 
         // 确保 Lucide SVG 已渲染
         if (window.lucide?.createIcons) window.lucide.createIcons();
-      }
-
-      function renderHistory() {
-        const list = $("#history-list");
-        if (!list) return;
-        if (!feedbackHistory.length) {
-          list.innerHTML = `
-            <li class="history-item">
-              <div class="history-top">
-                <div class="history-feel">暂无记录</div>
-                <div class="history-time">—</div>
-              </div>
-              <div class="history-meta">你点过“偏冷/刚好/偏热”后，记录会出现在这里。</div>
-            </li>
-          `;
-          return;
-        }
-
-        const items = [...feedbackHistory].slice(-30).reverse();
-        list.innerHTML = items
-          .map((it) => {
-            const t = new Date(it.date);
-            const time = isNaN(t.getTime())
-              ? "—"
-              : `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")} ${String(
-                  t.getHours(),
-                ).padStart(2, "0")}:${String(t.getMinutes()).padStart(2, "0")}`;
-            const feelMap = { cold: "偏冷", perfect: "刚好", hot: "偏热" };
-            const feel = feelMap[it.feeling] || it.feeling || "—";
-            const meta = [
-              it.temp != null ? `当时温度：${it.temp}°` : null,
-              it.outfitSpoken ? `穿搭：${it.outfitSpoken}` : null,
-            ]
-              .filter(Boolean)
-              .join(" · ");
-            return `
-              <li class="history-item">
-                <div class="history-top">
-                  <div class="history-feel">${feel}</div>
-                  <div class="history-time">${time}</div>
-                </div>
-                <div class="history-meta">${meta || "—"}</div>
-              </li>
-            `;
-          })
-          .join("");
       }
 
       // ========= 衣柜 / 模态框 =========
