@@ -767,6 +767,48 @@
         color: var(--text-light);
       }
 
+      .history-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .history-item {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 18px;
+        padding: 12px 12px;
+        box-shadow: 0 10px 26px rgba(31, 38, 135, 0.08);
+      }
+
+      .history-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .history-feel {
+        font-weight: 900;
+        color: rgba(45, 52, 54, 0.88);
+      }
+
+      .history-time {
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(99, 110, 114, 0.75);
+      }
+
+      .history-meta {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(99, 110, 114, 0.8);
+        line-height: 1.5;
+      }
+
       /* Lucide icon base */
       .i {
         width: 22px;
@@ -934,6 +976,16 @@
         </div>
       </div>
 
+      <div class="page" id="history-page">
+        <div class="content">
+          <div class="settings-section">
+            <div class="settings-title">🧾 反馈记录</div>
+            <div class="settings-desc">这里会保存你每次点“偏冷/刚好/偏热”的记录。</div>
+            <ul class="history-list" id="history-list"></ul>
+          </div>
+        </div>
+      </div>
+
       <div class="bottom-nav">
         <div class="nav-items">
           <button class="nav-item active" onclick="switchPage('home', event)">
@@ -943,6 +995,10 @@
           <button class="nav-item" onclick="switchPage('wardrobe', event)">
             <i class="i" data-lucide="shirt" aria-hidden="true"></i>
             <div class="nav-label">衣柜</div>
+          </button>
+          <button class="nav-item" onclick="switchPage('history', event)">
+            <i class="i" data-lucide="history" aria-hidden="true"></i>
+            <div class="nav-label">记录</div>
           </button>
           <button class="nav-item" onclick="switchPage('settings', event)">
             <i class="i" data-lucide="settings" aria-hidden="true"></i>
@@ -1039,11 +1095,584 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="./main.js"></script>
     <script>
-      // 把所有 data-lucide 变成内联 SVG（不依赖本地图片文件）
-      window.addEventListener("load", () => {
+      // 单文件版：样式+逻辑都在 index.html
+
+      // ========= 数据状态 =========
+      let wardrobe = JSON.parse(localStorage.getItem("wardrobe") || "[]");
+      let feedbackHistory = JSON.parse(localStorage.getItem("feedbackHistory") || "[]");
+      let tempBias = parseFloat(localStorage.getItem("tempBias") || "0");
+
+      // 注意：你把和风 key 写在前端代码里，任何人都能在浏览器里看到。
+      // 若要真正保密，需要用自己的后端做转发。
+      const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
+
+      // 真实天气会写入这里（不再使用硬编码模拟对象）
+      let currentWeather = null;
+
+      // ========= DOM 辅助 =========
+      function $(sel) {
+        return document.querySelector(sel);
+      }
+
+      // ========= 初始化 =========
+      function init() {
+        // 初始化时优先拉取真实天气（第一步）
+        const realWeatherTask = getRealWeather()
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            updateWeatherDisplay();
+            updateOutfitRecommendation();
+          });
+
+        // 其余 UI 初始化不依赖真实天气，可并行完成
+        bindEvents();
+        updateDate();
+        renderWardrobe();
+        updateSettings();
+
+        // 初始渲染图标
         if (window.lucide?.createIcons) window.lucide.createIcons();
+
+        return realWeatherTask;
+      }
+
+      // ========= 顶部信息 =========
+      function updateDate() {
+        const days = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+        const now = new Date();
+        const dayName = days[now.getDay()];
+        const el = $("#current-date");
+        if (el) el.textContent = `今天 · ${dayName}`;
+      }
+
+      function updateWeatherDisplay() {
+        const tempEl = $("#temperature");
+        const condEl = $("#weather-condition");
+        const humEl = $("#humidity");
+        const windEl = $("#wind");
+        const feelsEl = $("#feels-like");
+        const subjEl = $("#subjective-text");
+
+        if (!tempEl || !condEl || !humEl || !windEl || !feelsEl) return;
+
+        if (!currentWeather) {
+          tempEl.textContent = `—`;
+          condEl.textContent = "—";
+          humEl.textContent = `—`;
+          windEl.textContent = `—`;
+          feelsEl.textContent = `—`;
+          if (subjEl) subjEl.textContent = "正在获取唐山天气...";
+          return;
+        }
+
+        tempEl.textContent = `${currentWeather.temp}°`;
+        condEl.textContent = currentWeather.condition || "—";
+        humEl.textContent = `${currentWeather.humidity}%`;
+        windEl.textContent = `${currentWeather.wind} km/h`;
+        const feels = Number(currentWeather.feelsLike) + tempBias;
+        feelsEl.textContent = `${feels.toFixed(1)}°`;
+        if (subjEl) subjEl.textContent = buildSubjectiveLine(feels);
+      }
+
+      function buildSubjectiveLine(feels) {
+        if (feels <= 0) return "今天体感很冷，建议最里面保暖打底，再叠加厚外套。";
+        if (feels <= 8) return "今天体感偏冷，建议毛衣+外套，注意脖子和脚部保暖。";
+        if (feels <= 15) return "今天体感偏凉，长袖打底配薄外套会比较舒服。";
+        if (feels <= 22) return "今天体感刚刚好，薄长袖或短袖+轻薄外搭就很合适。";
+        if (feels <= 28) return "今天体感偏暖，轻薄短袖为主，出汗多可以选更透气的面料。";
+        return "今天体感偏热，尽量选择宽松、透气、浅色的衣服，多补水。";
+      }
+
+      // ========= 推荐逻辑 =========
+      function calcSuggestedWarmth(adjustedTemp) {
+        if (adjustedTemp < 5) return 5;
+        if (adjustedTemp < 10) return 4;
+        if (adjustedTemp < 15) return 3;
+        if (adjustedTemp < 22) return 2;
+        return 1;
+      }
+
+      function updateOutfitRecommendation() {
+        if (!currentWeather) return;
+        const adjustedTemp = Number(currentWeather.temp) + tempBias;
+        const suggestedWarmth = calcSuggestedWarmth(adjustedTemp);
+        const warmthEl = $("#suggested-warmth");
+        if (warmthEl) warmthEl.textContent = String(suggestedWarmth);
+
+        const container = $("#outfit-grid");
+        if (!container) return;
+
+        const suitableClothes = wardrobe.filter(
+          (item) =>
+            item.warmth === suggestedWarmth &&
+            adjustedTemp >= item.minTemp &&
+            adjustedTemp <= item.maxTemp,
+        );
+
+        if (!suitableClothes.length) {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;">
+              <div class="empty-icon">👕</div>
+              <div class="empty-title">暂无合适衣服</div>
+              <div class="empty-desc">快去衣柜添加吧！</div>
+            </div>
+          `;
+        } else {
+          container.innerHTML = suitableClothes
+            .map(
+              (item) => `
+            <div class="outfit-item">
+              <div class="outfit-item-image">
+                ${
+                  item.image
+                    ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+                    : ""
+                }
+              </div>
+              <div class="outfit-item-name">${item.name}</div>
+            </div>
+          `,
+            )
+            .join("");
+        }
+
+        renderTrends(adjustedTemp);
+      }
+
+      // ========= 温度趋势 =========
+      function renderTrends(adjustedTemp) {
+        const todayStrip = $("#today-trend");
+        const daysStrip = $("#days-trend");
+        if (!todayStrip || !daysStrip) return;
+
+        // 默认：模拟今天 24h + 昨今后
+        const hours = Array.from({ length: 24 }, (_, i) => {
+          const x = (i - 12) / 12;
+          const wave = Math.sin(x * Math.PI) * 3.2;
+          return Math.round((adjustedTemp + wave) * 10) / 10;
+        });
+        renderHourBars(todayStrip, hours);
+
+        const days = [-1, 0, 1, 2, 3].map((d) => ({
+          label: d === 0 ? "今" : d === -1 ? "昨" : `+${d}`,
+          temp: Math.round((adjustedTemp + d * 1.2) * 10) / 10,
+        }));
+        renderDayBars(daysStrip, days);
+      }
+
+      function renderHourBars(container, temps) {
+        container.classList.add("isHours");
+        const min = Math.min(...temps);
+        const max = Math.max(...temps);
+        const span = Math.max(3, max - min || 1);
+        container.innerHTML = temps
+          .map((t) => {
+            const h = 0.18 + ((t - min) / span) * 0.75;
+            return `<div class="trend-hour" style="--h:${h.toFixed(2)}"></div>`;
+          })
+          .join("");
+      }
+
+      function renderDayBars(container, days) {
+        const temps = days.map((d) => d.temp);
+        const min = Math.min(...temps);
+        const max = Math.max(...temps);
+        const span = Math.max(3, max - min || 1);
+
+        container.innerHTML = days
+          .map((d) => {
+            const h = 0.25 + ((d.temp - min) / span) * 0.65;
+            return `<div class="trend-bar" style="--h:${h.toFixed(2)}" data-day="${d.label}"></div>`;
+          })
+          .join("");
+      }
+
+      // ========= 体感反馈 =========
+      function recordFeedback(feeling, evt) {
+        const feedback = {
+          date: new Date().toISOString(),
+          temp: currentWeather?.temp,
+          feeling,
+        };
+
+        feedbackHistory.push(feedback);
+        localStorage.setItem("feedbackHistory", JSON.stringify(feedbackHistory));
+
+        if (feeling === "cold") tempBias -= 0.5;
+        else if (feeling === "hot") tempBias += 0.5;
+
+        tempBias = Math.max(-3, Math.min(3, tempBias));
+        localStorage.setItem("tempBias", String(tempBias));
+
+        const btn = evt?.target?.closest(".feedback-btn");
+        if (btn) btn.style.transform = "scale(0.95)";
+
+        setTimeout(() => {
+          if (btn) btn.style.transform = "";
+          updateWeatherDisplay();
+          updateOutfitRecommendation();
+          updateSettings();
+          askWhatWorn();
+        }, 100);
+      }
+
+      function askWhatWorn() {
+        const ok = confirm("今天大概穿了什么？如果方便，我可以用语音帮你记下来。");
+        if (!ok) return;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          alert("当前浏览器不支持语音输入，可以先记在心里，下次再试。");
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "zh-CN";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          if (!transcript) return;
+          const last = feedbackHistory[feedbackHistory.length - 1];
+          if (last) {
+            last.outfitSpoken = transcript;
+            localStorage.setItem("feedbackHistory", JSON.stringify(feedbackHistory));
+          }
+          alert(`已记下今天的穿搭：${transcript}`);
+        };
+
+        recognition.onerror = () => {
+          alert("语音识别没有成功，可以稍后再试一次。");
+        };
+
+        recognition.start();
+      }
+
+      // ========= 页面切换（display none/block） =========
+      function switchPage(pageName, evt) {
+        document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
+        document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+
+        const pageEl = document.getElementById(`${pageName}-page`);
+        if (pageEl) {
+          pageEl.style.display = "block";
+          pageEl.classList.add("active");
+        }
+
+        const nav = evt?.currentTarget || evt?.target?.closest(".nav-item");
+        if (nav) nav.classList.add("active");
+
+        if (pageName === "wardrobe") renderWardrobe();
+        if (pageName === "settings") updateSettings();
+        if (pageName === "history") renderHistory();
+
+        // 确保 Lucide SVG 已渲染
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+      }
+
+      function renderHistory() {
+        const list = $("#history-list");
+        if (!list) return;
+        if (!feedbackHistory.length) {
+          list.innerHTML = `
+            <li class="history-item">
+              <div class="history-top">
+                <div class="history-feel">暂无记录</div>
+                <div class="history-time">—</div>
+              </div>
+              <div class="history-meta">你点过“偏冷/刚好/偏热”后，记录会出现在这里。</div>
+            </li>
+          `;
+          return;
+        }
+
+        const items = [...feedbackHistory].slice(-30).reverse();
+        list.innerHTML = items
+          .map((it) => {
+            const t = new Date(it.date);
+            const time = isNaN(t.getTime())
+              ? "—"
+              : `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")} ${String(
+                  t.getHours(),
+                ).padStart(2, "0")}:${String(t.getMinutes()).padStart(2, "0")}`;
+            const feelMap = { cold: "偏冷", perfect: "刚好", hot: "偏热" };
+            const feel = feelMap[it.feeling] || it.feeling || "—";
+            const meta = [
+              it.temp != null ? `当时温度：${it.temp}°` : null,
+              it.outfitSpoken ? `穿搭：${it.outfitSpoken}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ");
+            return `
+              <li class="history-item">
+                <div class="history-top">
+                  <div class="history-feel">${feel}</div>
+                  <div class="history-time">${time}</div>
+                </div>
+                <div class="history-meta">${meta || "—"}</div>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      // ========= 衣柜 / 模态框 =========
+      function showAddModal() {
+        const modal = $("#add-modal");
+        if (modal) modal.classList.add("active");
+      }
+
+      function closeAddModal() {
+        const modal = $("#add-modal");
+        const form = $("#add-clothes-form");
+        const preview = $("#preview-container");
+        const details = $("#clothes-details");
+        if (modal) modal.classList.remove("active");
+        if (form) form.reset();
+        if (preview) preview.classList.remove("active");
+        if (details) details.hidden = true;
+      }
+
+      function previewImage(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = $("#image-preview");
+          const container = $("#preview-container");
+          if (!img || !container) return;
+          const dataUrl = e.target?.result;
+          img.src = dataUrl;
+          container.classList.add("active");
+          const details = $("#clothes-details");
+          if (details) details.hidden = false;
+          autoFillClothesFromImage();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function autoFillClothesFromImage() {
+        const nameInput = $("#clothes-name");
+        const typeInput = $("#clothes-type");
+        const warmthInput = $("#clothes-warmth");
+        const minInput = $("#clothes-min-temp");
+        const maxInput = $("#clothes-max-temp");
+        if (!nameInput || !typeInput || !warmthInput || !minInput || !maxInput) return;
+
+        const approxFeels = Number(currentWeather?.temp ?? 18) + tempBias;
+        let warmth = 3;
+        if (approxFeels <= 0) warmth = 5;
+        else if (approxFeels <= 8) warmth = 4;
+        else if (approxFeels <= 15) warmth = 3;
+        else if (approxFeels <= 22) warmth = 2;
+        else warmth = 1;
+
+        const baseName =
+          warmth >= 4
+            ? "厚外套"
+            : warmth === 3
+              ? "毛衣 / 卫衣"
+              : warmth === 2
+                ? "薄外套"
+                : "短袖 / 薄衫";
+
+        if (!nameInput.value.trim()) nameInput.value = baseName;
+        if (!typeInput.value) typeInput.value = warmth >= 4 ? "外套" : "上衣";
+        warmthInput.value = String(warmth);
+
+        const span = 6;
+        const min = Math.round((approxFeels - span - 2) * 1) / 1;
+        const max = Math.round((approxFeels + span + 2) * 1) / 1;
+        minInput.value = String(min);
+        maxInput.value = String(max);
+      }
+
+      function addClothes(event) {
+        event.preventDefault();
+
+        const name = $("#clothes-name")?.value.trim();
+        const type = $("#clothes-type")?.value;
+        const warmth = parseInt($("#clothes-warmth")?.value, 10);
+        const minTemp = parseInt($("#clothes-min-temp")?.value, 10);
+        const maxTemp = parseInt($("#clothes-max-temp")?.value, 10);
+        const imageFile = $("#clothes-image")?.files?.[0];
+
+        if (!imageFile) {
+          alert("请先拍一张/选一张照片再添加。");
+          return;
+        }
+        if (!name) {
+          alert("请输入衣服名称");
+          return;
+        }
+
+        const newItem = {
+          id: Date.now(),
+          name,
+          type,
+          warmth,
+          minTemp,
+          maxTemp,
+          image: null,
+        };
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          newItem.image = e.target?.result;
+          wardrobe.push(newItem);
+          localStorage.setItem("wardrobe", JSON.stringify(wardrobe));
+          renderWardrobe();
+          updateOutfitRecommendation();
+          closeAddModal();
+        };
+        reader.readAsDataURL(imageFile);
+      }
+
+      function deleteClothes(id) {
+        if (!confirm("确定要删除这件衣服吗？")) return;
+        wardrobe = wardrobe.filter((item) => item.id !== id);
+        localStorage.setItem("wardrobe", JSON.stringify(wardrobe));
+        renderWardrobe();
+        updateOutfitRecommendation();
+      }
+
+      function renderWardrobe() {
+        const container = $("#wardrobe-grid");
+        if (!container) return;
+
+        if (!wardrobe.length) {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;">
+              <div class="empty-icon">👔</div>
+              <div class="empty-title">衣柜空空如也</div>
+              <div class="empty-desc">点击上方按钮添加您的第一件衣服</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = wardrobe
+          .map(
+            (item) => `
+          <div class="wardrobe-item">
+            <button class="delete-item-btn" onclick="deleteClothes(${item.id})">×</button>
+            <div class="wardrobe-item-image">
+              ${
+                item.image
+                  ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`
+                  : ""
+              }
+            </div>
+            <div class="wardrobe-item-name">${item.name}</div>
+            <div class="wardrobe-item-type">${item.type}</div>
+            <div class="wardrobe-item-temp">${item.minTemp}°C - ${item.maxTemp}°C</div>
+            <div class="warmth-dots">
+              ${[1, 2, 3, 4, 5]
+                .map((i) => `<div class="warmth-dot ${i <= item.warmth ? "active" : ""}"></div>`)
+                .join("")}
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      // ========= 设置 / 偏好 =========
+      function updateBiasDescription() {
+        let desc = "标准";
+        if (tempBias <= -2.5) desc = "非常怕冷 🥶";
+        else if (tempBias <= -1.5) desc = "比较怕冷 ❄️";
+        else if (tempBias <= -0.5) desc = "略怕冷 🌤️";
+        else if (tempBias >= 2.5) desc = "非常怕热 🔥";
+        else if (tempBias >= 1.5) desc = "比较怕热 ☀️";
+        else if (tempBias >= 0.5) desc = "略怕热 🌡️";
+
+        const el = $("#bias-description");
+        if (el) el.textContent = desc;
+      }
+
+      function updateSettings() {
+        const feedbackCountEl = $("#feedback-count");
+        const totalClothesEl = $("#total-clothes");
+        const slider = $("#temp-bias-slider");
+
+        if (feedbackCountEl) feedbackCountEl.textContent = String(feedbackHistory.length);
+        if (totalClothesEl) totalClothesEl.textContent = String(wardrobe.length);
+        if (slider) slider.value = String(tempBias);
+        updateBiasDescription();
+      }
+
+      // ========= 事件绑定 =========
+      function bindEvents() {
+        const slider = $("#temp-bias-slider");
+        if (slider) {
+          slider.addEventListener("input", (e) => {
+            tempBias = parseFloat(e.target.value);
+            localStorage.setItem("tempBias", String(tempBias));
+            updateBiasDescription();
+            updateWeatherDisplay();
+            updateOutfitRecommendation();
+          });
+        }
+
+        const modal = $("#add-modal");
+        if (modal) {
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeAddModal();
+          });
+        }
+
+        const form = $("#add-clothes-form");
+        if (form) form.addEventListener("submit", addClothes);
+
+        const cancelBtn = $("#btn-cancel");
+        if (cancelBtn) cancelBtn.addEventListener("click", closeAddModal);
+
+        const fileInput = $("#clothes-image");
+        if (fileInput) fileInput.addEventListener("change", previewImage);
+      }
+
+      // ========= 获取真实天气（和风 now） =========
+      async function getRealWeather() {
+        const url =
+          "https://q53yfrupmn.re.qweatherapi.com/v7/weather/now?location=101090501&key=63d45dfa246b4e38bcef997d971d5f4e";
+        const res = await fetch(url);
+        const data = await res.json();
+        console.log("API 返回数据：", data);
+
+        if (!res.ok || data?.code !== "200" || !data?.now) {
+          throw new Error(`qweather now failed: ${data?.code || res.status}`);
+        }
+
+        const now = data.now;
+        currentWeather = {
+          temp: Number(now.temp),
+          feelsLike: Number(now.feelsLike),
+          humidity: Number(now.humidity),
+          wind: Number(now.windSpeed),
+          condition: now.text,
+        };
+
+        updateWeatherDisplay();
+        console.log("唐山天气已连接，当前温度：" + data.now.temp);
+      }
+
+      // 暴露给 HTML onclick
+      window.recordFeedback = recordFeedback;
+      window.switchPage = switchPage;
+      window.showAddModal = showAddModal;
+      window.deleteClothes = deleteClothes;
+
+      window.addEventListener("load", () => {
+        // 用 display none/block 做切换
+        document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
+        const home = document.getElementById("home-page");
+        if (home) home.style.display = "block";
+        init();
       });
     </script>
   </body>
