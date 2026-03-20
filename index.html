@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
-    <title>温感 · 个性化天气助手</title>
+    <title>温感 · Weather & Dressing</title>
     <meta name="theme-color" content="#FAF9F6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -24,18 +24,21 @@
         --bg: #faf9f6;
         --card: #ffffff;
         --ink: #5f5f5f;
-        --muted: rgba(95, 95, 95, 0.74);
-        --muted2: rgba(95, 95, 95, 0.56);
+        --muted: rgba(95, 95, 95, 0.72);
+        --muted2: rgba(95, 95, 95, 0.52);
         --line: rgba(95, 95, 95, 0.14);
         --shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
         --r: 24px;
         --maxw: 560px;
 
+        --coral: #ff9f89;
+        --coral-2: #ffd2c8;
+        --gold: #ffe7b3;
+        --bluegray: #c8d5e6;
+        --bluegray-2: #eef3fb;
         --cream: #f7f1e1;
-        --cream2: #f2ead6;
-        --blue: #e4f0ff;
-        --orange: #ffe8d2;
-        --curve: #f1e7d0;
+
+        --trend: rgba(255, 159, 137, 0.55);
       }
 
       * {
@@ -58,12 +61,21 @@
         overflow-x: hidden;
       }
 
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background: radial-gradient(circle at 25% 10%, rgba(255, 210, 200, 0.42), rgba(250, 249, 246, 0) 55%),
+          radial-gradient(circle at 80% 70%, rgba(255, 231, 179, 0.35), rgba(250, 249, 246, 0) 55%);
+      }
+
       .app {
         max-width: var(--maxw);
         margin: 0 auto;
         min-height: 100vh;
         padding: calc(28px + env(safe-area-inset-top)) 28px
-          calc(112px + env(safe-area-inset-bottom));
+          calc(96px + env(safe-area-inset-bottom));
       }
 
       .topbar {
@@ -78,13 +90,13 @@
         letter-spacing: -0.2px;
         font-size: 18px;
       }
-      .pill {
+      .loc {
         display: inline-flex;
         align-items: center;
         gap: 10px;
         padding: 10px 12px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.86);
         border: 1px solid var(--line);
         box-shadow: var(--shadow);
         font-size: 13px;
@@ -92,12 +104,12 @@
         color: var(--muted);
         white-space: nowrap;
       }
-      .pill .dot {
+      .loc-dot {
         width: 8px;
         height: 8px;
         border-radius: 999px;
-        background: radial-gradient(circle at 30% 30%, var(--cream), rgba(230, 196, 138, 0.85));
-        box-shadow: 0 0 0 4px rgba(230, 196, 138, 0.18);
+        background: radial-gradient(circle at 30% 30%, var(--gold), var(--coral));
+        box-shadow: 0 0 0 4px rgba(255, 159, 137, 0.16);
       }
 
       .tab {
@@ -111,250 +123,293 @@
         gap: 20px;
       }
       .card {
-        border-radius: var(--r);
         background: var(--card);
         border: 1px solid var(--line);
+        border-radius: var(--r);
         box-shadow: var(--shadow);
         padding: 24px;
       }
-
-      .temp-big {
-        font-size: 78px;
-        font-weight: 800;
-        letter-spacing: -1.5px;
-        line-height: 1;
-      }
-      .temp-subrow {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        margin-top: 10px;
-        color: var(--muted);
-        font-weight: 700;
-      }
-      .temp-subrow .num {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--ink);
-      }
-
-      .insight {
-        margin-top: 16px;
-        padding: 18px 18px;
+      .card-lite {
         border-radius: 18px;
-        background: linear-gradient(135deg, rgba(247, 241, 225, 0.9), rgba(242, 234, 214, 0.6));
-        border: 1px solid rgba(230, 196, 138, 0.22);
-        color: rgba(95, 95, 95, 0.9);
-        font-weight: 700;
-        line-height: 1.6;
-        white-space: pre-line;
-      }
-      .insight .small {
-        display: block;
-        margin-top: 10px;
-        font-weight: 700;
-        color: var(--muted);
-      }
-
-      .meta-grid {
-        margin-top: 14px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-      }
-      .meta {
-        border-radius: 18px;
-        background: rgba(250, 249, 246, 0.65);
+        background: rgba(250, 249, 246, 0.62);
         border: 1px solid rgba(95, 95, 95, 0.14);
-        padding: 12px 12px;
-        text-align: center;
-      }
-      .meta .k {
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .meta .v {
-        margin-top: 6px;
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--ink);
-      }
-
-      .curve-wrap {
-        margin-top: 16px;
-        border-top: 1px dashed rgba(95, 95, 95, 0.18);
-        padding-top: 14px;
-      }
-      .curve-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--muted);
-        margin-bottom: 10px;
-      }
-      canvas#temp-canvas {
-        width: 100%;
-        height: 120px;
-        display: block;
-        border-radius: 18px;
-        background: rgba(250, 249, 246, 0.55);
-        border: 1px solid rgba(95, 95, 95, 0.14);
-      }
-
-      .guide-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-      }
-      .guide-title {
-        font-size: 16px;
-        font-weight: 800;
-        margin: 0;
-      }
-      .guide-now {
-        border-radius: 999px;
-        padding: 10px 12px;
-        background: rgba(247, 241, 225, 0.85);
-        border: 1px solid rgba(230, 196, 138, 0.22);
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.88);
         box-shadow: var(--shadow);
-        white-space: nowrap;
+        padding: 16px;
       }
-      .levels {
-        margin-top: 14px;
-        display: grid;
-        gap: 10px;
-      }
-      .level {
-        display: grid;
-        grid-template-columns: 46px 1fr;
-        gap: 12px;
-        align-items: center;
-        padding: 14px 14px;
-        border-radius: 18px;
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        background: rgba(250, 249, 246, 0.6);
-        box-shadow: var(--shadow);
-      }
-      .lv-ico {
-        width: 46px;
-        height: 46px;
-        border-radius: 16px;
-        display: grid;
-        place-items: center;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(95, 95, 95, 0.12);
+      .h2 {
         font-weight: 800;
-        color: rgba(95, 95, 95, 0.9);
-      }
-      .lv-title {
-        font-size: 13px;
-        font-weight: 800;
+        font-size: 16px;
         margin: 0;
-        color: rgba(95, 95, 95, 0.92);
       }
-      .lv-items {
-        margin-top: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--muted);
-        line-height: 1.45;
-      }
-
-      .cal-wrap {
-        display: grid;
-        gap: 18px;
-      }
-      .cal-desc {
-        margin: 0;
+      .p {
+        margin: 10px 0 0;
         color: var(--muted);
         font-weight: 700;
         line-height: 1.55;
       }
-      .cal-ui {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-        align-items: center;
+
+      .hero {
+        position: relative;
+        overflow: hidden;
       }
-      .cal-btn {
-        border: none;
-        cursor: pointer;
-        font: inherit;
-        border-radius: 999px;
-        aspect-ratio: 1 / 1;
-        display: grid;
-        place-items: center;
-        padding: 18px;
-        box-shadow: var(--shadow);
-        transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
-        border: 1px solid rgba(95, 95, 95, 0.12);
+      .hero-mesh {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at 20% 20%, rgba(255, 231, 179, 0.7), rgba(255, 231, 179, 0) 55%),
+          radial-gradient(circle at 80% 15%, rgba(255, 159, 137, 0.42), rgba(255, 159, 137, 0) 55%),
+          radial-gradient(circle at 25% 80%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 60%);
+        opacity: 0.95;
+        transition: filter 500ms ease;
       }
-      .cal-btn:active {
-        transform: scale(1.02);
+      .hero.is-rain .hero-mesh {
+        background: radial-gradient(circle at 20% 20%, rgba(200, 213, 230, 0.85), rgba(200, 213, 230, 0) 55%),
+          radial-gradient(circle at 80% 15%, rgba(238, 243, 251, 0.92), rgba(238, 243, 251, 0) 55%),
+          radial-gradient(circle at 25% 80%, rgba(95, 95, 95, 0.08), rgba(95, 95, 95, 0) 60%);
       }
-      .cal-btn.cold {
-        background: radial-gradient(circle at 30% 30%, var(--blue), rgba(255, 255, 255, 0.55));
-      }
-      .cal-btn.hot {
-        background: radial-gradient(circle at 30% 30%, var(--orange), rgba(255, 255, 255, 0.55));
-      }
-      .cal-btn .t {
-        font-weight: 800;
-        font-size: 14px;
-        color: rgba(95, 95, 95, 0.92);
-      }
-      .cal-btn .s {
-        margin-top: 8px;
-        font-weight: 800;
-        font-size: 12px;
-        color: rgba(95, 95, 95, 0.66);
+      .hero-content {
+        position: relative;
+        z-index: 1;
       }
 
-      .offset-card {
-        grid-column: 1 / -1;
-        border-radius: 18px;
-        background: rgba(247, 241, 225, 0.75);
-        border: 1px solid rgba(230, 196, 138, 0.22);
-        box-shadow: var(--shadow);
-        padding: 16px;
+      .temp-row {
         display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: end;
+      }
+      .temp-now {
+        font-size: 82px;
+        font-weight: 800;
+        letter-spacing: -1.6px;
+        line-height: 0.95;
+      }
+      .temp-meta {
+        text-align: right;
+        min-width: 140px;
+      }
+      .temp-perceived .k {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .temp-perceived .v {
+        display: block;
+        margin-top: 4px;
+        font-size: 20px;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.92);
+      }
+      .cond {
+        margin-top: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.78);
+      }
+
+      .insight {
+        margin-top: 16px;
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 159, 137, 0.18);
+        color: rgba(95, 95, 95, 0.92);
+        font-weight: 700;
+        line-height: 1.6;
+        white-space: pre-line;
+      }
+
+      .trend {
+        margin-top: 16px;
+      }
+      .trend-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .trend-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .trend-note {
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.82);
+      }
+      #trend-svg {
+        width: 100%;
+        height: 120px;
+        display: block;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid rgba(95, 95, 95, 0.14);
+      }
+      #trend-path {
+        stroke: var(--trend);
+        stroke-width: 3.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 10px 18px rgba(255, 159, 137, 0.12));
+      }
+      #trend-min-dot,
+      #trend-max-dot {
+        fill: rgba(255, 159, 137, 0.7);
+      }
+      #trend-min-label,
+      #trend-max-label {
+        font-size: 12px;
+        font-weight: 800;
+        fill: rgba(95, 95, 95, 0.82);
+      }
+
+      .outfit {
+        margin-top: 14px;
+      }
+      .outfit-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .outfit-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .outfit-lv {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255, 159, 137, 0.12);
+        border: 1px solid rgba(255, 159, 137, 0.22);
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.92);
+        white-space: nowrap;
+      }
+      .outfit-items {
+        font-weight: 700;
+        color: rgba(95, 95, 95, 0.9);
+        line-height: 1.55;
+      }
+
+      .quick-feedback {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
       }
-      .offset-row {
+      .qbtn {
+        border: 1px solid rgba(95, 95, 95, 0.14);
+        background: rgba(247, 241, 225, 0.88);
+        border-radius: 999px;
+        padding: 12px 12px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+        box-shadow: var(--shadow);
+        transition: transform 200ms cubic-bezier(0.2, 0.9, 0.2, 1);
+      }
+      .qbtn:active {
+        transform: scale(1.02);
+      }
+      .qbtn.cold {
+        background: rgba(238, 243, 251, 0.9);
+      }
+      .qbtn.ok {
+        background: rgba(247, 241, 225, 0.92);
+      }
+      .qbtn.hot {
+        background: rgba(255, 210, 200, 0.65);
+      }
+
+      .stat-row {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .stat {
+        border-radius: 18px;
+        background: rgba(250, 249, 246, 0.62);
+        border: 1px solid rgba(95, 95, 95, 0.14);
+        box-shadow: var(--shadow);
+        padding: 14px 14px;
+        text-align: center;
+      }
+      .stat .k {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .stat .v {
+        margin-top: 8px;
+        font-size: 22px;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.92);
+      }
+
+      .slider-block {
+        margin-top: 14px;
+        border-radius: 18px;
+        background: rgba(250, 249, 246, 0.62);
+        border: 1px solid rgba(95, 95, 95, 0.14);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+      .slider-head {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: 12px;
+        margin-bottom: 10px;
       }
-      .offset-row .k {
+      .slider-head .k {
         font-weight: 800;
-        color: rgba(95, 95, 95, 0.82);
+        color: var(--muted);
       }
-      .offset-row .v {
+      .slider-head .v {
         font-weight: 800;
-        font-size: 18px;
         color: rgba(95, 95, 95, 0.92);
       }
-      .scale {
-        display: grid;
-        grid-template-columns: repeat(13, 1fr);
-        gap: 6px;
-        align-items: center;
-      }
-      .tick {
-        height: 10px;
+      .slider {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 16px;
         border-radius: 999px;
-        background: rgba(95, 95, 95, 0.14);
+        background: linear-gradient(90deg, rgba(185, 215, 255, 0.85), rgba(255, 159, 137, 0.85));
+        outline: none;
+        border: 1px solid rgba(95, 95, 95, 0.14);
       }
-      .tick.active {
-        background: rgba(230, 196, 138, 0.65);
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(95, 95, 95, 0.18);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      }
+      .slider::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(95, 95, 95, 0.18);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      }
+      .slider-ends {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.6);
       }
 
       .tabbar {
@@ -364,43 +419,70 @@
         transform: translateX(-50%);
         width: 100%;
         max-width: var(--maxw);
-        padding: 14px 28px calc(14px + env(safe-area-inset-bottom));
-        background: rgba(250, 249, 246, 0.76);
+        padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(250, 249, 246, 0.78);
         backdrop-filter: blur(14px);
         border-top: 1px solid rgba(95, 95, 95, 0.14);
-      }
-      .tabs {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
       }
       .tabbtn {
         border: 1px solid rgba(95, 95, 95, 0.14);
-        background: rgba(255, 255, 255, 0.86);
+        background: rgba(255, 255, 255, 0.88);
         border-radius: 18px;
         padding: 12px 10px;
         cursor: pointer;
         font: inherit;
-        transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
+        font-weight: 800;
+        color: rgba(95, 95, 95, 0.86);
         box-shadow: var(--shadow);
+        transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
       }
       .tabbtn:active {
         transform: scale(0.985);
       }
       .tabbtn.active {
-        border-color: rgba(230, 196, 138, 0.32);
+        border-color: rgba(255, 159, 137, 0.32);
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
+        color: rgba(95, 95, 95, 0.92);
       }
-      .tabbtn .t {
-        font-weight: 800;
-        font-size: 12px;
-        color: rgba(95, 95, 95, 0.9);
+
+      /* Loading skeleton */
+      .skeleton {
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          rgba(95, 95, 95, 0.08),
+          rgba(95, 95, 95, 0.06),
+          rgba(95, 95, 95, 0.08)
+        );
+        background-size: 180% 100%;
+        animation: sk 1.2s ease-in-out infinite;
       }
-      .tabbtn .s {
-        margin-top: 4px;
-        font-weight: 700;
-        font-size: 11px;
-        color: rgba(95, 95, 95, 0.6);
+      .sk-line {
+        height: 12px;
+        margin-top: 10px;
+      }
+      .sk-line:first-child {
+        margin-top: 0;
+      }
+      .w60 {
+        width: 60%;
+      }
+      .w80 {
+        width: 80%;
+      }
+      .w95 {
+        width: 95%;
+      }
+      @keyframes sk {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 180% 50%;
+        }
       }
 
       @media (max-width: 390px) {
@@ -408,292 +490,205 @@
           padding-left: 18px;
           padding-right: 18px;
         }
-        .tabbar {
-          padding-left: 18px;
-          padding-right: 18px;
+        .temp-now {
+          font-size: 68px;
         }
-        .temp-big {
-          font-size: 66px;
+        .temp-meta {
+          min-width: 120px;
         }
-      }
-
-      /* ===== Dynamic background ===== */
-      .bg {
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-        background: var(--bg);
-      }
-      .bg::before,
-      .bg::after {
-        content: "";
-        position: absolute;
-        inset: -40%;
-        background: radial-gradient(circle at 30% 20%, rgba(247, 241, 225, 0.9), rgba(250, 249, 246, 0));
-        transform: rotate(8deg);
-        opacity: 0.85;
-        animation: drift 14s ease-in-out infinite;
-      }
-      .bg::after {
-        inset: -55%;
-        background: radial-gradient(circle at 70% 70%, rgba(242, 234, 214, 0.9), rgba(250, 249, 246, 0));
-        transform: rotate(-10deg);
-        opacity: 0.8;
-        animation-duration: 18s;
-      }
-      @keyframes drift {
-        0% {
-          transform: translate3d(0, 0, 0) rotate(8deg) scale(1);
-        }
-        50% {
-          transform: translate3d(3%, -2%, 0) rotate(12deg) scale(1.02);
-        }
-        100% {
-          transform: translate3d(0, 0, 0) rotate(8deg) scale(1);
-        }
-      }
-
-      .bg .theme {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 500ms ease;
-      }
-      .bg .theme.sunny {
-        background: radial-gradient(circle at 70% 20%, rgba(255, 214, 138, 0.34), rgba(250, 249, 246, 0) 55%),
-          radial-gradient(circle at 20% 75%, rgba(247, 241, 225, 0.9), rgba(250, 249, 246, 0) 58%);
-      }
-      .bg .theme.cloudy {
-        background: radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.85), rgba(250, 249, 246, 0) 55%),
-          radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.75), rgba(250, 249, 246, 0) 60%);
-      }
-      .bg .theme.rain {
-        background: radial-gradient(circle at 30% 30%, rgba(185, 215, 255, 0.25), rgba(250, 249, 246, 0) 55%),
-          radial-gradient(circle at 70% 70%, rgba(95, 95, 95, 0.08), rgba(250, 249, 246, 0) 60%);
-      }
-      .bg .theme.rain::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: repeating-radial-gradient(
-          circle at 60% 40%,
-          rgba(185, 215, 255, 0.18) 0 6px,
-          rgba(250, 249, 246, 0) 6px 18px
-        );
-        opacity: 0.6;
-        animation: ripple 4.8s linear infinite;
-      }
-      @keyframes ripple {
-        0% {
-          transform: translate3d(0, 0, 0) scale(1);
-          opacity: 0.28;
-        }
-        50% {
-          transform: translate3d(-1%, 1%, 0) scale(1.05);
-          opacity: 0.5;
-        }
-        100% {
-          transform: translate3d(0, 0, 0) scale(1);
-          opacity: 0.28;
-        }
-      }
-      .bg .theme.wind {
-        background: radial-gradient(circle at 40% 20%, rgba(199, 216, 207, 0.35), rgba(250, 249, 246, 0) 55%);
-      }
-      .bg .theme.wind::before {
-        content: "";
-        position: absolute;
-        inset: -10% -40%;
-        background: linear-gradient(
-          90deg,
-          rgba(95, 95, 95, 0) 0%,
-          rgba(95, 95, 95, 0.06) 35%,
-          rgba(95, 95, 95, 0) 70%
-        );
-        opacity: 0.6;
-        transform: rotate(-10deg);
-        animation: wind 3.8s linear infinite;
-      }
-      @keyframes wind {
-        0% {
-          transform: translate3d(-20%, 0, 0) rotate(-10deg);
-        }
-        100% {
-          transform: translate3d(20%, 0, 0) rotate(-10deg);
-        }
-      }
-      .bg .theme.snow {
-        background: radial-gradient(circle at 60% 25%, rgba(255, 255, 255, 0.88), rgba(250, 249, 246, 0) 58%),
-          radial-gradient(circle at 35% 75%, rgba(185, 215, 255, 0.22), rgba(250, 249, 246, 0) 62%);
       }
     </style>
   </head>
   <body>
-    <div class="bg" aria-hidden="true">
-      <div class="theme sunny" id="bg-sunny"></div>
-      <div class="theme cloudy" id="bg-cloudy"></div>
-      <div class="theme rain" id="bg-rain"></div>
-      <div class="theme wind" id="bg-wind"></div>
-      <div class="theme snow" id="bg-snow"></div>
-    </div>
+    <div class="bg" aria-hidden="true"></div>
 
-    <div class="app">
-      <div class="topbar">
+    <main class="app" aria-label="温感">
+      <header class="topbar">
         <div class="brand">温感</div>
-        <div class="pill" id="location-pill">
-          <span class="dot" aria-hidden="true"></span>
-          <span id="location-name">唐山市</span>
+        <div class="loc" id="loc-pill">
+          <span class="loc-dot" aria-hidden="true"></span>
+          <span id="loc-name">唐山</span>
         </div>
-      </div>
+      </header>
 
-      <section class="tab active" id="tab-realtime" aria-label="实时体感">
+      <section class="tab active" id="tab-home" aria-label="Home">
         <div class="stack">
-          <div class="card">
-            <div class="temp-big" id="ui-real-temp">—</div>
-            <div class="temp-subrow">
-              <span>体感</span>
-              <span class="num" id="ui-calculated-temp">—</span>
-              <span id="ui-condition">—</span>
-            </div>
-
-            <div class="insight" id="ui-insight">
-              正在生成今天的体感建议...
-              <span class="small" id="ui-insight-sub">提示：会结合降水概率、风力、温差、紫外线。</span>
-            </div>
-
-            <div class="meta-grid" aria-label="关键指标">
-              <div class="meta">
-                <div class="k">湿度</div>
-                <div class="v" id="ui-humidity">—</div>
-              </div>
-              <div class="meta">
-                <div class="k">风力</div>
-                <div class="v" id="ui-wind">—</div>
-              </div>
-              <div class="meta">
-                <div class="k">紫外线</div>
-                <div class="v" id="ui-uv">—</div>
-              </div>
-            </div>
-
-            <div class="curve-wrap" aria-label="24小时温度曲线">
-              <div class="curve-title">
-                <span>24 小时曲线</span>
-                <span id="ui-curve-note">—</span>
-              </div>
-              <canvas id="temp-canvas"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="tab" id="tab-guide" aria-label="穿搭指南">
-        <div class="stack">
-          <div class="card">
-            <div class="guide-head">
-              <p class="guide-title">穿搭指南（Lv 1 - 10）</p>
-              <div class="guide-now" id="ui-current-level">当前：Lv —</div>
-            </div>
-            <div class="levels" id="ui-levels"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="tab" id="tab-calibration" aria-label="体感校准">
-        <div class="stack">
-          <div class="card">
-            <div class="cal-wrap">
-              <p class="cal-desc">
-                用两次点击就能让推荐明显贴近你。左边表示更怕冷，右边表示更怕热。
-              </p>
-              <div class="cal-ui">
-                <button class="cal-btn cold" id="btn-cold" type="button">
-                  <div>
-                    <div class="t">我怕冷</div>
-                    <div class="s">偏移量 +1</div>
+          <section class="hero card" id="home-hero" aria-label="实时体感">
+            <div class="hero-mesh" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div class="temp-row">
+                <div class="temp-now" id="ui-temp-now">—</div>
+                <div class="temp-meta">
+                  <div class="temp-perceived">
+                    <span class="k">Perceived</span>
+                    <span class="v" id="ui-temp-perceived">—</span>
                   </div>
-                </button>
-                <button class="cal-btn hot" id="btn-hot" type="button">
-                  <div>
-                    <div class="t">我怕热</div>
-                    <div class="s">偏移量 -1</div>
-                  </div>
-                </button>
-
-                <div class="offset-card" aria-label="当前偏移量">
-                  <div class="offset-row">
-                    <div class="k">当前偏移量</div>
-                    <div class="v" id="ui-offset">0</div>
-                  </div>
-                  <div class="scale" id="ui-scale" aria-hidden="true"></div>
+                  <div class="cond" id="ui-cond">—</div>
                 </div>
               </div>
+
+              <div class="insight" id="ui-insight" aria-label="AI Insight">
+                <div class="skeleton sk-line w80"></div>
+                <div class="skeleton sk-line w95"></div>
+                <div class="skeleton sk-line w60"></div>
+              </div>
+
+              <div class="trend card-lite" aria-label="24h Trend">
+                <div class="trend-head">
+                  <div class="trend-title">24h Trend</div>
+                  <div class="trend-note" id="ui-trend-note">—</div>
+                </div>
+                <svg
+                  id="trend-svg"
+                  viewBox="0 0 320 120"
+                  preserveAspectRatio="none"
+                  role="img"
+                  aria-label="24小时温度曲线"
+                >
+                  <path id="trend-path" d="" fill="none"></path>
+                  <circle id="trend-min-dot" r="3.5"></circle>
+                  <circle id="trend-max-dot" r="3.5"></circle>
+                  <text id="trend-min-label"></text>
+                  <text id="trend-max-label"></text>
+                </svg>
+              </div>
+
+              <div class="outfit card-lite" aria-label="Outfit Level">
+                <div class="outfit-head">
+                  <div class="outfit-title">Outfit Level</div>
+                  <div class="outfit-lv" id="ui-level">Lv —</div>
+                </div>
+                <div class="outfit-items" id="ui-outfit-items">—</div>
+              </div>
+
+              <div class="quick-feedback" aria-label="Quick Feedback">
+                <button class="qbtn cold" id="btn-cold" type="button">Cold</button>
+                <button class="qbtn ok" id="btn-ok" type="button">OK</button>
+                <button class="qbtn hot" id="btn-hot" type="button">Hot</button>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </section>
-    </div>
 
-    <nav class="tabbar" aria-label="底部导航">
-      <div class="tabs">
-        <button class="tabbtn active" data-tab="realtime" type="button">
-          <div class="t">实时体感</div>
-          <div class="s">天气 · 曲线 · 建议</div>
-        </button>
-        <button class="tabbtn" data-tab="guide" type="button">
-          <div class="t">穿搭指南</div>
-          <div class="s">1-10 级单品</div>
-        </button>
-        <button class="tabbtn" data-tab="calibration" type="button">
-          <div class="t">体感校准</div>
-          <div class="s">两键学习偏好</div>
-        </button>
-      </div>
+      <section class="tab" id="tab-wardrobe" aria-label="Wardrobe">
+        <div class="stack">
+          <section class="card" aria-label="Wardrobe">
+            <div class="h2">Wardrobe</div>
+            <div class="p">你的衣柜会优先用于匹配推荐单品。</div>
+            <div class="stat-row">
+              <div class="stat">
+                <div class="k">Wardrobe Count</div>
+                <div class="v" id="ui-wardrobe-count">42</div>
+              </div>
+              <div class="stat">
+                <div class="k">Temp Offset</div>
+                <div class="v" id="ui-offset-badge">0</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-calibration" aria-label="Calibration">
+        <div class="stack">
+          <section class="card" aria-label="Calibration">
+            <div class="h2">Calibration</div>
+            <div class="p">拖动滑杆会立即影响体感温度与穿搭等级。</div>
+
+            <div class="slider-block">
+              <div class="slider-head">
+                <div class="k">tempOffset</div>
+                <div class="v" id="ui-offset">0</div>
+              </div>
+              <input
+                id="offset-slider"
+                class="slider"
+                type="range"
+                min="-3"
+                max="3"
+                step="1"
+                value="0"
+                aria-label="tempOffset slider"
+              />
+              <div class="slider-ends" aria-hidden="true">
+                <span>Blue</span>
+                <span>Coral</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card" aria-label="Stats">
+            <div class="h2">Stats</div>
+            <div class="stat-row">
+              <div class="stat">
+                <div class="k">Wardrobe Count</div>
+                <div class="v">42 Items</div>
+              </div>
+              <div class="stat">
+                <div class="k">Feedback</div>
+                <div class="v" id="ui-feedback-count">0</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Tabs">
+      <button class="tabbtn active" data-tab="home" type="button">Home</button>
+      <button class="tabbtn" data-tab="wardrobe" type="button">Wardrobe</button>
+      <button class="tabbtn" data-tab="calibration" type="button">Calibration</button>
     </nav>
 
     <script>
       (() => {
         "use strict";
 
-        const STORAGE_KEY = "userPreference";
-        const STORAGE_FEEDBACK = "feedbackHistory";
+        // ===== Config =====
+        const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
+        const QWEATHER_LOCATION = "101090501"; // Tangshan
+        const QWEATHER_HOST = "https://q53yfrupmn.re.qweatherapi.com";
 
-        function loadJson(key, fallback) {
-          try {
-            const raw = localStorage.getItem(key);
-            if (!raw) return fallback;
-            return JSON.parse(raw);
-          } catch (_) {
-            return fallback;
-          }
-        }
+        const STORAGE_KEYS = {
+          tempOffset: "tempOffset",
+          feedbackCount: "feedbackCount",
+          wardrobeCount: "wardrobeCount",
+        };
 
-        function saveJson(key, value) {
-          localStorage.setItem(key, JSON.stringify(value));
-        }
+        const OFFSET_MIN = -3;
+        const OFFSET_MAX = 3;
+        const FEEDBACK_STEP = 1; // quick feedback delta
 
+        // ===== State =====
+        const state = {
+          loading: true,
+          now: null,
+          hourly24: [],
+          daily3: null,
+          indices: [],
+          tempOffset: 0,
+          feedbackCount: 0,
+          wardrobeCount: 42,
+        };
+
+        // ===== Utils =====
+        const $ = (id) => document.getElementById(id);
         function clamp(n, min, max) {
           return Math.max(min, Math.min(max, n));
         }
 
-        const userPreference = loadJson(STORAGE_KEY, { tempOffset: 0, feedbackCount: 0 });
-        let feedbackHistory = loadJson(STORAGE_FEEDBACK, []);
+        function readNum(key, fallback) {
+          const v = Number(localStorage.getItem(key));
+          return Number.isFinite(v) ? v : fallback;
+        }
 
-        // tempOffset semantics:
-        // +1 means "I feel colder than average" -> recommend thicker.
-        // Therefore we subtract it from calculatedTemp so the temperature band goes down.
-        const OFFSET_MIN = -6;
-        const OFFSET_MAX = 6;
-        const OFFSET_STEP = 1.0;
-
-        // ===== QWeather endpoints =====
-        const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
-        const LOCATION = "101090501"; // 唐山
-        const API_HOST = "https://q53yfrupmn.re.qweatherapi.com";
+        function writeNum(key, value) {
+          localStorage.setItem(key, String(value));
+        }
 
         function api(path) {
-          return `${API_HOST}${path}?location=${LOCATION}&key=${QWEATHER_KEY}`;
+          return `${QWEATHER_HOST}${path}?location=${QWEATHER_LOCATION}&key=${QWEATHER_KEY}`;
         }
 
         async function fetchJson(url) {
@@ -703,37 +698,39 @@
           return data;
         }
 
-        // ===== Weather state =====
-        const state = { now: null, hourly: null, daily: null, indices: null };
-
         // ===== Algorithm =====
-        function calculateTemp(now) {
+        // calculatedTemp = realTemp + humidity*0.15 - windSpeed*0.2 + tempOffset
+        // Here tempOffset is user calibration:
+        // negative -> user feels colder -> recommend thicker (lower calculatedTemp band)
+        // positive -> user feels warmer -> recommend thinner (higher band)
+        function calculateTemp(now, tempOffset) {
           if (!now) return null;
           const realTemp = Number(now.temp);
           const humidity = Number(now.humidity);
           const windSpeed = Number(now.windSpeed);
-          const offset = Number(userPreference.tempOffset) || 0;
+          const offset = Number(tempOffset) || 0;
           if (![realTemp, humidity, windSpeed, offset].every((n) => Number.isFinite(n))) return null;
-          // calculatedTemp = realTemp + humidity*0.15 - windSpeed*0.2 - tempOffset
-          return realTemp + humidity * 0.15 - windSpeed * 0.2 - offset;
+          return realTemp + humidity * 0.15 - windSpeed * 0.2 + offset;
         }
 
-        const LEVEL_TABLE = {
-          10: ["长款加厚羽绒服", "发热内衣", "羊绒衫", "暖宝宝", "围巾帽子"],
-          9: ["厚羽绒服", "毛衣", "保暖裤"],
-          8: ["标准羽绒服/羊羔毛外套", "厚针织"],
-          7: ["厚呢大衣/轻薄羽绒服", "中厚毛衣"],
-          6: ["大衣/夹克棉服", "衬衫内搭"],
+        // 10-level mapping from -20..35+ (no seasonal words)
+        const OUTFIT_TABLE = {
+          10: ["长款加厚羽绒服", "发热内衣", "羊绒衫", "围巾帽子", "保暖手套"],
+          9: ["厚羽绒服", "高领毛衣", "保暖裤"],
+          8: ["羽绒服/羊羔毛外套", "厚针织", "加厚袜"],
+          7: ["厚呢外套/轻薄羽绒", "中厚毛衣"],
+          6: ["外套", "衬衫/打底", "长裤"],
           5: ["风衣/西装外套", "薄针织/长袖"],
           4: ["卫衣/针织开衫", "T 恤"],
-          3: ["长袖衬衫", "衬衫裙（可卷袖）"],
-          2: ["短袖 T 恤/吊带裙", "防晒衫"],
-          1: ["极简清爽排汗", "真丝/亚麻材质"],
+          3: ["长袖衬衫", "轻薄连衣裙/半裙"],
+          2: ["短袖/吊带", "防晒衫"],
+          1: ["极简清爽", "亚麻/真丝/速干面料"],
         };
 
         function getOutfitLevel(t) {
           const temp = Number(t);
           if (!Number.isFinite(temp)) return 5;
+          // [-20..35+] bands
           if (temp <= -15) return 10;
           if (temp <= -5) return 9;
           if (temp <= 0) return 8;
@@ -746,203 +743,171 @@
           return 1;
         }
 
-        function getTempDescription(level) {
+        function formatOutfit(level) {
+          const items = OUTFIT_TABLE[level] || OUTFIT_TABLE[5];
+          return items.join(" · ");
+        }
+
+        function pickEmotion(level) {
           const TEXT = {
-            10: "今天很冷，建议把保暖层次做到位：贴身保暖 + 中层羊绒 + 外层防风。",
-            9: "今天冷得很认真：厚羽绒配毛衣，保暖裤不要省。",
-            8: "今天冰感明显：羽绒或羊羔毛外套，厚针织会更安心。",
-            7: "零度边缘：大衣里记得加件高领羊绒，风一吹也不慌。",
-            6: "今天偏冷：外套选挺括一点，里面用衬衫/打底做层次更精致。",
-            5: "今天很舒服：风衣/西装外套 + 薄针织，温柔又利落。",
-            4: "今天很适合松弛穿：开衫或卫衣，内搭 T 恤就刚刚好。",
-            3: "今天有点热：长袖衬衫或衬衫裙，卷袖会更轻盈。",
-            2: "今天偏热：短袖或吊带裙，记得备件防晒衫。",
-            1: "今天很热：尽量轻薄透气，真丝/亚麻会更舒服。",
+            10: "今天真的很冷，你值得被好好包裹住。",
+            9: "今天冷得有点锋利，保暖要更认真一点。",
+            8: "今天空气偏冷，厚针织会让你更安心。",
+            7: "今天风一吹就凉，外层选更防风的会舒服很多。",
+            6: "今天体感偏凉，穿搭做一点层次会更精致。",
+            5: "今天刚刚好，利落外套会很显气质。",
+            4: "今天很舒服，轻松一点也很好看。",
+            3: "今天微微偏热，轻薄长袖会更松弛。",
+            2: "今天偏热，防晒和补水记得安排上。",
+            1: "今天很热，选择透气面料会让你更自在。",
           };
           return TEXT[level] || "今天穿得舒服最重要。";
         }
 
-        // ===== Insight generation =====
-        function generateWeatherInsight(input) {
-          const hints = [];
+        // ===== Insight =====
+        function generateInsight(input) {
+          const lines = [];
+
           const pop = Number(input.pop);
           const windScale = Number(input.windScale);
           const uvIndex = Number(input.uvIndex);
-          const tempMax = Number(input.tempMax);
-          const tempMin = Number(input.tempMin);
+          const tMax = Number(input.tempMax);
+          const tMin = Number(input.tempMin);
+
+          // Emotion opener (based on outfit level)
+          if (Number.isFinite(input.level)) {
+            lines.push(pickEmotion(input.level));
+          }
 
           if (Number.isFinite(pop)) {
-            if (pop >= 60) hints.push("今天可能有雨，记得带伞。");
-            else if (pop >= 30) hints.push("今天有一定降水概率，出门带把轻便伞更安心。");
+            if (pop >= 70) lines.push("今天可能会下雨，带伞会让你更从容。");
+            else if (pop >= 40) lines.push("降水概率不低，出门带把轻便伞更安心。");
           }
+
           if (Number.isFinite(windScale)) {
-            if (windScale >= 6) hints.push("风力偏强，体感会被吹冷，建议选更防风的外层。");
-            else if (windScale >= 4) hints.push("有点风，注意脖颈和脚踝别着凉。");
+            if (windScale >= 6) lines.push("风力偏强，体感会被吹冷，外层尽量选防风的。");
+            else if (windScale >= 4) lines.push("有点风，注意脖颈和脚踝别着凉。");
           }
-          if (Number.isFinite(tempMax) && Number.isFinite(tempMin)) {
-            const diff = Math.abs(tempMax - tempMin);
-            if (diff >= 12) hints.push(`早晚温差约 ${Math.round(diff)} 度，晚上出门建议多加一件。`);
-            else if (diff >= 8) hints.push(`早晚温差约 ${Math.round(diff)} 度，随手带件薄外搭更稳。`);
+
+          if (Number.isFinite(tMax) && Number.isFinite(tMin)) {
+            const diff = Math.abs(tMax - tMin);
+            if (diff >= 12) lines.push(`早晚温差约 ${Math.round(diff)}°，晚上出门建议多带一件。`);
+            else if (diff >= 8) lines.push(`早晚温差约 ${Math.round(diff)}°，随手带件薄外搭更稳。`);
           }
+
           if (Number.isFinite(uvIndex)) {
-            if (uvIndex >= 8) hints.push("紫外线较强，出门注意遮阳与防晒。");
-            else if (uvIndex >= 6) hints.push("紫外线偏高，防晒别忘了。");
+            if (uvIndex >= 8) lines.push("紫外线较强，别忘了防晒和遮阳。");
+            else if (uvIndex >= 6) lines.push("紫外线偏高，防晒记得补涂。");
           }
 
-          if (!hints.length) return "今天整体比较平稳，按体感温度选一套舒服的层次就好。";
-          return hints.join("；");
+          if (!lines.length) return "今天整体比较平稳，按体感温度选一套舒服的层次就好。";
+          return lines.join("\n");
         }
 
-        // ===== Theme selection =====
-        function iconToTheme(iconCode) {
-          const code = Number(iconCode);
-          if (!Number.isFinite(code)) return "sunny";
-          if (code >= 300 && code < 400) return "rain";
-          if (code >= 400 && code < 500) return "snow";
-          if (code >= 200 && code < 300) return "wind";
-          if (code === 100) return "sunny";
-          if (code >= 101 && code <= 104) return "cloudy";
-          return "cloudy";
-        }
-
-        function applyTheme(theme) {
-          const ids = ["sunny", "cloudy", "rain", "wind", "snow"];
-          for (const t of ids) {
-            const el = document.getElementById(`bg-${t}`);
-            if (!el) continue;
-            el.style.opacity = t === theme ? "1" : "0";
-          }
-        }
-
-        // ===== Canvas curve =====
-        function drawCurve(canvas, temps) {
-          if (!canvas) return;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-
-          const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-          const w = Math.max(280, canvas.clientWidth);
-          const h = Math.max(120, canvas.clientHeight);
-          canvas.width = w * dpr;
-          canvas.height = h * dpr;
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-          ctx.clearRect(0, 0, w, h);
-
-          const points = temps
-            .map((t) => Number(t))
-            .filter((n) => Number.isFinite(n))
-            .slice(0, 24);
-          if (points.length < 6) {
-            ctx.fillStyle = "rgba(95,95,95,0.55)";
-            ctx.font = "700 12px Quicksand, system-ui";
-            ctx.fillText("暂无足够的小时数据", 14, 22);
-            return;
-          }
-
-          const min = Math.min(...points);
-          const max = Math.max(...points);
-          const span = Math.max(2, max - min);
-          const padX = 14;
-          const padY = 18;
-          const innerW = w - padX * 2;
-          const innerH = h - padY * 2;
-
-          function xy(i, val) {
-            const x = padX + (i / (points.length - 1)) * innerW;
-            const y = padY + (1 - (val - min) / span) * innerH;
-            return { x, y };
-          }
-
-          // Light grid
-          ctx.strokeStyle = "rgba(95,95,95,0.08)";
-          ctx.lineWidth = 1;
-          for (let i = 1; i <= 3; i++) {
-            const y = padY + (i / 4) * innerH;
-            ctx.beginPath();
-            ctx.moveTo(padX, y);
-            ctx.lineTo(w - padX, y);
-            ctx.stroke();
-          }
-
-          // Smooth path (Catmull-Rom -> Bezier)
-          const pts = points.map((v, i) => xy(i, v));
-          ctx.beginPath();
-          ctx.moveTo(pts[0].x, pts[0].y);
-          for (let i = 0; i < pts.length - 1; i++) {
-            const p0 = pts[i - 1] || pts[i];
-            const p1 = pts[i];
-            const p2 = pts[i + 1];
-            const p3 = pts[i + 2] || p2;
+        // ===== SVG Trend (Bezier) =====
+        function buildSmoothPath(points) {
+          if (points.length < 2) return "";
+          // Catmull-Rom to Bezier
+          let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+          for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i - 1] || points[i];
+            const p1 = points[i];
+            const p2 = points[i + 1];
+            const p3 = points[i + 2] || p2;
             const cp1x = p1.x + (p2.x - p0.x) / 6;
             const cp1y = p1.y + (p2.y - p0.y) / 6;
             const cp2x = p2.x - (p3.x - p1.x) / 6;
             const cp2y = p2.y - (p3.y - p1.y) / 6;
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+          }
+          return d;
+        }
+
+        function renderTrendSvg(temps) {
+          const svg = $("trend-svg");
+          const path = $("trend-path");
+          const minDot = $("trend-min-dot");
+          const maxDot = $("trend-max-dot");
+          const minLabel = $("trend-min-label");
+          const maxLabel = $("trend-max-label");
+          if (!svg || !path || !minDot || !maxDot || !minLabel || !maxLabel) return;
+
+          const pointsRaw = temps
+            .map((t) => Number(t))
+            .filter((n) => Number.isFinite(n))
+            .slice(0, 24);
+
+          if (pointsRaw.length < 6) {
+            path.setAttribute("d", "");
+            minLabel.textContent = "";
+            maxLabel.textContent = "";
+            return;
           }
 
-          // Glow stroke
-          ctx.save();
-          ctx.strokeStyle = "rgba(241,231,208,0.75)";
-          ctx.lineWidth = 5;
-          ctx.shadowColor = "rgba(230,196,138,0.22)";
-          ctx.shadowBlur = 14;
-          ctx.stroke();
-          ctx.restore();
+          const W = 320;
+          const H = 120;
+          const padX = 12;
+          const padY = 16;
+          const innerW = W - padX * 2;
+          const innerH = H - padY * 2;
+          const min = Math.min(...pointsRaw);
+          const max = Math.max(...pointsRaw);
+          const span = Math.max(2, max - min);
 
-          // Main stroke
-          ctx.strokeStyle =
-            getComputedStyle(document.documentElement).getPropertyValue("--curve").trim() || "#F1E7D0";
-          ctx.lineWidth = 3;
-          ctx.stroke();
+          const pts = pointsRaw.map((v, i) => {
+            const x = padX + (i / (pointsRaw.length - 1)) * innerW;
+            const y = padY + (1 - (v - min) / span) * innerH;
+            return { x, y, v };
+          });
 
-          // Labels
-          ctx.fillStyle = "rgba(95,95,95,0.55)";
-          ctx.font = "700 11px Quicksand, system-ui";
-          ctx.fillText(`${Math.round(min)}°`, padX, h - 8);
-          const maxText = `${Math.round(max)}°`;
-          const tw = ctx.measureText(maxText).width;
-          ctx.fillText(maxText, w - padX - tw, 14);
-        }
+          path.setAttribute("d", buildSmoothPath(pts));
 
-        // ===== UI rendering =====
-        function $(id) {
-          return document.getElementById(id);
-        }
-
-        function renderScale(offset) {
-          const el = $("ui-scale");
-          if (!el) return;
-          el.innerHTML = "";
-          const off = clamp(Math.round(Number(offset) || 0), OFFSET_MIN, OFFSET_MAX);
-          for (let v = -6; v <= 6; v++) {
-            const d = document.createElement("div");
-            d.className = "tick" + (v === off ? " active" : "");
-            el.appendChild(d);
+          let minIdx = 0;
+          let maxIdx = 0;
+          for (let i = 1; i < pts.length; i++) {
+            if (pts[i].v < pts[minIdx].v) minIdx = i;
+            if (pts[i].v > pts[maxIdx].v) maxIdx = i;
           }
+
+          const pMin = pts[minIdx];
+          const pMax = pts[maxIdx];
+
+          minDot.setAttribute("cx", String(pMin.x));
+          minDot.setAttribute("cy", String(pMin.y));
+          maxDot.setAttribute("cx", String(pMax.x));
+          maxDot.setAttribute("cy", String(pMax.y));
+
+          minLabel.textContent = `${Math.round(pMin.v)}°`;
+          maxLabel.textContent = `${Math.round(pMax.v)}°`;
+
+          // Position labels with a small offset
+          minLabel.setAttribute("x", String(pMin.x + 6));
+          minLabel.setAttribute("y", String(pMin.y + 14));
+          maxLabel.setAttribute("x", String(pMax.x + 6));
+          maxLabel.setAttribute("y", String(Math.max(14, pMax.y - 8)));
         }
 
-        function renderLevels() {
-          const root = $("ui-levels");
-          if (!root) return;
-          root.innerHTML = "";
-          for (let lv = 10; lv >= 1; lv--) {
-            const items = LEVEL_TABLE[lv] || [];
-            const row = document.createElement("div");
-            row.className = "level";
-            row.innerHTML = `
-              <div class="lv-ico">Lv ${lv}</div>
-              <div class="lv-main">
-                <p class="lv-title">${items.join(" + ")}</p>
-                <div class="lv-items">${items.length ? "单品建议：" + items.join(" · ") : ""}</div>
-              </div>
-            `;
-            root.appendChild(row);
-          }
+        // ===== Weather theming =====
+        function iconToTheme(iconCode) {
+          const code = Number(iconCode);
+          if (!Number.isFinite(code)) return "sun";
+          if (code >= 300 && code < 400) return "rain";
+          if (code >= 400 && code < 500) return "snow";
+          if (code >= 200 && code < 300) return "wind";
+          if (code === 100) return "sun";
+          if (code >= 101 && code <= 104) return "cloud";
+          return "cloud";
         }
 
+        function applyHeroTheme(theme) {
+          const hero = $("home-hero");
+          if (!hero) return;
+          hero.classList.toggle("is-rain", theme === "rain");
+        }
+
+        // ===== Data extraction =====
         function getUvIndex() {
-          const list = state.indices?.daily;
+          const list = state.indices;
           if (!Array.isArray(list)) return null;
           const uv = list.find((x) => typeof x?.name === "string" && x.name.includes("紫外线"));
           if (!uv) return null;
@@ -955,115 +920,131 @@
           return null;
         }
 
-        function buildInsightInput() {
-          const hourly = state.hourly?.hourly;
-          const daily = state.daily?.daily;
-          const now = state.now;
+        function calcPopMaxNext12h() {
+          const hourly = state.hourly24 || [];
+          const slice = hourly.slice(0, 12);
+          const pops = slice.map((h) => Number(h.pop)).filter((n) => Number.isFinite(n));
+          if (!pops.length) return null;
+          return Math.max(...pops);
+        }
 
-          let pop = null;
-          if (Array.isArray(hourly) && hourly.length) {
-            const slice = hourly.slice(0, 12);
-            const pops = slice.map((h) => Number(h.pop)).filter((n) => Number.isFinite(n));
-            if (pops.length) pop = Math.max(...pops);
-          }
+        function getTodayMinMax() {
+          const d = state.daily3?.[0];
+          if (!d) return { min: null, max: null };
+          const min = Number(d.tempMin);
+          const max = Number(d.tempMax);
+          return {
+            min: Number.isFinite(min) ? min : null,
+            max: Number.isFinite(max) ? max : null,
+          };
+        }
 
-          let tempMax = null;
-          let tempMin = null;
-          if (Array.isArray(daily) && daily[0]) {
-            tempMax = Number(daily[0].tempMax);
-            tempMin = Number(daily[0].tempMin);
-          }
-
-          const windScale =
-            now?.windScale != null && Number.isFinite(Number(now.windScale)) ? Number(now.windScale) : null;
-
-          return { pop, windScale, tempMax, tempMin, uvIndex: getUvIndex() };
+        // ===== UI =====
+        function setText(id, text) {
+          const el = $(id);
+          if (!el) return;
+          el.textContent = text;
         }
 
         function updateUI() {
           const now = state.now;
-          const calculated = calculateTemp(now);
+          const calculated = calculateTemp(now, state.tempOffset);
           const level = getOutfitLevel(calculated);
 
-          if ($("ui-real-temp")) $("ui-real-temp").textContent = now ? `${Number(now.temp)}°` : "—";
-          if ($("ui-calculated-temp"))
-            $("ui-calculated-temp").textContent = calculated == null ? "—" : `${calculated.toFixed(1)}°`;
-          if ($("ui-condition")) $("ui-condition").textContent = now?.text ? `· ${now.text}` : "—";
+          setText("ui-temp-now", now ? `${Number(now.temp)}°` : "—");
+          setText("ui-temp-perceived", calculated == null ? "—" : `${calculated.toFixed(1)}°`);
+          setText("ui-cond", now?.text ? now.text : "—");
 
-          if ($("ui-humidity")) $("ui-humidity").textContent = now ? `${Number(now.humidity)}%` : "—";
-          if ($("ui-wind")) {
-            const ws = now?.windScale != null ? Number(now.windScale) : NaN;
-            $("ui-wind").textContent = Number.isFinite(ws) ? `${ws} 级` : "—";
+          setText("ui-level", calculated == null ? "Lv —" : `Lv ${level}`);
+          setText("ui-outfit-items", calculated == null ? "—" : formatOutfit(level));
+
+          setText("ui-offset", String(state.tempOffset));
+          setText("ui-offset-badge", String(state.tempOffset));
+          setText("ui-feedback-count", String(state.feedbackCount));
+          setText("ui-wardrobe-count", String(state.wardrobeCount));
+
+          // Trend note + SVG
+          const temps = state.hourly24.map((h) => Number(h.temp)).filter((n) => Number.isFinite(n));
+          if (temps.length) {
+            const min = Math.min(...temps);
+            const max = Math.max(...temps);
+            setText("ui-trend-note", `min ${Math.round(min)}° · max ${Math.round(max)}°`);
+          } else {
+            setText("ui-trend-note", "—");
           }
+          renderTrendSvg(temps);
 
+          // Insight text
           const uvIndex = getUvIndex();
-          if ($("ui-uv")) $("ui-uv").textContent = uvIndex == null ? "—" : String(uvIndex);
+          const pop = calcPopMaxNext12h();
+          const mm = getTodayMinMax();
+          const windScale = now?.windScale != null ? Number(now.windScale) : null;
 
-          if ($("ui-offset")) $("ui-offset").textContent = String(Number(userPreference.tempOffset) || 0);
-          renderScale(userPreference.tempOffset);
-
-          if ($("ui-current-level"))
-            $("ui-current-level").textContent = calculated == null ? "当前：Lv —" : `当前：Lv ${level}`;
-
+          const insight = generateInsight({
+            windScale,
+            pop,
+            uvIndex,
+            tempMax: mm.max,
+            tempMin: mm.min,
+            level,
+          });
           const insightEl = $("ui-insight");
-          if (insightEl) {
-            const insight = generateWeatherInsight(buildInsightInput());
-            const desc = getTempDescription(level);
-            const items = (LEVEL_TABLE[level] || []).join(" + ");
-            const calcText = calculated == null ? "—" : `${calculated.toFixed(1)}°`;
-            insightEl.textContent = `${insight}\n\n${desc}\n\n推荐：Lv ${level}\n${items}\n\n体感温度：${calcText}`;
-          }
+          if (insightEl) insightEl.textContent = insight;
 
-          applyTheme(iconToTheme(now?.icon));
+          applyHeroTheme(iconToTheme(now?.icon));
+        }
 
-          const temps = (state.hourly?.hourly || []).map((h) => Number(h.temp));
-          drawCurve($("temp-canvas"), temps);
-
-          const noteEl = $("ui-curve-note");
-          if (noteEl) {
-            const pts = temps.filter((n) => Number.isFinite(n));
-            if (pts.length) {
-              const min = Math.min(...pts);
-              const max = Math.max(...pts);
-              noteEl.textContent = `最低 ${Math.round(min)}° · 最高 ${Math.round(max)}°`;
-            } else {
-              noteEl.textContent = "—";
-            }
+        function setLoading(isLoading) {
+          state.loading = isLoading;
+          const insightEl = $("ui-insight");
+          if (!insightEl) return;
+          if (isLoading) {
+            insightEl.innerHTML =
+              '<div class="skeleton sk-line w80"></div><div class="skeleton sk-line w95"></div><div class="skeleton sk-line w60"></div>';
           }
         }
 
         // ===== Tabs =====
         function setActiveTab(name) {
-          const tabs = ["realtime", "guide", "calibration"];
-          for (const t of tabs) {
+          ["home", "wardrobe", "calibration"].forEach((t) => {
             const el = document.getElementById(`tab-${t}`);
             if (el) el.classList.toggle("active", t === name);
-          }
+          });
           document.querySelectorAll(".tabbtn").forEach((b) => {
             b.classList.toggle("active", b.dataset.tab === name);
           });
         }
 
-        // ===== Calibration =====
-        function feedback(delta) {
-          userPreference.feedbackCount = Number(userPreference.feedbackCount) || 0;
-          userPreference.feedbackCount += 1;
-          userPreference.tempOffset = clamp((Number(userPreference.tempOffset) || 0) + delta, OFFSET_MIN, OFFSET_MAX);
-          saveJson(STORAGE_KEY, userPreference);
+        // ===== Feedback & Slider =====
+        function persistOffset() {
+          writeNum(STORAGE_KEYS.tempOffset, state.tempOffset);
+        }
 
-          feedbackHistory = Array.isArray(feedbackHistory) ? feedbackHistory : [];
-          feedbackHistory.push({ at: new Date().toISOString(), delta, tempOffset: userPreference.tempOffset });
-          saveJson(STORAGE_FEEDBACK, feedbackHistory);
+        function persistFeedbackCount() {
+          writeNum(STORAGE_KEYS.feedbackCount, state.feedbackCount);
+        }
 
+        function applyOffsetDelta(delta) {
+          state.tempOffset = clamp(state.tempOffset + delta, OFFSET_MIN, OFFSET_MAX);
+          persistOffset();
           updateUI();
         }
 
-        // ===== Fetching =====
+        function recordFeedback(kind) {
+          state.feedbackCount += 1;
+          persistFeedbackCount();
+
+          if (kind === "cold") applyOffsetDelta(-FEEDBACK_STEP);
+          else if (kind === "hot") applyOffsetDelta(+FEEDBACK_STEP);
+          else updateUI();
+        }
+
+        // ===== Weather fetch =====
         async function loadWeather() {
           const nowUrl = api("/v7/weather/now");
           const h24Url = api("/v7/weather/24h");
           const d3Url = api("/v7/weather/3d");
-          const idxUrl = api("/v7/indices/1d") + `&type=0`;
+          const idxUrl = api("/v7/indices/1d") + "&type=0";
 
           try {
             const [nowData, hourlyData, dailyData, idxData] = await Promise.all([
@@ -1074,20 +1055,26 @@
             ]);
 
             if (nowData?.code === "200" && nowData?.now) state.now = nowData.now;
-            if (hourlyData?.code === "200" && hourlyData?.hourly) state.hourly = hourlyData;
-            if (dailyData?.code === "200" && dailyData?.daily) state.daily = dailyData;
-            if (idxData?.code === "200" && idxData?.daily) state.indices = idxData;
+            if (hourlyData?.code === "200" && Array.isArray(hourlyData?.hourly))
+              state.hourly24 = hourlyData.hourly;
+            if (dailyData?.code === "200" && Array.isArray(dailyData?.daily)) state.daily3 = dailyData.daily;
+            if (idxData?.code === "200" && Array.isArray(idxData?.daily)) state.indices = idxData.daily;
           } catch (e) {
             console.warn("Weather fetch failed, using mock data", e);
-            state.now = { temp: 18, humidity: 65, windSpeed: 12, windScale: 3, icon: 100, text: "—" };
-            state.hourly = {
-              hourly: Array.from({ length: 24 }, (_, i) => ({
-                temp: 16 + Math.sin(((i - 10) / 12) * Math.PI) * 3.6,
-                pop: i >= 9 && i <= 16 ? 25 : 10,
-              })),
+            state.now = {
+              temp: 18,
+              humidity: 65,
+              windSpeed: 12,
+              windScale: 3,
+              icon: 100,
+              text: "Mock",
             };
-            state.daily = { daily: [{ tempMax: 21, tempMin: 9 }] };
-            state.indices = { daily: [{ name: "紫外线指数", level: "6", category: "中等" }] };
+            state.hourly24 = Array.from({ length: 24 }, (_, i) => ({
+              temp: 16 + Math.sin(((i - 10) / 12) * Math.PI) * 3.6,
+              pop: i >= 9 && i <= 16 ? 35 : 10,
+            }));
+            state.daily3 = [{ tempMax: 21, tempMin: 9 }];
+            state.indices = [{ name: "紫外线指数", level: "6", category: "中等" }];
           }
         }
 
@@ -1097,23 +1084,36 @@
             btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
           });
 
-          const cold = document.getElementById("btn-cold");
-          if (cold) cold.addEventListener("click", () => feedback(+OFFSET_STEP));
-          const hot = document.getElementById("btn-hot");
-          if (hot) hot.addEventListener("click", () => feedback(-OFFSET_STEP));
+          const cold = $("btn-cold");
+          const ok = $("btn-ok");
+          const hot = $("btn-hot");
+          if (cold) cold.addEventListener("click", () => recordFeedback("cold"));
+          if (ok) ok.addEventListener("click", () => recordFeedback("ok"));
+          if (hot) hot.addEventListener("click", () => recordFeedback("hot"));
 
-          window.addEventListener("resize", () => updateUI());
+          const slider = $("offset-slider");
+          if (slider) {
+            slider.addEventListener("input", (e) => {
+              const v = Number(e.target.value);
+              state.tempOffset = clamp(Number.isFinite(v) ? v : 0, OFFSET_MIN, OFFSET_MAX);
+              persistOffset();
+              updateUI();
+            });
+          }
         }
 
         async function init() {
-          userPreference.tempOffset = clamp(Number(userPreference.tempOffset) || 0, OFFSET_MIN, OFFSET_MAX);
-          userPreference.feedbackCount = Number(userPreference.feedbackCount) || 0;
-          saveJson(STORAGE_KEY, userPreference);
+          state.tempOffset = clamp(readNum(STORAGE_KEYS.tempOffset, 0), OFFSET_MIN, OFFSET_MAX);
+          state.feedbackCount = Math.max(0, Math.floor(readNum(STORAGE_KEYS.feedbackCount, 0)));
+          state.wardrobeCount = Math.max(0, Math.floor(readNum(STORAGE_KEYS.wardrobeCount, 42)));
 
-          renderLevels();
+          const slider = $("offset-slider");
+          if (slider) slider.value = String(state.tempOffset);
+
           bindEvents();
-
+          setLoading(true);
           await loadWeather();
+          setLoading(false);
           updateUI();
         }
 
