@@ -23,7 +23,7 @@
       :root {
         --bg: #faf9f6;
         --card: #ffffff;
-        --ink: #5f5f5f;
+        --ink: #5a5a5a;
         --muted: rgba(95, 95, 95, 0.72);
         --muted2: rgba(95, 95, 95, 0.52);
         --line: rgba(95, 95, 95, 0.14);
@@ -172,11 +172,9 @@
         z-index: 1;
       }
 
-      .temp-row {
+      .temp-block {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 12px;
-        align-items: end;
+        gap: 10px;
       }
       .temp-now {
         font-size: 82px;
@@ -184,25 +182,17 @@
         letter-spacing: -1.6px;
         line-height: 0.95;
       }
-      .temp-meta {
-        text-align: right;
-        min-width: 140px;
-      }
-      .temp-perceived .k {
-        display: block;
-        font-size: 11px;
+      .temp-sub {
+        font-size: 13px;
         font-weight: 800;
         color: var(--muted);
       }
-      .temp-perceived .v {
-        display: block;
-        margin-top: 4px;
-        font-size: 20px;
+      .temp-sub-num {
         font-weight: 800;
-        color: rgba(95, 95, 95, 0.92);
+        color: var(--ink);
       }
       .cond {
-        margin-top: 8px;
+        margin-top: 0;
         font-size: 12px;
         font-weight: 800;
         color: rgba(95, 95, 95, 0.78);
@@ -240,30 +230,13 @@
         font-weight: 800;
         color: rgba(95, 95, 95, 0.82);
       }
-      #trend-svg {
+      #trend-canvas {
         width: 100%;
         height: 120px;
         display: block;
         border-radius: 18px;
         background: rgba(255, 255, 255, 0.62);
         border: 1px solid rgba(95, 95, 95, 0.14);
-      }
-      #trend-path {
-        stroke: var(--trend);
-        stroke-width: 3.2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        filter: drop-shadow(0 10px 18px rgba(255, 159, 137, 0.12));
-      }
-      #trend-min-dot,
-      #trend-max-dot {
-        fill: rgba(255, 159, 137, 0.7);
-      }
-      #trend-min-label,
-      #trend-max-label {
-        font-size: 12px;
-        font-weight: 800;
-        fill: rgba(95, 95, 95, 0.82);
       }
 
       .outfit {
@@ -419,7 +392,8 @@
         transform: translateX(-50%);
         width: 100%;
         max-width: var(--maxw);
-        padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        height: calc(60px + env(safe-area-inset-bottom));
+        padding: 8px 18px calc(8px + env(safe-area-inset-bottom));
         background: rgba(250, 249, 246, 0.78);
         backdrop-filter: blur(14px);
         border-top: 1px solid rgba(95, 95, 95, 0.14);
@@ -431,13 +405,15 @@
         border: 1px solid rgba(95, 95, 95, 0.14);
         background: rgba(255, 255, 255, 0.88);
         border-radius: 18px;
-        padding: 12px 10px;
+        padding: 0;
         cursor: pointer;
         font: inherit;
         font-weight: 800;
         color: rgba(95, 95, 95, 0.86);
         box-shadow: var(--shadow);
         transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
+        display: grid;
+        place-items: center;
       }
       .tabbtn:active {
         transform: scale(0.985);
@@ -446,6 +422,17 @@
         border-color: rgba(255, 159, 137, 0.32);
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
         color: rgba(95, 95, 95, 0.92);
+      }
+
+      .tabico {
+        width: 22px;
+        height: 22px;
+        stroke: rgba(90, 90, 90, 0.82);
+        stroke-width: 2.1;
+        fill: none;
+      }
+      .tabbtn.active .tabico {
+        stroke: rgba(255, 159, 137, 0.95);
       }
 
       /* Loading skeleton */
@@ -493,9 +480,6 @@
         .temp-now {
           font-size: 68px;
         }
-        .temp-meta {
-          min-width: 120px;
-        }
       }
     </style>
   </head>
@@ -511,78 +495,63 @@
         </div>
       </header>
 
-      <section class="tab active" id="tab-home" aria-label="Home">
+      <section class="tab active" id="tab-home" aria-label="首页">
         <div class="stack">
           <section class="hero card" id="home-hero" aria-label="实时体感">
             <div class="hero-mesh" aria-hidden="true"></div>
             <div class="hero-content">
-              <div class="temp-row">
+              <div class="temp-block" aria-label="温度">
                 <div class="temp-now" id="ui-temp-now">—</div>
-                <div class="temp-meta">
-                  <div class="temp-perceived">
-                    <span class="k">Perceived</span>
-                    <span class="v" id="ui-temp-perceived">—</span>
-                  </div>
-                  <div class="cond" id="ui-cond">—</div>
+                <div class="temp-sub">
+                  体感温度 <span class="temp-sub-num" id="ui-temp-perceived">—</span>
                 </div>
+                <div class="cond" id="ui-cond">—</div>
               </div>
 
-              <div class="insight" id="ui-insight" aria-label="AI Insight">
+              <div class="insight" id="ui-insight" aria-label="智能洞察">
                 <div class="skeleton sk-line w80"></div>
                 <div class="skeleton sk-line w95"></div>
                 <div class="skeleton sk-line w60"></div>
               </div>
 
-              <div class="trend card-lite" aria-label="24h Trend">
+              <div class="trend card-lite" aria-label="24 小时曲线">
                 <div class="trend-head">
-                  <div class="trend-title">24h Trend</div>
+                  <div class="trend-title">24 小时曲线</div>
                   <div class="trend-note" id="ui-trend-note">—</div>
                 </div>
-                <svg
-                  id="trend-svg"
-                  viewBox="0 0 320 120"
-                  preserveAspectRatio="none"
-                  role="img"
-                  aria-label="24小时温度曲线"
-                >
-                  <path id="trend-path" d="" fill="none"></path>
-                  <circle id="trend-min-dot" r="3.5"></circle>
-                  <circle id="trend-max-dot" r="3.5"></circle>
-                  <text id="trend-min-label"></text>
-                  <text id="trend-max-label"></text>
-                </svg>
+                <canvas id="trend-canvas" aria-label="24小时温度曲线"></canvas>
               </div>
 
-              <div class="outfit card-lite" aria-label="Outfit Level">
+              <div class="outfit card-lite" aria-label="穿搭建议">
                 <div class="outfit-head">
-                  <div class="outfit-title">Outfit Level</div>
+                  <div class="outfit-title">穿搭建议</div>
                   <div class="outfit-lv" id="ui-level">Lv —</div>
                 </div>
                 <div class="outfit-items" id="ui-outfit-items">—</div>
               </div>
 
-              <div class="quick-feedback" aria-label="Quick Feedback">
-                <button class="qbtn cold" id="btn-cold" type="button">Cold</button>
-                <button class="qbtn ok" id="btn-ok" type="button">OK</button>
-                <button class="qbtn hot" id="btn-hot" type="button">Hot</button>
+              <div class="quick-feedback" aria-label="快捷反馈">
+                <button class="qbtn cold" id="btn-cold" type="button">有点冷</button>
+                <button class="qbtn ok" id="btn-ok" type="button">刚刚好</button>
+                <button class="qbtn hot" id="btn-hot" type="button">有点热</button>
               </div>
             </div>
           </section>
         </div>
       </section>
 
-      <section class="tab" id="tab-wardrobe" aria-label="Wardrobe">
+      <section class="tab" id="tab-wardrobe" aria-label="数字衣橱">
         <div class="stack">
-          <section class="card" aria-label="Wardrobe">
-            <div class="h2">Wardrobe</div>
-            <div class="p">你的衣柜会优先用于匹配推荐单品。</div>
+          <section class="card" aria-label="数字衣橱">
+            <div class="h2">数字衣橱</div>
+            <div class="p">这里将展示你收纳的单品，并用于更贴合的推荐。</div>
             <div class="stat-row">
               <div class="stat">
-                <div class="k">Wardrobe Count</div>
+                <div class="k">已收纳</div>
                 <div class="v" id="ui-wardrobe-count">42</div>
               </div>
               <div class="stat">
-                <div class="k">Temp Offset</div>
+                <div class="k">偏好偏移</div>
                 <div class="v" id="ui-offset-badge">0</div>
               </div>
             </div>
@@ -590,16 +559,19 @@
         </div>
       </section>
 
-      <section class="tab" id="tab-calibration" aria-label="Calibration">
+      <section class="tab" id="tab-calibration" aria-label="私人偏好校准">
         <div class="stack">
-          <section class="card" aria-label="Calibration">
-            <div class="h2">Calibration</div>
-            <div class="p">拖动滑杆会立即影响体感温度与穿搭等级。</div>
+          <section class="card" aria-label="私人偏好校准">
+            <div class="h2">私人偏好校准</div>
+            <div class="p">拖动滑块会立刻影响体感温度与穿搭等级。</div>
 
             <div class="slider-block">
               <div class="slider-head">
-                <div class="k">tempOffset</div>
-                <div class="v" id="ui-offset">0</div>
+                <div class="k">偏好刻度</div>
+                <div class="v">
+                  <span id="ui-offset-label">体感正常</span>
+                  <span style="margin-left: 10px" id="ui-offset">0</span>
+                </div>
               </div>
               <input
                 id="offset-slider"
@@ -609,25 +581,26 @@
                 max="3"
                 step="1"
                 value="0"
-                aria-label="tempOffset slider"
+                aria-label="偏好滑块"
               />
               <div class="slider-ends" aria-hidden="true">
-                <span>Blue</span>
-                <span>Coral</span>
+                <span>怕冷</span>
+                <span>怕热</span>
               </div>
             </div>
           </section>
 
-          <section class="card" aria-label="Stats">
-            <div class="h2">Stats</div>
+          <section class="card" aria-label="统计">
+            <div class="h2">统计</div>
+            <div class="p">数字衣橱已收纳：<strong>42</strong> 件单品</div>
             <div class="stat-row">
               <div class="stat">
-                <div class="k">Wardrobe Count</div>
-                <div class="v">42 Items</div>
+                <div class="k">反馈次数</div>
+                <div class="v" id="ui-feedback-count">0</div>
               </div>
               <div class="stat">
-                <div class="k">Feedback</div>
-                <div class="v" id="ui-feedback-count">0</div>
+                <div class="k">当前偏移</div>
+                <div class="v" id="ui-offset-badge-2">0</div>
               </div>
             </div>
           </section>
@@ -635,10 +608,29 @@
       </section>
     </main>
 
-    <nav class="tabbar" aria-label="Tabs">
-      <button class="tabbtn active" data-tab="home" type="button">Home</button>
-      <button class="tabbtn" data-tab="wardrobe" type="button">Wardrobe</button>
-      <button class="tabbtn" data-tab="calibration" type="button">Calibration</button>
+    <nav class="tabbar" aria-label="底部导航">
+      <button class="tabbtn active" data-tab="home" type="button" aria-label="首页">
+        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-10.5Z"></path>
+        </svg>
+      </button>
+      <button class="tabbtn" data-tab="wardrobe" type="button" aria-label="数字衣橱">
+        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5c2.2 2 5 3 8 3s5.8-1 8-3"></path>
+          <path d="M6 5v3.5c0 1.2.8 2.4 2 3l2.5 1.5"></path>
+          <path d="M18 5v3.5c0 1.2-.8 2.4-2 3L13.5 13"></path>
+          <path d="M7 22V12.5"></path>
+          <path d="M17 22V12.5"></path>
+        </svg>
+      </button>
+      <button class="tabbtn" data-tab="calibration" type="button" aria-label="私人偏好校准">
+        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+          <path
+            d="M19.4 15a7.8 7.8 0 0 0 .1-1 7.8 7.8 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1l-.3-2.6H9l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1 7.8 7.8 0 0 0 .1 1l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.3 2.6h6l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5Z"
+          ></path>
+        </svg>
+      </button>
     </nav>
 
     <script>
