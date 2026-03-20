@@ -7,260 +7,283 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
     <title>温感 · 个性化天气助手</title>
-    <meta name="theme-color" content="#0b1f4a" />
+    <meta name="theme-color" content="#FAF9F6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
 
     <style>
       :root {
-        --gradient-warm: linear-gradient(135deg, #ff6b6b 0%, #ffe66d 100%);
-        --gradient-cool: linear-gradient(135deg, #4ecdc4 0%, #556fb5 100%);
-        --gradient-bg: linear-gradient(to bottom, #faf3e0, #e8f5e9);
-        --accent-orange: #ff9f1c;
-        --text-primary: #2d3436;
-        --text-secondary: #636e72;
-        --text-light: #b2bec3;
-        --white: #ffffff;
-        --glass-bg: rgba(255, 255, 255, 0.75);
-        --glass-border: rgba(255, 255, 255, 0.18);
-        --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
-        --shadow-hover: 0 12px 48px rgba(31, 38, 135, 0.25);
+        --bg: #faf9f6;
+        --card: #ffffff;
+        --ink: #1f2328;
+        --muted: rgba(31, 35, 40, 0.62);
+        --muted2: rgba(31, 35, 40, 0.42);
+        --line: rgba(31, 35, 40, 0.08);
+        --shadow: 0 12px 38px rgba(27, 24, 19, 0.06);
+        --shadow2: 0 18px 58px rgba(27, 24, 19, 0.1);
+        --r: 20px;
+
+        --rose: #dba7a6;
+        --rose2: #f1d7d6;
+        --sage: #c7d8cf;
+        --amber: #e6c48a;
+
+        --tap: 0.985;
+        --maxw: 520px;
       }
 
       * {
-        margin: 0;
-        padding: 0;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
       }
-
       html,
       body {
         height: 100%;
       }
-
       body {
-        font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
-          Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-        background: var(--gradient-bg);
-        min-height: 100vh;
-        color: var(--text-primary);
-        overflow-x: hidden;
-        overscroll-behavior: none;
-        -webkit-font-smoothing: antialiased;
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
         text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        overscroll-behavior: none;
+        overflow-x: hidden;
       }
 
-      .app-container {
-        max-width: 480px;
+      .app {
+        max-width: var(--maxw);
         margin: 0 auto;
         min-height: 100vh;
-        position: relative;
-        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        padding: calc(16px + env(safe-area-inset-top)) 16px calc(92px + env(safe-area-inset-bottom));
       }
 
-      .top-bar {
-        padding: calc(18px + env(safe-area-inset-top)) 20px 24px;
+      .topbar {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
       }
 
-      .app-title {
-        font-size: 28px;
-        font-weight: 800;
-        background: var(--gradient-warm);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.5px;
+      .brand {
+        font-weight: 900;
+        letter-spacing: -0.4px;
+        font-size: 22px;
       }
 
-      .location-badge {
-        background: var(--glass-bg);
-        backdrop-filter: blur(10px);
-        padding: 8px 14px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        box-shadow: var(--shadow-soft);
-        border: 1px solid var(--glass-border);
+      .loc-pill {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 10px 22px rgba(27, 24, 19, 0.04);
+        color: var(--muted);
+        font-weight: 800;
+        font-size: 13px;
         white-space: nowrap;
       }
-
-      .content {
-        padding: 0 20px;
+      .loc-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, var(--rose2), var(--rose));
+        box-shadow: 0 0 0 4px rgba(219, 167, 166, 0.16);
       }
 
-      .weather-hero {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border-radius: 32px;
-        padding: 40px 32px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-soft);
-        border: 1px solid var(--glass-border);
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: var(--r);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(31, 35, 40, 0.06);
+        padding: 18px;
+      }
+      .stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .hero {
         position: relative;
         overflow: hidden;
       }
-
-      .weather-date {
-        font-size: 14px;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
-        font-weight: 600;
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -120px -140px auto auto;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle at 30% 30%, rgba(219, 167, 166, 0.55), rgba(230, 196, 138, 0.18));
+        filter: blur(0px);
+        transform: rotate(10deg);
+        pointer-events: none;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto auto -140px -160px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle at 30% 30%, rgba(199, 216, 207, 0.65), rgba(219, 167, 166, 0.12));
+        transform: rotate(-12deg);
+        pointer-events: none;
       }
 
-      .weather-main {
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        gap: 14px;
+      }
+
+      .meta-row {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        margin-bottom: 28px;
-        position: relative;
-        z-index: 1;
+        gap: 12px;
       }
 
-      .temp-display {
-        flex: 1;
+      .date {
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--muted);
       }
 
-      .temperature {
-        font-size: 88px;
-        font-weight: 850;
+      .temp {
+        font-size: 72px;
+        font-weight: 950;
+        letter-spacing: -2px;
         line-height: 1;
-        letter-spacing: -4px;
-        background: var(--gradient-warm);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 8px;
+        margin-top: 6px;
+      }
+      .cond {
+        margin-top: 8px;
+        font-size: 16px;
+        font-weight: 800;
+        color: rgba(31, 35, 40, 0.86);
       }
 
-      .weather-condition {
-        font-size: 20px;
-        color: var(--text-primary);
-        font-weight: 700;
+      .mini {
+        border-radius: 16px;
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        background: rgba(255, 255, 255, 0.75);
+        padding: 12px 12px;
+        min-width: 92px;
+        box-shadow: 0 10px 26px rgba(27, 24, 19, 0.05);
+        text-align: right;
+      }
+      .mini .k {
+        font-size: 11px;
+        font-weight: 900;
+        color: var(--muted2);
+        letter-spacing: 0.2px;
+      }
+      .mini .v {
+        margin-top: 4px;
+        font-size: 18px;
+        font-weight: 950;
       }
 
-      .subjective-text {
-        margin: 4px 0 18px;
-        font-size: 20px;
-        line-height: 1.7;
-        font-weight: 700;
-        color: rgba(45, 52, 54, 0.95);
+      .primary-text {
+        margin: 0;
+        padding: 14px 14px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(219, 167, 166, 0.18), rgba(230, 196, 138, 0.14));
+        border: 1px solid rgba(219, 167, 166, 0.2);
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 1.55;
+        letter-spacing: -0.2px;
+        white-space: pre-line;
       }
 
-      .weather-icon {
-        width: 52px;
-        height: 52px;
-        display: grid;
-        place-items: center;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.55);
-        box-shadow: 0 10px 26px rgba(31, 38, 135, 0.12);
-      }
-
-      .weather-stats {
+      .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        position: relative;
-        z-index: 1;
+        gap: 10px;
       }
-
-      .stat-item {
+      .stat {
+        padding: 12px 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        background: rgba(255, 255, 255, 0.7);
         text-align: center;
       }
-
-      .stat-label {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin-bottom: 6px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+      .stat .k {
+        font-size: 11px;
+        font-weight: 900;
+        color: var(--muted2);
+      }
+      .stat .v {
+        margin-top: 6px;
+        font-size: 16px;
+        font-weight: 950;
       }
 
-      .stat-value {
-        font-size: 18px;
-        font-weight: 800;
-        color: var(--text-primary);
+      .trend {
+        padding-top: 10px;
+        border-top: 1px dashed rgba(31, 35, 40, 0.12);
       }
-
-      .trend-section {
-        margin-top: 16px;
-        padding-top: 12px;
-        border-top: 1px dashed rgba(99, 110, 114, 0.18);
-      }
-
-      .trend-row + .trend-row {
-        margin-top: 10px;
-      }
-
       .trend-row {
         display: flex;
         align-items: center;
         gap: 10px;
+        margin-top: 10px;
       }
-
+      .trend-row:first-child {
+        margin-top: 0;
+      }
       .trend-label {
         font-size: 11px;
-        color: var(--text-secondary);
+        font-weight: 900;
+        color: var(--muted);
         white-space: nowrap;
-        font-weight: 700;
       }
-
       .trend-strip {
         flex: 1;
         display: flex;
         gap: 4px;
       }
-
       .trend-strip.isHours {
         gap: 3px;
       }
-
       .trend-hour {
         flex: 1;
         min-width: 0;
-        height: 22px;
+        height: 18px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.65);
+        background: rgba(31, 35, 40, 0.06);
         position: relative;
         overflow: hidden;
       }
-
       .trend-hour::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 153, 153, 0.7),
-          rgba(86, 170, 255, 0.85)
-        );
+        background: linear-gradient(180deg, rgba(219, 167, 166, 0.72), rgba(199, 216, 207, 0.8));
         transform-origin: top;
         transform: scaleY(var(--h, 0.3));
       }
-
       .trend-bar {
         flex: 1;
         min-width: 0;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(31, 35, 40, 0.06);
         position: relative;
         overflow: hidden;
       }
-
       .trend-bar::before {
         content: "";
         position: absolute;
@@ -268,629 +291,576 @@
         bottom: 0;
         width: 100%;
         border-radius: inherit;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 159, 28, 0.9),
-          rgba(255, 215, 160, 0.4)
-        );
+        background: linear-gradient(180deg, rgba(230, 196, 138, 0.95), rgba(219, 167, 166, 0.22));
         transform-origin: bottom;
         transform: scaleY(var(--h, 0.2));
       }
-
       .trend-bar::after {
         content: attr(data-day);
         position: absolute;
         inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: grid;
+        place-items: center;
         font-size: 10px;
-        font-weight: 800;
-        color: rgba(45, 52, 54, 0.86);
+        font-weight: 950;
+        color: rgba(31, 35, 40, 0.78);
       }
-
-      .feedback-card,
-      .outfit-card,
-      .settings-section {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        padding: 28px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-soft);
-        border: 1px solid var(--glass-border);
-      }
-
-      .card-title,
-      .settings-title {
-        font-size: 18px;
-        font-weight: 800;
-        margin-bottom: 16px;
-        color: var(--text-primary);
-      }
-
-      .card-subtitle,
-      .settings-desc {
-        font-size: 14px;
-        color: var(--text-secondary);
-        margin-bottom: 20px;
-        line-height: 1.6;
-        font-weight: 600;
-      }
-
-      .feedback-buttons {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-      }
-
-      .feedback-btn {
-        background: #fff;
-        border: 2px solid transparent;
-        border-radius: 16px;
-        padding: 20px 12px;
-        font-size: 14px;
-        font-weight: 800;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      }
-
-      .feedback-btn:active {
-        transform: scale(0.99);
-      }
-
-      .feedback-btn.cold {
-        color: #3b82f6;
-      }
-
-      .feedback-btn.perfect {
-        color: #10b981;
-      }
-
-      .feedback-btn.hot {
-        color: #ef4444;
-      }
-
-      .warmth-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #ffe66d, #ff9f1c);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 900;
-        color: #fff;
-        margin-bottom: 20px;
-      }
-
-      .outfit-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 12px;
-      }
-
-      .outfit-item {
-        background: #fff;
-        border-radius: 16px;
-        padding: 12px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      }
-
-      .outfit-item-image {
-        width: 100%;
-        height: 80px;
-        background: #f3f4f6;
-        border-radius: 12px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .outfit-item-name {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 480px;
-        width: 100%;
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border-top: 1px solid var(--glass-border);
-        padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
-        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
-      }
-
-      .nav-items {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-      }
-
-      .nav-item {
-        background: transparent;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 16px;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        font: inherit;
-      }
-
-      .nav-label {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--text-secondary);
-      }
-
-      .nav-item.active {
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .nav-item.active .nav-label {
-        background: var(--gradient-warm);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .page {
-        display: none;
-      }
-
-      .page.active {
-        display: block;
-      }
-
-      .add-item-btn {
-        width: 100%;
-        background: var(--gradient-warm);
-        color: #fff;
-        border: none;
-        border-radius: 20px;
-        padding: 18px;
-        font-size: 16px;
-        font-weight: 900;
-        cursor: pointer;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
-      }
-
-      .wardrobe-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-
-      .wardrobe-item {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 16px;
-        box-shadow: var(--shadow-soft);
-        border: 1px solid var(--glass-border);
-        position: relative;
-      }
-
-      .delete-item-btn {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        width: 28px;
-        height: 28px;
-        background: rgba(239, 68, 68, 0.9);
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .wardrobe-item-image {
-        width: 100%;
-        height: 140px;
-        background: #f3f4f6;
-        border-radius: 16px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .wardrobe-item-name {
-        font-size: 14px;
-        font-weight: 900;
-        color: var(--text-primary);
-        margin-bottom: 4px;
-      }
-
-      .wardrobe-item-type {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
-      }
-
-      .wardrobe-item-temp {
-        font-size: 11px;
-        font-weight: 700;
-        color: var(--text-light);
-        margin-bottom: 8px;
-      }
-
-      .warmth-dots {
-        display: flex;
-        gap: 4px;
-      }
-
-      .warmth-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #e5e7eb;
-      }
-
-      .warmth-dot.active {
-        background: var(--accent-orange);
-        box-shadow: 0 0 8px rgba(255, 159, 28, 0.5);
-      }
-
-      .settings-title {
-        font-size: 16px;
-      }
-
-      .slider-container {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-top: 16px;
-      }
-
-      .slider-label {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--text-secondary);
-        white-space: nowrap;
-      }
-
-      .slider {
-        flex: 1;
-        -webkit-appearance: none;
-        appearance: none;
-        height: 16px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #d7efff, #ffe8ea);
-        outline: none;
-      }
-
-      .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 26px;
-        height: 26px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.95);
-        border: 2px solid rgba(255, 255, 255, 0.75);
-        box-shadow: 0 6px 18px rgba(31, 38, 135, 0.18);
-      }
-
-      .slider::-moz-range-thumb {
-        width: 26px;
-        height: 26px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.95);
-        border: 2px solid rgba(255, 255, 255, 0.75);
-        box-shadow: 0 6px 18px rgba(31, 38, 135, 0.18);
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        margin-top: 12px;
-      }
-
-      .stat-box {
-        background: #fff;
-        border-radius: 16px;
-        padding: 16px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      }
-
-      .stat-box-label {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
-      }
-
-      .stat-box-value {
-        font-size: 28px;
-        font-weight: 900;
-        background: var(--gradient-warm);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(8px);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-
-      .modal.active {
-        display: flex;
-      }
-
-      .modal-content {
-        background: #fff;
-        border-radius: 32px;
-        padding: 32px;
-        max-width: 400px;
-        width: 100%;
-        max-height: 85vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      }
-
-      .modal-title {
-        font-size: 24px;
-        font-weight: 900;
-        margin-bottom: 24px;
-        background: var(--gradient-warm);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 14px;
-        font-weight: 800;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-      }
-
-      .form-input,
-      .form-select {
-        width: 100%;
-        padding: 14px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        font-size: 14px;
-        font: inherit;
-        background: #fff;
-      }
-
-      .image-preview-container {
-        margin-top: 12px;
-        display: none;
-      }
-
-      .image-preview-container.active {
-        display: block;
-      }
-
-      .image-preview {
-        width: 100%;
-        max-height: 200px;
-        object-fit: cover;
-        border-radius: 16px;
-      }
-
-      .modal-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 28px;
-      }
-
-      .modal-btn {
-        padding: 14px 24px;
-        border: none;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 900;
-        cursor: pointer;
-        font: inherit;
-      }
-
-      .modal-btn-cancel {
-        background: #f3f4f6;
-        color: var(--text-secondary);
-      }
-
-      .modal-btn-submit {
-        background: var(--gradient-warm);
-        color: #fff;
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--text-secondary);
-      }
-
-      .empty-icon {
-        font-size: 72px;
-        margin-bottom: 16px;
-        opacity: 0.5;
-      }
-
-      .empty-title {
-        font-size: 18px;
-        font-weight: 900;
-        margin-bottom: 8px;
-      }
-
-      .empty-desc {
-        font-size: 14px;
-        font-weight: 700;
-        color: var(--text-light);
-      }
-
       .trend-hours {
         margin-top: 6px;
         display: flex;
         justify-content: space-between;
         gap: 6px;
         font-size: 10px;
-        font-weight: 800;
-        color: rgba(99, 110, 114, 0.75);
-        letter-spacing: 0.2px;
+        font-weight: 900;
+        color: rgba(31, 35, 40, 0.5);
         user-select: none;
       }
 
-      /* Lucide icon base */
-      .i {
-        width: 22px;
-        height: 22px;
+      .section-title {
+        font-weight: 950;
+        font-size: 15px;
+        margin: 0 0 6px;
+        letter-spacing: -0.2px;
+      }
+      .section-desc {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.45;
       }
 
-      .i.sm {
-        width: 16px;
-        height: 16px;
+      .feedback-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .feedback-btn {
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 249, 246, 0.9));
+        border-radius: 18px;
+        padding: 14px 10px;
+        cursor: pointer;
+        font: inherit;
+        box-shadow: 0 10px 22px rgba(27, 24, 19, 0.06);
+        transition: transform 120ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        display: grid;
+        place-items: center;
+        gap: 6px;
+        font-weight: 950;
+      }
+      .feedback-btn:active {
+        transform: scale(var(--tap));
+      }
+      .feedback-btn.cold {
+        border-color: rgba(199, 216, 207, 0.7);
+      }
+      .feedback-btn.perfect {
+        border-color: rgba(230, 196, 138, 0.55);
+      }
+      .feedback-btn.hot {
+        border-color: rgba(219, 167, 166, 0.65);
+      }
+      .feedback-btn .sub {
+        font-size: 11px;
+        font-weight: 900;
+        color: var(--muted);
       }
 
-      .i.lg {
+      .warmth-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(219, 167, 166, 0.25);
+        background: linear-gradient(135deg, rgba(219, 167, 166, 0.22), rgba(230, 196, 138, 0.18));
+        font-weight: 950;
+      }
+      #suggested-warmth {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .outfit-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+        gap: 10px;
+      }
+
+      .outfit-item {
+        background: rgba(250, 249, 246, 0.6);
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        border-radius: 16px;
+        padding: 12px;
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(27, 24, 19, 0.04);
+      }
+      /* The first cell is the algorithm's recommendation hint card (inserted by JS). */
+      .outfit-grid .outfit-item:first-child {
+        background: linear-gradient(135deg, rgba(219, 167, 166, 0.17), rgba(199, 216, 207, 0.14));
+        border-color: rgba(219, 167, 166, 0.25);
+        box-shadow: var(--shadow2);
+        text-align: left;
+      }
+      .outfit-item-image {
+        width: 100%;
+        height: 84px;
+        background: rgba(31, 35, 40, 0.06);
+        border-radius: 14px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .outfit-item-name {
+        font-size: 12px;
+        font-weight: 950;
+        color: rgba(31, 35, 40, 0.9);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .outfit-grid .outfit-item:first-child .outfit-item-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .add-item-btn {
+        width: 100%;
+        border: none;
+        border-radius: var(--r);
+        padding: 14px 16px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 950;
+        color: rgba(31, 35, 40, 0.92);
+        background: linear-gradient(135deg, rgba(219, 167, 166, 0.28), rgba(230, 196, 138, 0.22));
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(219, 167, 166, 0.24);
+        transition: transform 120ms ease;
+      }
+      .add-item-btn:active {
+        transform: scale(var(--tap));
+      }
+
+      .wardrobe-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .wardrobe-item {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        border-radius: var(--r);
+        padding: 14px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+      .delete-item-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
         width: 28px;
         height: 28px;
+        border-radius: 999px;
+        border: 1px solid rgba(31, 35, 40, 0.1);
+        background: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+        font-weight: 950;
+        line-height: 1;
+        transition: transform 120ms ease;
+      }
+      .delete-item-btn:active {
+        transform: scale(var(--tap));
+      }
+      .wardrobe-item-image {
+        width: 100%;
+        height: 130px;
+        background: rgba(31, 35, 40, 0.06);
+        border-radius: 16px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .wardrobe-item-name {
+        font-size: 14px;
+        font-weight: 950;
+        letter-spacing: -0.2px;
+      }
+      .wardrobe-item-type {
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 800;
+      }
+      .wardrobe-item-temp {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--muted2);
+        font-weight: 800;
       }
 
-      @media (max-width: 400px) {
-        .temperature {
-          font-size: 72px;
+      .warmth-dots {
+        margin-top: 10px;
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .warmth-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(31, 35, 40, 0.12);
+      }
+      .warmth-dot.active {
+        background: rgba(219, 167, 166, 0.95);
+        box-shadow: 0 0 0 3px rgba(219, 167, 166, 0.15);
+      }
+
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 10px;
+      }
+      .slider {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 16px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(199, 216, 207, 0.7), rgba(219, 167, 166, 0.75));
+        outline: none;
+        border: 1px solid rgba(31, 35, 40, 0.08);
+      }
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(31, 35, 40, 0.12);
+        box-shadow: 0 10px 24px rgba(27, 24, 19, 0.12);
+      }
+      .slider::-moz-range-thumb {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(31, 35, 40, 0.12);
+        box-shadow: 0 10px 24px rgba(27, 24, 19, 0.12);
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 900;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .stats-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .stat-box {
+        border-radius: var(--r);
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 14px;
+        text-align: center;
+        box-shadow: var(--shadow);
+      }
+      .stat-box-label {
+        font-size: 12px;
+        font-weight: 900;
+        color: var(--muted);
+      }
+      .stat-box-value {
+        margin-top: 8px;
+        font-size: 26px;
+        font-weight: 950;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: var(--maxw);
+        padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(250, 249, 246, 0.72);
+        backdrop-filter: blur(14px);
+        border-top: 1px solid rgba(31, 35, 40, 0.08);
+      }
+      .nav-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .nav-item {
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        background: rgba(255, 255, 255, 0.82);
+        border-radius: 18px;
+        padding: 10px 10px;
+        cursor: pointer;
+        font: inherit;
+        transition: transform 120ms ease, box-shadow 200ms ease;
+        display: grid;
+        place-items: center;
+        gap: 6px;
+      }
+      .nav-item:active {
+        transform: scale(var(--tap));
+      }
+      .nav-item.active {
+        box-shadow: var(--shadow2);
+        border-color: rgba(219, 167, 166, 0.32);
+      }
+      .nav-label {
+        font-size: 12px;
+        font-weight: 950;
+        color: rgba(31, 35, 40, 0.72);
+      }
+      .nav-item.active .nav-label {
+        color: rgba(31, 35, 40, 0.9);
+      }
+      .nav-ico {
+        width: 20px;
+        height: 20px;
+        stroke: rgba(31, 35, 40, 0.78);
+        stroke-width: 2.1;
+        fill: none;
+      }
+      .nav-item.active .nav-ico {
+        stroke: rgba(219, 167, 166, 0.95);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(31, 35, 40, 0.28);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 22px;
+        border: 1px solid rgba(31, 35, 40, 0.08);
+        box-shadow: 0 30px 90px rgba(27, 24, 19, 0.24);
+        padding: 18px;
+        max-height: 85vh;
+        overflow: auto;
+      }
+      .modal-title {
+        font-size: 18px;
+        font-weight: 950;
+        margin: 6px 0 14px;
+        letter-spacing: -0.2px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 900;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .form-input,
+      .form-select {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid rgba(31, 35, 40, 0.12);
+        background: rgba(250, 249, 246, 0.55);
+        padding: 12px 12px;
+        font: inherit;
+        outline: none;
+      }
+      .form-input:focus,
+      .form-select:focus {
+        border-color: rgba(219, 167, 166, 0.55);
+        box-shadow: 0 0 0 4px rgba(219, 167, 166, 0.16);
+      }
+      .image-preview-container {
+        display: none;
+        margin-top: 10px;
+      }
+      .image-preview-container.active {
+        display: block;
+      }
+      .image-preview {
+        width: 100%;
+        max-height: 220px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 1px solid rgba(31, 35, 40, 0.08);
+      }
+      .modal-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .modal-btn {
+        border-radius: 16px;
+        border: 1px solid rgba(31, 35, 40, 0.12);
+        padding: 12px 12px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 950;
+        transition: transform 120ms ease;
+      }
+      .modal-btn:active {
+        transform: scale(var(--tap));
+      }
+      .modal-btn-cancel {
+        background: rgba(250, 249, 246, 0.8);
+        color: rgba(31, 35, 40, 0.82);
+      }
+      .modal-btn-submit {
+        background: linear-gradient(135deg, rgba(219, 167, 166, 0.9), rgba(230, 196, 138, 0.84));
+        border-color: rgba(219, 167, 166, 0.5);
+        color: rgba(31, 35, 40, 0.92);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 44px 12px;
+        color: var(--muted);
+        border-radius: 18px;
+        border: 1px dashed rgba(31, 35, 40, 0.12);
+        background: rgba(250, 249, 246, 0.6);
+      }
+      .empty-title {
+        margin-top: 6px;
+        font-weight: 950;
+        color: rgba(31, 35, 40, 0.86);
+      }
+      .empty-desc {
+        margin-top: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 380px) {
+        .temp {
+          font-size: 64px;
         }
         .feedback-buttons {
+          grid-template-columns: 1fr;
+        }
+        .wardrobe-grid {
           grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
   <body>
-    <div class="app-container">
-      <div class="top-bar">
-        <div class="app-title">温感</div>
-        <div class="location-badge" id="location-badge">
-          <i class="i sm" data-lucide="map-pin" aria-hidden="true"></i>
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">温感</div>
+        <div class="loc-pill" id="location-badge">
+          <span class="loc-dot" aria-hidden="true"></span>
           <span>唐山市</span>
         </div>
       </div>
 
       <div class="page active" id="home-page">
-        <div class="content">
-          <div class="weather-hero">
-            <div class="weather-date" id="current-date">今天 · 星期四</div>
-            <div class="weather-main">
-              <div class="temp-display">
-                <div class="temperature" id="temperature">—</div>
-                <div class="weather-condition" id="weather-condition">—</div>
-              </div>
-              <div class="weather-icon" aria-label="天气图标">
-                <i class="i lg" data-lucide="sun" aria-hidden="true"></i>
-              </div>
-            </div>
-            <p class="subjective-text" id="subjective-text">
-              正在获取唐山天气...
-            </p>
-            <div class="weather-stats">
-              <div class="stat-item">
-                <div class="stat-label">
-                  <i class="i sm" data-lucide="droplets" aria-hidden="true"></i>
-                  <span>湿度</span>
+        <div class="stack">
+          <div class="card hero">
+            <div class="hero-inner">
+              <div class="meta-row">
+                <div>
+                  <div class="date" id="current-date">今天 · 星期五</div>
+                  <div class="temp" id="temperature">—</div>
+                  <div class="cond" id="weather-condition">—</div>
                 </div>
-                <div class="stat-value" id="humidity">—</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">
-                  <i class="i sm" data-lucide="wind" aria-hidden="true"></i>
-                  <span>风速</span>
+                <div class="mini" aria-label="体感温度">
+                  <div class="k">体感</div>
+                  <div class="v" id="feels-like">—</div>
                 </div>
-                <div class="stat-value" id="wind">—</div>
               </div>
-              <div class="stat-item">
-                <div class="stat-label">
-                  <i class="i sm" data-lucide="thermometer" aria-hidden="true"></i>
-                  <span>体感</span>
+
+              <p class="primary-text" id="subjective-text">正在获取唐山天气...</p>
+
+              <div class="stats" aria-label="湿度风速等信息">
+                <div class="stat">
+                  <div class="k">湿度</div>
+                  <div class="v" id="humidity">—</div>
                 </div>
-                <div class="stat-value" id="feels-like">—</div>
+                <div class="stat">
+                  <div class="k">风速</div>
+                  <div class="v" id="wind">—</div>
+                </div>
+                <div class="stat">
+                  <div class="k">定位</div>
+                  <div class="v">唐山</div>
+                </div>
               </div>
-            </div>
-            <div class="trend-section" aria-label="温度变化趋势">
-              <div class="trend-row">
-                <div class="trend-label">今天 24 小时</div>
-                <div class="trend-strip" id="today-trend"></div>
-              </div>
-              <div class="trend-hours" id="today-hours" aria-hidden="true"></div>
-              <div class="trend-row">
-                <div class="trend-label">前后几天</div>
-                <div class="trend-strip" id="days-trend"></div>
+
+              <div class="trend" aria-label="温度变化趋势">
+                <div class="trend-row">
+                  <div class="trend-label">今天 24 小时</div>
+                  <div class="trend-strip" id="today-trend"></div>
+                </div>
+                <div class="trend-hours" id="today-hours" aria-hidden="true"></div>
+                <div class="trend-row">
+                  <div class="trend-label">前后几天</div>
+                  <div class="trend-strip" id="days-trend"></div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="feedback-card">
-            <div class="card-title">今日体感如何？</div>
-            <div class="card-subtitle">您的反馈帮助我们更准确地理解您的温度偏好</div>
+          <div class="card">
+            <div class="section-title">今日体感如何？</div>
+            <div class="section-desc">点一下，我们会立刻校准你的体感偏好，让推荐越来越贴合你。</div>
             <div class="feedback-buttons">
               <button class="feedback-btn cold" onclick="recordFeedback('cold', event)">
-                <i class="i lg" data-lucide="snowflake" aria-hidden="true"></i>
                 <div>偏冷</div>
+                <div class="sub">下次更厚</div>
               </button>
               <button class="feedback-btn perfect" onclick="recordFeedback('perfect', event)">
-                <i class="i lg" data-lucide="sparkles" aria-hidden="true"></i>
                 <div>刚好</div>
+                <div class="sub">保持</div>
               </button>
               <button class="feedback-btn hot" onclick="recordFeedback('hot', event)">
-                <i class="i lg" data-lucide="flame" aria-hidden="true"></i>
                 <div>偏热</div>
+                <div class="sub">下次更薄</div>
               </button>
             </div>
           </div>
 
-          <div class="outfit-card">
-            <div class="card-title">穿搭建议</div>
-            <div class="warmth-indicator">
+          <div class="card">
+            <div class="section-title">穿搭建议</div>
+            <div class="section-desc">推荐厚度基于你的体感公式与偏好校准结果。</div>
+            <div class="warmth-indicator" aria-label="推荐厚度">
               <span>推荐厚度</span>
-              <span id="suggested-warmth">3</span>
+              <span id="suggested-warmth">—</span>
               <span>级</span>
             </div>
             <div class="outfit-grid" id="outfit-grid"></div>
@@ -899,45 +869,43 @@
       </div>
 
       <div class="page" id="wardrobe-page">
-        <div class="content">
-          <button class="add-item-btn" onclick="showAddModal()">➕ 添加新衣服</button>
-          <div class="wardrobe-grid" id="wardrobe-grid"></div>
+        <div class="stack">
+          <div class="card">
+            <div class="section-title">衣柜</div>
+            <div class="section-desc">把你常穿的衣服加进来，推荐会优先匹配你的衣柜。</div>
+            <button class="add-item-btn" onclick="showAddModal()">添加新衣服</button>
+            <div class="wardrobe-grid" id="wardrobe-grid"></div>
+          </div>
         </div>
       </div>
 
       <div class="page" id="settings-page">
-        <div class="content">
-          <div class="settings-section">
-            <div class="settings-title">🌡️ 体感偏好</div>
-            <div class="settings-desc">当前偏好：<strong id="bias-description">标准</strong></div>
-            <div class="slider-container">
-              <span class="slider-label">偏冷</span>
+        <div class="stack">
+          <div class="card">
+            <div class="section-title">体感偏好</div>
+            <div class="section-desc">当前偏好：<strong id="bias-description">标准</strong></div>
+            <div class="settings-row">
+              <span class="label">偏冷</span>
               <input
                 type="range"
-                min="-3"
-                max="3"
+                min="-6"
+                max="6"
                 step="0.5"
                 value="0"
                 class="slider"
                 id="temp-bias-slider"
               />
-              <span class="slider-label">偏热</span>
+              <span class="label">偏热</span>
             </div>
           </div>
 
-          <div class="settings-section">
-            <div class="settings-title">📊 使用统计</div>
+          <div class="card">
+            <div class="section-title">使用统计</div>
             <div class="stats-grid">
               <div class="stat-box">
                 <div class="stat-box-label">反馈次数</div>
                 <div class="stat-box-value" id="feedback-count">0</div>
               </div>
-            </div>
-          </div>
-
-          <div class="settings-section">
-            <div class="settings-title">👕 衣柜统计</div>
-            <div class="stats-grid">
               <div class="stat-box">
                 <div class="stat-box-label">总衣服数</div>
                 <div class="stat-box-value" id="total-clothes">0</div>
@@ -946,39 +914,49 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="bottom-nav">
-        <div class="nav-items">
-          <button class="nav-item active" onclick="switchPage('home', event)">
-            <i class="i" data-lucide="home" aria-hidden="true"></i>
-            <div class="nav-label">首页</div>
-          </button>
-          <button class="nav-item" onclick="switchPage('wardrobe', event)">
-            <i class="i" data-lucide="shirt" aria-hidden="true"></i>
-            <div class="nav-label">衣柜</div>
-          </button>
-          <button class="nav-item" onclick="switchPage('settings', event)">
-            <i class="i" data-lucide="settings" aria-hidden="true"></i>
-            <div class="nav-label">设置</div>
-          </button>
-        </div>
+    <div class="bottom-nav" aria-label="底部导航">
+      <div class="nav-row">
+        <button class="nav-item active" onclick="switchPage('home', event)">
+          <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-10.5Z"></path>
+          </svg>
+          <div class="nav-label">首页</div>
+        </button>
+        <button class="nav-item" onclick="switchPage('wardrobe', event)">
+          <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5c2.2 2 5 3 8 3s5.8-1 8-3"></path>
+            <path d="M6 5v3.5c0 1.2.8 2.4 2 3l2.5 1.5"></path>
+            <path d="M18 5v3.5c0 1.2-.8 2.4-2 3L13.5 13"></path>
+            <path d="M7 22V12.5"></path>
+            <path d="M17 22V12.5"></path>
+          </svg>
+          <div class="nav-label">衣柜</div>
+        </button>
+        <button class="nav-item" onclick="switchPage('settings', event)">
+          <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+            ></path>
+            <path
+              d="M19.4 15a7.8 7.8 0 0 0 .1-1 7.8 7.8 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1l-.3-2.6H9l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1 7.8 7.8 0 0 0 .1 1l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.3 2.6h6l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5Z"
+            ></path>
+          </svg>
+          <div class="nav-label">设置</div>
+        </button>
       </div>
     </div>
 
-    <div class="modal" id="add-modal">
+    <div class="modal" id="add-modal" aria-label="添加新衣服">
       <div class="modal-content">
         <div class="modal-title">添加新衣服</div>
         <form id="add-clothes-form">
           <div class="form-group">
             <label class="form-label">上传/拍摄一张照片（必选）</label>
-            <input
-              type="file"
-              class="form-input"
-              id="clothes-image"
-              accept="image/*"
-            />
+            <input type="file" class="form-input" id="clothes-image" accept="image/*" />
             <div class="image-preview-container" id="preview-container">
-              <img id="image-preview" class="image-preview" />
+              <img id="image-preview" class="image-preview" alt="预览" />
             </div>
           </div>
 
@@ -1006,591 +984,753 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">厚度等级（1-5，已自动识别，可修改）</label>
+              <label class="form-label">厚度等级（1-10，已自动识别，可修改）</label>
               <input
                 type="number"
                 class="form-input"
                 id="clothes-warmth"
                 min="1"
-                max="5"
-                value="3"
+                max="10"
+                value="6"
                 required
               />
             </div>
 
             <div class="form-group">
               <label class="form-label">适用最低温度（°C，可微调）</label>
-              <input
-                type="number"
-                class="form-input"
-                id="clothes-min-temp"
-                value="10"
-                required
-              />
+              <input type="number" class="form-input" id="clothes-min-temp" value="10" required />
             </div>
 
             <div class="form-group">
               <label class="form-label">适用最高温度（°C，可微调）</label>
-              <input
-                type="number"
-                class="form-input"
-                id="clothes-max-temp"
-                value="20"
-                required
-              />
+              <input type="number" class="form-input" id="clothes-max-temp" value="20" required />
             </div>
           </div>
 
           <div class="modal-buttons">
-            <button type="button" class="modal-btn modal-btn-cancel" id="btn-cancel">
-              取消
-            </button>
+            <button type="button" class="modal-btn modal-btn-cancel" id="btn-cancel">取消</button>
             <button type="submit" class="modal-btn modal-btn-submit">添加</button>
           </div>
         </form>
       </div>
     </div>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-      // 单文件版：样式+逻辑都在 index.html
+      // Inlined from app.js (single-file delivery).
+      // Keep globals minimal; expose only what inline onclick handlers need.
 
-      // ========= 数据状态 =========
-      let wardrobe = JSON.parse(localStorage.getItem("wardrobe") || "[]");
-      let feedbackHistory = JSON.parse(localStorage.getItem("feedbackHistory") || "[]");
-      let tempBias = parseFloat(localStorage.getItem("tempBias") || "0");
+      (() => {
+        "use strict";
 
-      // 注意：你把和风 key 写在前端代码里，任何人都能在浏览器里看到。
-      // 若要真正保密，需要用自己的后端做转发。
-      const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
-
-      // 真实天气会写入这里（不再使用硬编码模拟对象）
-      let currentWeather = null;
-
-      // ========= DOM 辅助 =========
-      function $(sel) {
-        return document.querySelector(sel);
-      }
-
-      // ========= 初始化 =========
-      function init() {
-        // 初始化时优先拉取真实天气（第一步）
-        const realWeatherTask = getRealWeather()
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            updateWeatherDisplay();
-            updateOutfitRecommendation();
-          });
-
-        // 其余 UI 初始化不依赖真实天气，可并行完成
-        bindEvents();
-        updateDate();
-        renderWardrobe();
-        updateSettings();
-
-        // 初始渲染图标
-        if (window.lucide?.createIcons) window.lucide.createIcons();
-
-        return realWeatherTask;
-      }
-
-      // ========= 顶部信息 =========
-      function updateDate() {
-        const days = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-        const now = new Date();
-        const dayName = days[now.getDay()];
-        const el = $("#current-date");
-        if (el) el.textContent = `今天 · ${dayName}`;
-      }
-
-      function updateWeatherDisplay() {
-        const tempEl = $("#temperature");
-        const condEl = $("#weather-condition");
-        const humEl = $("#humidity");
-        const windEl = $("#wind");
-        const feelsEl = $("#feels-like");
-        const subjEl = $("#subjective-text");
-
-        if (!tempEl || !condEl || !humEl || !windEl || !feelsEl) return;
-
-        if (!currentWeather) {
-          tempEl.textContent = `—`;
-          condEl.textContent = "—";
-          humEl.textContent = `—`;
-          windEl.textContent = `—`;
-          feelsEl.textContent = `—`;
-          if (subjEl) subjEl.textContent = "正在获取唐山天气...";
-          return;
+        // ===== Helpers =====
+        function $(sel) {
+          return document.querySelector(sel);
         }
 
-        tempEl.textContent = `${currentWeather.temp}°`;
-        condEl.textContent = currentWeather.condition || "—";
-        humEl.textContent = `${currentWeather.humidity}%`;
-        windEl.textContent = `${currentWeather.wind} km/h`;
-        const feels = Number(currentWeather.feelsLike) + tempBias;
-        feelsEl.textContent = `${feels.toFixed(1)}°`;
-        if (subjEl) subjEl.textContent = buildSubjectiveLine(feels);
-      }
+        function clamp(n, min, max) {
+          return Math.max(min, Math.min(max, n));
+        }
 
-      function buildSubjectiveLine(feels) {
-        if (feels <= 0) return "今天体感很冷，建议最里面保暖打底，再叠加厚外套。";
-        if (feels <= 8) return "今天体感偏冷，建议毛衣+外套，注意脖子和脚部保暖。";
-        if (feels <= 15) return "今天体感偏凉，长袖打底配薄外套会比较舒服。";
-        if (feels <= 22) return "今天体感刚刚好，薄长袖或短袖+轻薄外搭就很合适。";
-        if (feels <= 28) return "今天体感偏暖，轻薄短袖为主，出汗多可以选更透气的面料。";
-        return "今天体感偏热，尽量选择宽松、透气、浅色的衣服，多补水。";
-      }
+        function loadJson(key, fallback) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return fallback;
+            return JSON.parse(raw);
+          } catch {
+            return fallback;
+          }
+        }
 
-      // ========= 推荐逻辑 =========
-      function calcSuggestedWarmth(adjustedTemp) {
-        if (adjustedTemp < 5) return 5;
-        if (adjustedTemp < 10) return 4;
-        if (adjustedTemp < 15) return 3;
-        if (adjustedTemp < 22) return 2;
-        return 1;
-      }
+        function saveJson(key, value) {
+          localStorage.setItem(key, JSON.stringify(value));
+        }
 
-      function updateOutfitRecommendation() {
-        if (!currentWeather) return;
-        const adjustedTemp = Number(currentWeather.temp) + tempBias;
-        const suggestedWarmth = calcSuggestedWarmth(adjustedTemp);
-        const warmthEl = $("#suggested-warmth");
-        if (warmthEl) warmthEl.textContent = String(suggestedWarmth);
+        // ===== Storage keys =====
+        const STORAGE_KEYS = {
+          wardrobe: "wardrobe",
+          feedbackHistory: "feedbackHistory",
+          userPreference: "userPreference",
+          legacyTempBias: "tempBias",
+        };
 
-        const container = $("#outfit-grid");
-        if (!container) return;
+        // ===== User preference model (persisted) =====
+        // tempOffset: calibration offset applied in perceived temp formula
+        // feedbackCount: number of feedback actions by the user
+        let wardrobe = loadJson(STORAGE_KEYS.wardrobe, []);
+        let feedbackHistory = loadJson(STORAGE_KEYS.feedbackHistory, []);
+        let userPreference = loadJson(STORAGE_KEYS.userPreference, null);
 
-        const suitableClothes = wardrobe.filter(
-          (item) =>
-            item.warmth === suggestedWarmth &&
-            adjustedTemp >= item.minTemp &&
-            adjustedTemp <= item.maxTemp,
-        );
+        function normalizeUserPreference() {
+          if (!userPreference || typeof userPreference !== "object") {
+            const legacy = Number(localStorage.getItem(STORAGE_KEYS.legacyTempBias));
+            userPreference = {
+              tempOffset: Number.isFinite(legacy) ? legacy : 0,
+              feedbackCount: Array.isArray(feedbackHistory) ? feedbackHistory.length : 0,
+            };
+            persistUserPreference();
+            return;
+          }
 
-        if (!suitableClothes.length) {
-          container.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-              <div class="empty-icon">👕</div>
-              <div class="empty-title">暂无合适衣服</div>
-              <div class="empty-desc">快去衣柜添加吧！</div>
+          userPreference.tempOffset = Number(userPreference.tempOffset) || 0;
+          userPreference.feedbackCount = Number(userPreference.feedbackCount) || 0;
+        }
+
+        function persistUserPreference() {
+          saveJson(STORAGE_KEYS.userPreference, userPreference);
+        }
+
+        // Old versions used warmth 1-5; new scale is 1-10.
+        function maybeMigrateWardrobeWarmthScale() {
+          if (!Array.isArray(wardrobe) || wardrobe.length === 0) return;
+          const hasAnyOver5 = wardrobe.some((it) => Number(it?.warmth) > 5);
+          if (hasAnyOver5) return;
+
+          const hasAny1to5 = wardrobe.some((it) => {
+            const w = Number(it?.warmth);
+            return Number.isFinite(w) && w >= 1 && w <= 5;
+          });
+          if (!hasAny1to5) return;
+
+          wardrobe = wardrobe.map((it) => {
+            const w = Number(it?.warmth);
+            if (!Number.isFinite(w)) return it;
+            return { ...it, warmth: clamp(Math.round(w * 2), 1, 10) };
+          });
+          saveJson(STORAGE_KEYS.wardrobe, wardrobe);
+        }
+
+        // ===== Weather state =====
+        const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
+        const QWEATHER_LOCATION = "101090501"; // 唐山
+        const QWEATHER_NOW_ENDPOINT =
+          "https://q53yfrupmn.re.qweatherapi.com/v7/weather/now";
+
+        let currentWeather = null;
+
+        // ===== Perceived temperature formula =====
+        // calculatedPerceivedTemp = realTemp + (humidity * 0.1) - (windSpeed * 0.2) + userPreference.tempOffset
+        function calculatePerceivedTemp() {
+          if (!currentWeather) return null;
+
+          const realTemp = Number(currentWeather.temp);
+          const humidity = Number(currentWeather.humidity);
+          const windSpeed = Number(currentWeather.windSpeed);
+          const offset = Number(userPreference.tempOffset) || 0;
+
+          if (![realTemp, humidity, windSpeed, offset].every((n) => Number.isFinite(n)))
+            return null;
+
+          return realTemp + humidity * 0.1 - windSpeed * 0.2 + offset;
+        }
+
+        function buildSubjectiveLine(perceivedTemp) {
+          if (perceivedTemp <= 0) return "今天体感很冷，建议最里面保暖打底，再叠加厚外套。";
+          if (perceivedTemp <= 8) return "今天体感偏冷，建议毛衣+外套，注意脖子和脚部保暖。";
+          if (perceivedTemp <= 15) return "今天体感偏凉，长袖打底配薄外套会比较舒服。";
+          if (perceivedTemp <= 22) return "今天体感刚刚好，薄长袖或短袖+轻薄外搭就很合适。";
+          if (perceivedTemp <= 28) return "今天体感偏暖，轻薄短袖为主，出汗多可以选更透气的面料。";
+          return "今天体感偏热，尽量选择宽松、透气、浅色的衣服，多补水。";
+        }
+
+        // ===== Outfit engine: perceived temp -> warmth level (1-10) and labels =====
+        function getOutfitPlan(perceivedTemp) {
+          // From warm to cold.
+          const buckets = [
+            { min: 28, warmth: 1, label: "清凉透气", pieces: ["短袖/背心", "短裤/薄裤"] },
+            { min: 26, warmth: 2, label: "轻薄通勤", pieces: ["短袖", "薄衬衫/防晒衫"] },
+            { min: 24, warmth: 3, label: "微风可加", pieces: ["短袖/薄衬衫", "轻薄外搭"] },
+            { min: 22, warmth: 4, label: "舒适过渡", pieces: ["长袖打底", "薄外套"] },
+            // 20-22C: thin knit (example requested)
+            { min: 20, warmth: 5, label: "薄针织", pieces: ["薄针织/长袖T", "轻便长裤"] },
+            // 18-20C: trench coat (example requested)
+            { min: 18, warmth: 6, label: "风衣", pieces: ["风衣/夹克", "长袖打底"] },
+            { min: 16, warmth: 7, label: "卫衣外套", pieces: ["卫衣", "外套"] },
+            { min: 14, warmth: 8, label: "毛衣外套", pieces: ["毛衣", "中等外套"] },
+            { min: 10, warmth: 9, label: "保暖加强", pieces: ["加绒/叠穿", "厚外套"] },
+            { min: -999, warmth: 10, label: "重度保暖", pieces: ["羽绒/棉服", "保暖内衣"] },
+          ];
+
+          return buckets.find((b) => perceivedTemp >= b.min) || buckets[buckets.length - 1];
+        }
+
+        // ===== Date =====
+        function updateDate() {
+          const days = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+          const now = new Date();
+          const dayName = days[now.getDay()];
+          const el = $("#current-date");
+          if (el) el.textContent = `今天 · ${dayName}`;
+        }
+
+        // ===== Weather UI =====
+        function updateWeatherDisplay() {
+          const tempEl = $("#temperature");
+          const condEl = $("#weather-condition");
+          const humEl = $("#humidity");
+          const windEl = $("#wind");
+          const feelsEl = $("#feels-like");
+          const subjEl = $("#subjective-text");
+
+          if (!tempEl || !condEl || !humEl || !windEl || !feelsEl) return;
+
+          if (!currentWeather) {
+            tempEl.textContent = "—";
+            condEl.textContent = "—";
+            humEl.textContent = "—";
+            windEl.textContent = "—";
+            feelsEl.textContent = "—";
+            if (subjEl) subjEl.textContent = "正在获取唐山天气...";
+            return;
+          }
+
+          const perceived = calculatePerceivedTemp();
+
+          tempEl.textContent = `${Number(currentWeather.temp)}°`;
+          condEl.textContent = currentWeather.condition || "—";
+          humEl.textContent = `${Number(currentWeather.humidity)}%`;
+          windEl.textContent = `${Number(currentWeather.windSpeed)} km/h`;
+          feelsEl.textContent = perceived == null ? "—" : `${perceived.toFixed(1)}°`;
+          if (subjEl)
+            subjEl.textContent = perceived == null ? "正在计算体感..." : buildSubjectiveLine(perceived);
+        }
+
+        // ===== Trends =====
+        function renderTrends(perceivedTemp) {
+          const todayStrip = $("#today-trend");
+          const daysStrip = $("#days-trend");
+          if (!todayStrip || !daysStrip) return;
+
+          const hours = Array.from({ length: 24 }, (_, i) => {
+            const x = (i - 12) / 12;
+            const wave = Math.sin(x * Math.PI) * 3.2;
+            return Math.round((perceivedTemp + wave) * 10) / 10;
+          });
+          renderHourBars(todayStrip, hours);
+
+          const days = [-1, 0, 1, 2, 3].map((d) => ({
+            label: d === 0 ? "今" : d === -1 ? "昨" : `+${d}`,
+            temp: Math.round((perceivedTemp + d * 1.2) * 10) / 10,
+          }));
+          renderDayBars(daysStrip, days);
+        }
+
+        function renderHourBars(container, temps) {
+          container.classList.add("isHours");
+          const min = Math.min(...temps);
+          const max = Math.max(...temps);
+          const span = Math.max(3, max - min || 1);
+
+          container.innerHTML = temps
+            .map((t) => {
+              const h = 0.18 + ((t - min) / span) * 0.75;
+              return `<div class="trend-hour" style="--h:${h.toFixed(2)}"></div>`;
+            })
+            .join("");
+
+          const hoursEl = document.getElementById("today-hours");
+          if (hoursEl) {
+            const ticks = [0, 3, 6, 9, 12, 15, 18, 21];
+            hoursEl.innerHTML = ticks.map((h) => `<span>${h}</span>`).join("");
+          }
+        }
+
+        function renderDayBars(container, days) {
+          const temps = days.map((d) => d.temp);
+          const min = Math.min(...temps);
+          const max = Math.max(...temps);
+          const span = Math.max(3, max - min || 1);
+
+          container.innerHTML = days
+            .map((d) => {
+              const h = 0.25 + ((d.temp - min) / span) * 0.65;
+              return `<div class="trend-bar" style="--h:${h.toFixed(2)}" data-day="${d.label}"></div>`;
+            })
+            .join("");
+        }
+
+        // ===== Recommendation update (single entry point) =====
+        function updateRecommendation() {
+          updateWeatherDisplay();
+
+          const container = $("#outfit-grid");
+          if (!container) return;
+
+          if (!currentWeather) {
+            container.innerHTML = "";
+            return;
+          }
+
+          const perceived = calculatePerceivedTemp();
+          if (perceived == null) {
+            container.innerHTML = "";
+            return;
+          }
+
+          const plan = getOutfitPlan(perceived);
+          const warmthEl = $("#suggested-warmth");
+          if (warmthEl) warmthEl.textContent = String(plan.warmth);
+
+          // Show the recommendation in the most prominent text area on Home.
+          // This is derived from the same outfit engine output.
+          const subjEl = $("#subjective-text");
+          if (subjEl) {
+            subjEl.textContent = `建议：${plan.label}（厚度 ${plan.warmth} 级）\n${plan.pieces.join(" · ")}`;
+          }
+
+          const suitableClothes = (Array.isArray(wardrobe) ? wardrobe : [])
+            .filter((item) => {
+              const w = Number(item?.warmth);
+              const minT = Number(item?.minTemp);
+              const maxT = Number(item?.maxTemp);
+              if (![w, minT, maxT].every((n) => Number.isFinite(n))) return false;
+              const warmthOk = Math.abs(w - plan.warmth) <= 1;
+              const tempOk = perceived >= minT && perceived <= maxT;
+              return warmthOk && tempOk;
+            })
+            .sort(
+              (a, b) =>
+                Math.abs(Number(a.warmth) - plan.warmth) -
+                Math.abs(Number(b.warmth) - plan.warmth),
+            );
+
+          const hintCard = `
+      <div class="outfit-item" style="grid-column:1/-1;">
+        <div class="outfit-item-name" style="white-space:normal;line-height:1.35;">
+          建议：${plan.label}（厚度 ${plan.warmth} 级）<br />
+          <span style="font-weight:700;color:rgba(99,110,114,0.9);">${plan.pieces.join(" · ")}</span>
+        </div>
+      </div>
+    `;
+
+          if (!suitableClothes.length) {
+            container.innerHTML =
+              hintCard +
+              `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-title">暂无合适衣服</div>
+          <div class="empty-desc">快去衣柜添加吧！</div>
+        </div>
+      `;
+          } else {
+            container.innerHTML =
+              hintCard +
+              suitableClothes
+                .map(
+                  (item) => `
+          <div class="outfit-item">
+            <div class="outfit-item-image">
+              ${
+                item.image
+                  ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+                  : ""
+              }
             </div>
-          `;
-        } else {
-          container.innerHTML = suitableClothes
+            <div class="outfit-item-name">${item.name}</div>
+          </div>
+        `,
+                )
+                .join("");
+          }
+
+          renderTrends(perceived);
+        }
+
+        // ===== Feedback loop =====
+        const OFFSET_MIN = -6;
+        const OFFSET_MAX = 6;
+        const OFFSET_STEP = 0.5;
+
+        // Note: Because the formula uses "+ tempOffset", to make "偏冷 => 更厚" work,
+        // we adjust tempOffset downwards on "cold" (lower perceived temp => thicker recommendation).
+        function applyFeedbackToOffset(feeling) {
+          if (feeling === "cold") userPreference.tempOffset -= OFFSET_STEP;
+          else if (feeling === "hot") userPreference.tempOffset += OFFSET_STEP;
+          userPreference.tempOffset = clamp(userPreference.tempOffset, OFFSET_MIN, OFFSET_MAX);
+        }
+
+        function recordFeedback(feeling, evt) {
+          userPreference.feedbackCount += 1;
+          applyFeedbackToOffset(feeling);
+          persistUserPreference();
+
+          const perceived = calculatePerceivedTemp();
+          const entry = {
+            date: new Date().toISOString(),
+            realTemp: currentWeather?.temp,
+            humidity: currentWeather?.humidity,
+            windSpeed: currentWeather?.windSpeed,
+            perceivedTemp: perceived,
+            feeling,
+            tempOffset: userPreference.tempOffset,
+          };
+
+          feedbackHistory = Array.isArray(feedbackHistory) ? feedbackHistory : [];
+          feedbackHistory.push(entry);
+          saveJson(STORAGE_KEYS.feedbackHistory, feedbackHistory);
+
+          const btn = evt?.target?.closest(".feedback-btn");
+          if (btn) btn.style.transform = "scale(0.95)";
+
+          // Immediate UI refresh so user can feel the feedback loop right away.
+          updateRecommendation();
+          updateSettings();
+
+          setTimeout(() => {
+            if (btn) btn.style.transform = "";
+            askWhatWorn();
+          }, 80);
+        }
+
+        function askWhatWorn() {
+          const ok = confirm("今天大概穿了什么？如果方便，我可以用语音帮你记下来。");
+          if (!ok) return;
+
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            alert("当前浏览器不支持语音输入，可以先记在心里，下次再试。");
+            return;
+          }
+
+          const recognition = new SpeechRecognition();
+          recognition.lang = "zh-CN";
+          recognition.interimResults = false;
+          recognition.maxAlternatives = 1;
+
+          recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            if (!transcript) return;
+            const last = feedbackHistory?.[feedbackHistory.length - 1];
+            if (last) {
+              last.outfitSpoken = transcript;
+              saveJson(STORAGE_KEYS.feedbackHistory, feedbackHistory);
+            }
+            alert(`已记下今天的穿搭：${transcript}`);
+          };
+
+          recognition.onerror = () => {
+            alert("语音识别没有成功，可以稍后再试一次。");
+          };
+
+          recognition.start();
+        }
+
+        // ===== Page switch =====
+        function switchPage(pageName, evt) {
+          document.querySelectorAll(".page").forEach((p) => {
+            p.style.display = "none";
+            p.classList.remove("active");
+          });
+          document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+
+          const pageEl = document.getElementById(`${pageName}-page`);
+          if (pageEl) {
+            pageEl.style.display = "block";
+            pageEl.classList.add("active");
+          }
+
+          const nav = evt?.currentTarget || evt?.target?.closest(".nav-item");
+          if (nav) nav.classList.add("active");
+
+          if (pageName === "wardrobe") renderWardrobe();
+          if (pageName === "settings") updateSettings();
+
+          if (window.lucide?.createIcons) window.lucide.createIcons();
+        }
+
+        // ===== Wardrobe / modal =====
+        function showAddModal() {
+          const modal = $("#add-modal");
+          if (modal) modal.classList.add("active");
+        }
+
+        function closeAddModal() {
+          const modal = $("#add-modal");
+          const form = $("#add-clothes-form");
+          const preview = $("#preview-container");
+          const details = $("#clothes-details");
+
+          if (modal) modal.classList.remove("active");
+          if (form) form.reset();
+          if (preview) preview.classList.remove("active");
+          if (details) details.hidden = true;
+        }
+
+        function previewImage(event) {
+          const file = event.target.files?.[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = $("#image-preview");
+            const container = $("#preview-container");
+            if (!img || !container) return;
+
+            img.src = e.target?.result;
+            container.classList.add("active");
+
+            const details = $("#clothes-details");
+            if (details) details.hidden = false;
+
+            autoFillClothesFromImage();
+          };
+
+          reader.readAsDataURL(file);
+        }
+
+        function autoFillClothesFromImage() {
+          const nameInput = $("#clothes-name");
+          const typeInput = $("#clothes-type");
+          const warmthInput = $("#clothes-warmth");
+          const minInput = $("#clothes-min-temp");
+          const maxInput = $("#clothes-max-temp");
+          if (!nameInput || !typeInput || !warmthInput || !minInput || !maxInput) return;
+
+          const perceived = calculatePerceivedTemp() ?? Number(currentWeather?.temp ?? 18);
+          const plan = getOutfitPlan(perceived);
+
+          const warmth = plan.warmth;
+          const baseName =
+            warmth >= 9
+              ? "厚外套 / 羽绒"
+              : warmth >= 7
+                ? "毛衣 / 外套"
+                : warmth >= 5
+                  ? "风衣 / 薄外套"
+                  : warmth >= 3
+                    ? "薄外搭"
+                    : "短袖 / 薄衫";
+
+          if (!nameInput.value.trim()) nameInput.value = baseName;
+          if (!typeInput.value) typeInput.value = warmth >= 6 ? "外套" : "上衣";
+          warmthInput.value = String(warmth);
+
+          const span = 6;
+          const min = Math.round((perceived - span - 2) * 1) / 1;
+          const max = Math.round((perceived + span + 2) * 1) / 1;
+          minInput.value = String(min);
+          maxInput.value = String(max);
+        }
+
+        function addClothes(event) {
+          event.preventDefault();
+
+          const name = $("#clothes-name")?.value.trim();
+          const type = $("#clothes-type")?.value;
+          const warmth = Number($("#clothes-warmth")?.value);
+          const minTemp = Number($("#clothes-min-temp")?.value);
+          const maxTemp = Number($("#clothes-max-temp")?.value);
+          const imageFile = $("#clothes-image")?.files?.[0];
+
+          if (!imageFile) {
+            alert("请先拍一张/选一张照片再添加。");
+            return;
+          }
+          if (!name) {
+            alert("请输入衣服名称");
+            return;
+          }
+          if (![warmth, minTemp, maxTemp].every((n) => Number.isFinite(n))) {
+            alert("请检查厚度/温度范围输入是否正确。");
+            return;
+          }
+
+          const newItem = {
+            id: Date.now(),
+            name,
+            type,
+            warmth: clamp(Math.round(warmth), 1, 10),
+            minTemp,
+            maxTemp,
+            image: null,
+          };
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            newItem.image = e.target?.result;
+            wardrobe = Array.isArray(wardrobe) ? wardrobe : [];
+            wardrobe.push(newItem);
+            saveJson(STORAGE_KEYS.wardrobe, wardrobe);
+            renderWardrobe();
+            updateRecommendation();
+            closeAddModal();
+          };
+          reader.readAsDataURL(imageFile);
+        }
+
+        function deleteClothes(id) {
+          if (!confirm("确定要删除这件衣服吗？")) return;
+          wardrobe = (Array.isArray(wardrobe) ? wardrobe : []).filter((item) => item.id !== id);
+          saveJson(STORAGE_KEYS.wardrobe, wardrobe);
+          renderWardrobe();
+          updateRecommendation();
+        }
+
+        function renderWardrobe() {
+          const container = $("#wardrobe-grid");
+          if (!container) return;
+
+          if (!Array.isArray(wardrobe) || wardrobe.length === 0) {
+            container.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-title">衣柜空空如也</div>
+          <div class="empty-desc">点击上方按钮添加您的第一件衣服</div>
+        </div>
+      `;
+            return;
+          }
+
+          container.innerHTML = wardrobe
             .map(
               (item) => `
-            <div class="outfit-item">
-              <div class="outfit-item-image">
-                ${
-                  item.image
-                    ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
-                    : ""
-                }
-              </div>
-              <div class="outfit-item-name">${item.name}</div>
-            </div>
-          `,
+        <div class="wardrobe-item">
+          <button class="delete-item-btn" onclick="deleteClothes(${item.id})">×</button>
+          <div class="wardrobe-item-image">
+            ${
+              item.image
+                ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`
+                : ""
+            }
+          </div>
+          <div class="wardrobe-item-name">${item.name}</div>
+          <div class="wardrobe-item-type">${item.type}</div>
+          <div class="wardrobe-item-temp">${item.minTemp}°C - ${item.maxTemp}°C</div>
+          <div class="warmth-dots">
+            ${Array.from({ length: 10 }, (_, idx) => idx + 1)
+              .map((i) => `<div class="warmth-dot ${i <= Number(item.warmth) ? "active" : ""}"></div>`)
+              .join("")}
+          </div>
+        </div>
+      `,
             )
             .join("");
         }
 
-        renderTrends(adjustedTemp);
-      }
+        // ===== Settings =====
+        function updateBiasDescription() {
+          const offset = Number(userPreference.tempOffset) || 0;
+          let desc = "标准";
+          if (offset <= -4.5) desc = "非常怕冷";
+          else if (offset <= -2.5) desc = "比较怕冷";
+          else if (offset <= -0.5) desc = "略怕冷";
+          else if (offset >= 4.5) desc = "非常怕热";
+          else if (offset >= 2.5) desc = "比较怕热";
+          else if (offset >= 0.5) desc = "略怕热";
 
-      // ========= 温度趋势 =========
-      function renderTrends(adjustedTemp) {
-        const todayStrip = $("#today-trend");
-        const daysStrip = $("#days-trend");
-        if (!todayStrip || !daysStrip) return;
-
-        // 默认：模拟今天 24h + 昨今后
-        const hours = Array.from({ length: 24 }, (_, i) => {
-          const x = (i - 12) / 12;
-          const wave = Math.sin(x * Math.PI) * 3.2;
-          return Math.round((adjustedTemp + wave) * 10) / 10;
-        });
-        renderHourBars(todayStrip, hours);
-
-        const days = [-1, 0, 1, 2, 3].map((d) => ({
-          label: d === 0 ? "今" : d === -1 ? "昨" : `+${d}`,
-          temp: Math.round((adjustedTemp + d * 1.2) * 10) / 10,
-        }));
-        renderDayBars(daysStrip, days);
-      }
-
-      function renderHourBars(container, temps) {
-        container.classList.add("isHours");
-        const min = Math.min(...temps);
-        const max = Math.max(...temps);
-        const span = Math.max(3, max - min || 1);
-        container.innerHTML = temps
-          .map((t) => {
-            const h = 0.18 + ((t - min) / span) * 0.75;
-            return `<div class="trend-hour" style="--h:${h.toFixed(2)}"></div>`;
-          })
-          .join("");
-
-        // 小时刻度（每 3 小时一个）
-        const hoursEl = document.getElementById("today-hours");
-        if (hoursEl) {
-          const ticks = [0, 3, 6, 9, 12, 15, 18, 21];
-          hoursEl.innerHTML = ticks.map((h) => `<span>${h}</span>`).join("");
-        }
-      }
-
-      function renderDayBars(container, days) {
-        const temps = days.map((d) => d.temp);
-        const min = Math.min(...temps);
-        const max = Math.max(...temps);
-        const span = Math.max(3, max - min || 1);
-
-        container.innerHTML = days
-          .map((d) => {
-            const h = 0.25 + ((d.temp - min) / span) * 0.65;
-            return `<div class="trend-bar" style="--h:${h.toFixed(2)}" data-day="${d.label}"></div>`;
-          })
-          .join("");
-      }
-
-      // ========= 体感反馈 =========
-      function recordFeedback(feeling, evt) {
-        const feedback = {
-          date: new Date().toISOString(),
-          temp: currentWeather?.temp,
-          feeling,
-        };
-
-        feedbackHistory.push(feedback);
-        localStorage.setItem("feedbackHistory", JSON.stringify(feedbackHistory));
-
-        if (feeling === "cold") tempBias -= 0.5;
-        else if (feeling === "hot") tempBias += 0.5;
-
-        tempBias = Math.max(-3, Math.min(3, tempBias));
-        localStorage.setItem("tempBias", String(tempBias));
-
-        const btn = evt?.target?.closest(".feedback-btn");
-        if (btn) btn.style.transform = "scale(0.95)";
-
-        setTimeout(() => {
-          if (btn) btn.style.transform = "";
-          updateWeatherDisplay();
-          updateOutfitRecommendation();
-          updateSettings();
-          askWhatWorn();
-        }, 100);
-      }
-
-      function askWhatWorn() {
-        const ok = confirm("今天大概穿了什么？如果方便，我可以用语音帮你记下来。");
-        if (!ok) return;
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          alert("当前浏览器不支持语音输入，可以先记在心里，下次再试。");
-          return;
+          const el = $("#bias-description");
+          if (el) el.textContent = desc;
         }
 
-        const recognition = new SpeechRecognition();
-        recognition.lang = "zh-CN";
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
+        function updateSettings() {
+          const feedbackCountEl = $("#feedback-count");
+          const totalClothesEl = $("#total-clothes");
+          const slider = $("#temp-bias-slider");
 
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          if (!transcript) return;
-          const last = feedbackHistory[feedbackHistory.length - 1];
-          if (last) {
-            last.outfitSpoken = transcript;
-            localStorage.setItem("feedbackHistory", JSON.stringify(feedbackHistory));
+          if (feedbackCountEl)
+            feedbackCountEl.textContent = String(userPreference.feedbackCount || 0);
+          if (totalClothesEl)
+            totalClothesEl.textContent = String(Array.isArray(wardrobe) ? wardrobe.length : 0);
+          if (slider) slider.value = String(Number(userPreference.tempOffset) || 0);
+          updateBiasDescription();
+        }
+
+        // ===== Events =====
+        function bindEvents() {
+          const slider = $("#temp-bias-slider");
+          if (slider) {
+            slider.addEventListener("input", (e) => {
+              userPreference.tempOffset = Number(e.target.value) || 0;
+              userPreference.tempOffset = clamp(userPreference.tempOffset, OFFSET_MIN, OFFSET_MAX);
+              persistUserPreference();
+              updateSettings();
+              updateRecommendation();
+            });
           }
-          alert(`已记下今天的穿搭：${transcript}`);
-        };
 
-        recognition.onerror = () => {
-          alert("语音识别没有成功，可以稍后再试一次。");
-        };
+          const modal = $("#add-modal");
+          if (modal) {
+            modal.addEventListener("click", (e) => {
+              if (e.target === modal) closeAddModal();
+            });
+          }
 
-        recognition.start();
-      }
+          const form = $("#add-clothes-form");
+          if (form) form.addEventListener("submit", addClothes);
 
-      // ========= 页面切换（display none/block） =========
-      function switchPage(pageName, evt) {
-        document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
-        document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+          const cancelBtn = $("#btn-cancel");
+          if (cancelBtn) cancelBtn.addEventListener("click", closeAddModal);
 
-        const pageEl = document.getElementById(`${pageName}-page`);
-        if (pageEl) {
-          pageEl.style.display = "block";
-          pageEl.classList.add("active");
+          const fileInput = $("#clothes-image");
+          if (fileInput) fileInput.addEventListener("change", previewImage);
         }
 
-        const nav = evt?.currentTarget || evt?.target?.closest(".nav-item");
-        if (nav) nav.classList.add("active");
+        // ===== Real weather fetch =====
+        async function getRealWeather() {
+          const url = `${QWEATHER_NOW_ENDPOINT}?location=${QWEATHER_LOCATION}&key=${QWEATHER_KEY}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          console.log("API 返回数据：", data);
 
-        if (pageName === "wardrobe") renderWardrobe();
-        if (pageName === "settings") updateSettings();
+          if (!res.ok || data?.code !== "200" || !data?.now) {
+            throw new Error(`qweather now failed: ${data?.code || res.status}`);
+          }
 
-        // 确保 Lucide SVG 已渲染
-        if (window.lucide?.createIcons) window.lucide.createIcons();
-      }
+          const now = data.now;
+          currentWeather = {
+            temp: Number(now.temp),
+            humidity: Number(now.humidity),
+            windSpeed: Number(now.windSpeed),
+            condition: now.text,
+          };
 
-      // ========= 衣柜 / 模态框 =========
-      function showAddModal() {
-        const modal = $("#add-modal");
-        if (modal) modal.classList.add("active");
-      }
-
-      function closeAddModal() {
-        const modal = $("#add-modal");
-        const form = $("#add-clothes-form");
-        const preview = $("#preview-container");
-        const details = $("#clothes-details");
-        if (modal) modal.classList.remove("active");
-        if (form) form.reset();
-        if (preview) preview.classList.remove("active");
-        if (details) details.hidden = true;
-      }
-
-      function previewImage(event) {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = $("#image-preview");
-          const container = $("#preview-container");
-          if (!img || !container) return;
-          const dataUrl = e.target?.result;
-          img.src = dataUrl;
-          container.classList.add("active");
-          const details = $("#clothes-details");
-          if (details) details.hidden = false;
-          autoFillClothesFromImage();
-        };
-        reader.readAsDataURL(file);
-      }
-
-      function autoFillClothesFromImage() {
-        const nameInput = $("#clothes-name");
-        const typeInput = $("#clothes-type");
-        const warmthInput = $("#clothes-warmth");
-        const minInput = $("#clothes-min-temp");
-        const maxInput = $("#clothes-max-temp");
-        if (!nameInput || !typeInput || !warmthInput || !minInput || !maxInput) return;
-
-        const approxFeels = Number(currentWeather?.temp ?? 18) + tempBias;
-        let warmth = 3;
-        if (approxFeels <= 0) warmth = 5;
-        else if (approxFeels <= 8) warmth = 4;
-        else if (approxFeels <= 15) warmth = 3;
-        else if (approxFeels <= 22) warmth = 2;
-        else warmth = 1;
-
-        const baseName =
-          warmth >= 4
-            ? "厚外套"
-            : warmth === 3
-              ? "毛衣 / 卫衣"
-              : warmth === 2
-                ? "薄外套"
-                : "短袖 / 薄衫";
-
-        if (!nameInput.value.trim()) nameInput.value = baseName;
-        if (!typeInput.value) typeInput.value = warmth >= 4 ? "外套" : "上衣";
-        warmthInput.value = String(warmth);
-
-        const span = 6;
-        const min = Math.round((approxFeels - span - 2) * 1) / 1;
-        const max = Math.round((approxFeels + span + 2) * 1) / 1;
-        minInput.value = String(min);
-        maxInput.value = String(max);
-      }
-
-      function addClothes(event) {
-        event.preventDefault();
-
-        const name = $("#clothes-name")?.value.trim();
-        const type = $("#clothes-type")?.value;
-        const warmth = parseInt($("#clothes-warmth")?.value, 10);
-        const minTemp = parseInt($("#clothes-min-temp")?.value, 10);
-        const maxTemp = parseInt($("#clothes-max-temp")?.value, 10);
-        const imageFile = $("#clothes-image")?.files?.[0];
-
-        if (!imageFile) {
-          alert("请先拍一张/选一张照片再添加。");
-          return;
-        }
-        if (!name) {
-          alert("请输入衣服名称");
-          return;
+          console.log("唐山天气已连接，当前温度：" + data.now.temp);
         }
 
-        const newItem = {
-          id: Date.now(),
-          name,
-          type,
-          warmth,
-          minTemp,
-          maxTemp,
-          image: null,
-        };
+        // ===== Init =====
+        function init() {
+          normalizeUserPreference();
+          maybeMigrateWardrobeWarmthScale();
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          newItem.image = e.target?.result;
-          wardrobe.push(newItem);
-          localStorage.setItem("wardrobe", JSON.stringify(wardrobe));
+          bindEvents();
+          updateDate();
           renderWardrobe();
-          updateOutfitRecommendation();
-          closeAddModal();
-        };
-        reader.readAsDataURL(imageFile);
-      }
+          updateSettings();
+          updateRecommendation();
 
-      function deleteClothes(id) {
-        if (!confirm("确定要删除这件衣服吗？")) return;
-        wardrobe = wardrobe.filter((item) => item.id !== id);
-        localStorage.setItem("wardrobe", JSON.stringify(wardrobe));
-        renderWardrobe();
-        updateOutfitRecommendation();
-      }
+          if (window.lucide?.createIcons) window.lucide.createIcons();
 
-      function renderWardrobe() {
-        const container = $("#wardrobe-grid");
-        if (!container) return;
-
-        if (!wardrobe.length) {
-          container.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-              <div class="empty-icon">👔</div>
-              <div class="empty-title">衣柜空空如也</div>
-              <div class="empty-desc">点击上方按钮添加您的第一件衣服</div>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = wardrobe
-          .map(
-            (item) => `
-          <div class="wardrobe-item">
-            <button class="delete-item-btn" onclick="deleteClothes(${item.id})">×</button>
-            <div class="wardrobe-item-image">
-              ${
-                item.image
-                  ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`
-                  : ""
+          return getRealWeather()
+            .catch((err) => {
+              console.error(err);
+              // Keep the app usable even when the API fails (CORS, network, quota, etc.).
+              if (!currentWeather) {
+                currentWeather = {
+                  temp: 18,
+                  humidity: 65,
+                  windSpeed: 12,
+                  condition: "—",
+                };
               }
-            </div>
-            <div class="wardrobe-item-name">${item.name}</div>
-            <div class="wardrobe-item-type">${item.type}</div>
-            <div class="wardrobe-item-temp">${item.minTemp}°C - ${item.maxTemp}°C</div>
-            <div class="warmth-dots">
-              ${[1, 2, 3, 4, 5]
-                .map((i) => `<div class="warmth-dot ${i <= item.warmth ? "active" : ""}"></div>`)
-                .join("")}
-            </div>
-          </div>
-        `,
-          )
-          .join("");
-      }
-
-      // ========= 设置 / 偏好 =========
-      function updateBiasDescription() {
-        let desc = "标准";
-        if (tempBias <= -2.5) desc = "非常怕冷 🥶";
-        else if (tempBias <= -1.5) desc = "比较怕冷 ❄️";
-        else if (tempBias <= -0.5) desc = "略怕冷 🌤️";
-        else if (tempBias >= 2.5) desc = "非常怕热 🔥";
-        else if (tempBias >= 1.5) desc = "比较怕热 ☀️";
-        else if (tempBias >= 0.5) desc = "略怕热 🌡️";
-
-        const el = $("#bias-description");
-        if (el) el.textContent = desc;
-      }
-
-      function updateSettings() {
-        const feedbackCountEl = $("#feedback-count");
-        const totalClothesEl = $("#total-clothes");
-        const slider = $("#temp-bias-slider");
-
-        if (feedbackCountEl) feedbackCountEl.textContent = String(feedbackHistory.length);
-        if (totalClothesEl) totalClothesEl.textContent = String(wardrobe.length);
-        if (slider) slider.value = String(tempBias);
-        updateBiasDescription();
-      }
-
-      // ========= 事件绑定 =========
-      function bindEvents() {
-        const slider = $("#temp-bias-slider");
-        if (slider) {
-          slider.addEventListener("input", (e) => {
-            tempBias = parseFloat(e.target.value);
-            localStorage.setItem("tempBias", String(tempBias));
-            updateBiasDescription();
-            updateWeatherDisplay();
-            updateOutfitRecommendation();
-          });
+              const subjEl = $("#subjective-text");
+              if (subjEl) subjEl.textContent = "天气获取失败，已使用本地模拟天气用于展示。";
+            })
+            .finally(() => {
+              updateRecommendation();
+            });
         }
 
-        const modal = $("#add-modal");
-        if (modal) {
-          modal.addEventListener("click", (e) => {
-            if (e.target === modal) closeAddModal();
-          });
-        }
+        // Expose to inline onclick
+        window.recordFeedback = recordFeedback;
+        window.switchPage = switchPage;
+        window.showAddModal = showAddModal;
+        window.deleteClothes = deleteClothes;
 
-        const form = $("#add-clothes-form");
-        if (form) form.addEventListener("submit", addClothes);
-
-        const cancelBtn = $("#btn-cancel");
-        if (cancelBtn) cancelBtn.addEventListener("click", closeAddModal);
-
-        const fileInput = $("#clothes-image");
-        if (fileInput) fileInput.addEventListener("change", previewImage);
-      }
-
-      // ========= 获取真实天气（和风 now） =========
-      async function getRealWeather() {
-        const url =
-          "https://q53yfrupmn.re.qweatherapi.com/v7/weather/now?location=101090501&key=63d45dfa246b4e38bcef997d971d5f4e";
-        const res = await fetch(url);
-        const data = await res.json();
-        console.log("API 返回数据：", data);
-
-        if (!res.ok || data?.code !== "200" || !data?.now) {
-          throw new Error(`qweather now failed: ${data?.code || res.status}`);
-        }
-
-        const now = data.now;
-        currentWeather = {
-          temp: Number(now.temp),
-          feelsLike: Number(now.feelsLike),
-          humidity: Number(now.humidity),
-          wind: Number(now.windSpeed),
-          condition: now.text,
-        };
-
-        updateWeatherDisplay();
-        console.log("唐山天气已连接，当前温度：" + data.now.temp);
-      }
-
-      // 暴露给 HTML onclick
-      window.recordFeedback = recordFeedback;
-      window.switchPage = switchPage;
-      window.showAddModal = showAddModal;
-      window.deleteClothes = deleteClothes;
-
-      window.addEventListener("load", () => {
-        // 用 display none/block 做切换
-        document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
-        const home = document.getElementById("home-page");
-        if (home) home.style.display = "block";
-        init();
-      });
+        window.addEventListener("load", () => {
+          document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
+          const home = document.getElementById("home-page");
+          if (home) home.style.display = "block";
+          init();
+        });
+      })();
     </script>
   </body>
 </html>
