@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
-    <title>温感 · Weather & Dressing</title>
+    <title>温感 · 体感天气助手</title>
     <meta name="theme-color" content="#FAF9F6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -39,6 +39,12 @@
         --cream: #f7f1e1;
 
         --trend: rgba(255, 159, 137, 0.55);
+
+        /* Diffuse mesh palette (overridden by body[data-sky]) */
+        --mesh-1: rgba(255, 231, 179, 0.46);
+        --mesh-2: rgba(255, 159, 137, 0.35);
+        --mesh-3: rgba(255, 255, 255, 0.75);
+        --mesh-4: rgba(247, 241, 225, 0.85);
       }
 
       * {
@@ -66,24 +72,80 @@
         inset: 0;
         z-index: -1;
         pointer-events: none;
-        background: radial-gradient(circle at 25% 10%, rgba(255, 210, 200, 0.42), rgba(250, 249, 246, 0) 55%),
-          radial-gradient(circle at 80% 70%, rgba(255, 231, 179, 0.35), rgba(250, 249, 246, 0) 55%);
+        background: radial-gradient(circle at 20% 15%, var(--mesh-1), rgba(250, 249, 246, 0) 58%),
+          radial-gradient(circle at 78% 18%, var(--mesh-2), rgba(250, 249, 246, 0) 58%),
+          radial-gradient(circle at 18% 80%, var(--mesh-4), rgba(250, 249, 246, 0) 62%),
+          radial-gradient(circle at 82% 78%, rgba(90, 90, 90, 0.05), rgba(250, 249, 246, 0) 62%);
+        animation: diffuse 14s ease-in-out infinite;
+      }
+
+      @keyframes diffuse {
+        0% {
+          filter: saturate(1) contrast(1);
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          filter: saturate(1.05) contrast(1.02);
+          transform: translate3d(0, -1.2%, 0) scale(1.02);
+        }
+        100% {
+          filter: saturate(1) contrast(1);
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+      }
+
+      body[data-sky="rain"] {
+        --mesh-1: rgba(200, 213, 230, 0.55);
+        --mesh-2: rgba(238, 243, 251, 0.82);
+        --mesh-4: rgba(200, 213, 230, 0.3);
+      }
+      body[data-sky="sun"] {
+        --mesh-1: rgba(255, 231, 179, 0.56);
+        --mesh-2: rgba(255, 159, 137, 0.35);
+        --mesh-4: rgba(247, 241, 225, 0.9);
+      }
+      body[data-sky="cloud"] {
+        --mesh-1: rgba(255, 255, 255, 0.72);
+        --mesh-2: rgba(200, 213, 230, 0.34);
+        --mesh-4: rgba(247, 241, 225, 0.82);
+      }
+      body[data-sky="wind"] {
+        --mesh-1: rgba(247, 241, 225, 0.85);
+        --mesh-2: rgba(200, 213, 230, 0.25);
+        --mesh-4: rgba(255, 231, 179, 0.28);
+      }
+      body[data-sky="snow"] {
+        --mesh-1: rgba(255, 255, 255, 0.82);
+        --mesh-2: rgba(200, 213, 230, 0.36);
+        --mesh-4: rgba(238, 243, 251, 0.82);
       }
 
       .app {
         max-width: var(--maxw);
         margin: 0 auto;
         min-height: 100vh;
-        padding: calc(28px + env(safe-area-inset-top)) 28px
-          calc(96px + env(safe-area-inset-bottom));
+        padding: calc(88px + env(safe-area-inset-top)) 28px
+          calc(86px + env(safe-area-inset-bottom));
       }
 
       .topbar {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: var(--maxw);
+        z-index: 20;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 14px;
-        margin-bottom: 18px;
+        padding: calc(14px + env(safe-area-inset-top)) 28px 14px;
+        margin-bottom: 0;
+        background: rgba(255, 255, 255, 0.62);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(90, 90, 90, 0.1);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.03);
       }
       .brand {
         font-weight: 800;
@@ -120,7 +182,7 @@
       }
       .stack {
         display: grid;
-        gap: 20px;
+        gap: 24px;
       }
       .card {
         background: var(--card);
@@ -130,11 +192,11 @@
         padding: 24px;
       }
       .card-lite {
-        border-radius: 18px;
+        border-radius: var(--r);
         background: rgba(250, 249, 246, 0.62);
         border: 1px solid rgba(95, 95, 95, 0.14);
         box-shadow: var(--shadow);
-        padding: 16px;
+        padding: 24px;
       }
       .h2 {
         font-weight: 800;
@@ -156,16 +218,11 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        background: radial-gradient(circle at 20% 20%, rgba(255, 231, 179, 0.7), rgba(255, 231, 179, 0) 55%),
-          radial-gradient(circle at 80% 15%, rgba(255, 159, 137, 0.42), rgba(255, 159, 137, 0) 55%),
-          radial-gradient(circle at 25% 80%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 60%);
+        background: radial-gradient(circle at 20% 20%, var(--mesh-1), rgba(250, 249, 246, 0) 58%),
+          radial-gradient(circle at 82% 16%, var(--mesh-2), rgba(250, 249, 246, 0) 58%),
+          radial-gradient(circle at 28% 82%, var(--mesh-4), rgba(250, 249, 246, 0) 62%);
         opacity: 0.95;
         transition: filter 500ms ease;
-      }
-      .hero.is-rain .hero-mesh {
-        background: radial-gradient(circle at 20% 20%, rgba(200, 213, 230, 0.85), rgba(200, 213, 230, 0) 55%),
-          radial-gradient(circle at 80% 15%, rgba(238, 243, 251, 0.92), rgba(238, 243, 251, 0) 55%),
-          radial-gradient(circle at 25% 80%, rgba(95, 95, 95, 0.08), rgba(95, 95, 95, 0) 60%);
       }
       .hero-content {
         position: relative;
@@ -277,26 +334,26 @@
       }
       .qbtn {
         border: 1px solid rgba(95, 95, 95, 0.14);
-        background: rgba(247, 241, 225, 0.88);
+        background: var(--cream);
         border-radius: 999px;
         padding: 12px 12px;
         cursor: pointer;
         font: inherit;
         font-weight: 800;
         box-shadow: var(--shadow);
-        transition: transform 200ms cubic-bezier(0.2, 0.9, 0.2, 1);
+        transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
       }
       .qbtn:active {
         transform: scale(1.02);
       }
       .qbtn.cold {
-        background: rgba(238, 243, 251, 0.9);
+        background: linear-gradient(135deg, rgba(185, 215, 255, 0.55), rgba(247, 241, 225, 0.92));
       }
       .qbtn.ok {
-        background: rgba(247, 241, 225, 0.92);
+        background: var(--cream);
       }
       .qbtn.hot {
-        background: rgba(255, 210, 200, 0.65);
+        background: linear-gradient(135deg, rgba(255, 159, 137, 0.32), rgba(247, 241, 225, 0.92));
       }
 
       .stat-row {
@@ -366,7 +423,7 @@
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.98);
         border: 1px solid rgba(95, 95, 95, 0.18);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
       }
       .slider::-moz-range-thumb {
         width: 28px;
@@ -374,7 +431,7 @@
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.98);
         border: 1px solid rgba(95, 95, 95, 0.18);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
       }
       .slider-ends {
         margin-top: 8px;
@@ -420,7 +477,7 @@
       }
       .tabbtn.active {
         border-color: rgba(255, 159, 137, 0.32);
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.03);
         color: rgba(95, 95, 95, 0.92);
       }
 
@@ -473,10 +530,6 @@
       }
 
       @media (max-width: 390px) {
-        .app {
-          padding-left: 18px;
-          padding-right: 18px;
-        }
         .temp-now {
           font-size: 68px;
         }
@@ -491,7 +544,7 @@
         <div class="brand">温感</div>
         <div class="loc" id="loc-pill">
           <span class="loc-dot" aria-hidden="true"></span>
-          <span id="loc-name">唐山</span>
+          <span id="loc-name">唐山市</span>
         </div>
       </header>
 
@@ -655,6 +708,8 @@
         // ===== State =====
         const state = {
           loading: true,
+          error: null,
+          usedMock: false,
           now: null,
           hourly24: [],
           daily3: null,
@@ -670,6 +725,27 @@
           return Math.max(min, Math.min(max, n));
         }
 
+        const OFFSET_LABELS = {
+          "-3": "极度怕冷",
+          "-2": "较怕冷",
+          "-1": "偏怕冷",
+          "0": "体感正常",
+          "1": "偏怕热",
+          "2": "较怕热",
+          "3": "极度怕热",
+        };
+
+        function offsetToLabel(v) {
+          const n = clamp(Math.round(Number(v) || 0), OFFSET_MIN, OFFSET_MAX);
+          return OFFSET_LABELS[String(n)] || "体感正常";
+        }
+
+        function formatOffset(v) {
+          const n = Number(v);
+          if (!Number.isFinite(n) || n === 0) return "0";
+          return n > 0 ? `+${n}` : String(n);
+        }
+
         function readNum(key, fallback) {
           const v = Number(localStorage.getItem(key));
           return Number.isFinite(v) ? v : fallback;
@@ -680,7 +756,7 @@
         }
 
         function api(path) {
-          return `${QWEATHER_HOST}${path}?location=${QWEATHER_LOCATION}&key=${QWEATHER_KEY}`;
+          return `${QWEATHER_HOST}${path}?location=${QWEATHER_LOCATION}&key=${QWEATHER_KEY}&lang=zh`;
         }
 
         async function fetchJson(url) {
@@ -757,8 +833,9 @@
         }
 
         // ===== Insight =====
+        // Soft, helpful, single-paragraph Chinese advice.
         function generateInsight(input) {
-          const lines = [];
+          const parts = [];
 
           const pop = Number(input.pop);
           const windScale = Number(input.windScale);
@@ -766,93 +843,67 @@
           const tMax = Number(input.tempMax);
           const tMin = Number(input.tempMin);
 
-          // Emotion opener (based on outfit level)
-          if (Number.isFinite(input.level)) {
-            lines.push(pickEmotion(input.level));
-          }
+          if (Number.isFinite(input.level)) parts.push(pickEmotion(input.level));
 
           if (Number.isFinite(pop)) {
-            if (pop >= 70) lines.push("今天可能会下雨，带伞会让你更从容。");
-            else if (pop >= 40) lines.push("降水概率不低，出门带把轻便伞更安心。");
+            if (pop >= 70) parts.push("降水概率偏高，带伞会更从容");
+            else if (pop >= 40) parts.push("可能会有零星降水，备一把轻便伞更安心");
           }
 
           if (Number.isFinite(windScale)) {
-            if (windScale >= 6) lines.push("风力偏强，体感会被吹冷，外层尽量选防风的。");
-            else if (windScale >= 4) lines.push("有点风，注意脖颈和脚踝别着凉。");
+            if (windScale >= 6) parts.push("风力偏强，体感会被吹冷，外层尽量选防风材质");
+            else if (windScale >= 4) parts.push("有点风，脖颈和脚踝记得照顾一下");
           }
 
           if (Number.isFinite(tMax) && Number.isFinite(tMin)) {
             const diff = Math.abs(tMax - tMin);
-            if (diff >= 12) lines.push(`早晚温差约 ${Math.round(diff)}°，晚上出门建议多带一件。`);
-            else if (diff >= 8) lines.push(`早晚温差约 ${Math.round(diff)}°，随手带件薄外搭更稳。`);
+            if (diff >= 12) parts.push(`温差约 ${Math.round(diff)}°，晚上出门建议多带一件`);
+            else if (diff >= 8) parts.push(`温差约 ${Math.round(diff)}°，随手带件薄外搭更稳`);
           }
 
           if (Number.isFinite(uvIndex)) {
-            if (uvIndex >= 8) lines.push("紫外线较强，别忘了防晒和遮阳。");
-            else if (uvIndex >= 6) lines.push("紫外线偏高，防晒记得补涂。");
+            if (uvIndex >= 8) parts.push("紫外线较强，记得防晒与遮阳");
+            else if (uvIndex >= 6) parts.push("紫外线偏高，防晒可以补涂一次");
           }
 
-          if (!lines.length) return "今天整体比较平稳，按体感温度选一套舒服的层次就好。";
-          return lines.join("\n");
+          if (!parts.length) return "今天整体比较平稳，按体感温度挑一套舒服的层次就好。";
+          return parts.join("；") + "。";
         }
 
-        // ===== SVG Trend (Bezier) =====
-        function buildSmoothPath(points) {
-          if (points.length < 2) return "";
-          // Catmull-Rom to Bezier
-          let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
-          for (let i = 0; i < points.length - 1; i++) {
-            const p0 = points[i - 1] || points[i];
-            const p1 = points[i];
-            const p2 = points[i + 1];
-            const p3 = points[i + 2] || p2;
-            const cp1x = p1.x + (p2.x - p0.x) / 6;
-            const cp1y = p1.y + (p2.y - p0.y) / 6;
-            const cp2x = p2.x - (p3.x - p1.x) / 6;
-            const cp2y = p2.y - (p3.y - p1.y) / 6;
-            d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-          }
-          return d;
-        }
+        // ===== 24h Curve (Canvas) =====
+        function drawTrendCanvas(temps) {
+          const canvas = $("trend-canvas");
+          if (!canvas) return;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
 
-        function renderTrendSvg(temps) {
-          const svg = $("trend-svg");
-          const path = $("trend-path");
-          const minDot = $("trend-min-dot");
-          const maxDot = $("trend-max-dot");
-          const minLabel = $("trend-min-label");
-          const maxLabel = $("trend-max-label");
-          if (!svg || !path || !minDot || !maxDot || !minLabel || !maxLabel) return;
+          const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+          const w = Math.max(280, canvas.clientWidth);
+          const h = Math.max(120, canvas.clientHeight);
+          canvas.width = w * dpr;
+          canvas.height = h * dpr;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, w, h);
 
           const pointsRaw = temps
             .map((t) => Number(t))
             .filter((n) => Number.isFinite(n))
             .slice(0, 24);
+          if (pointsRaw.length < 6) return;
 
-          if (pointsRaw.length < 6) {
-            path.setAttribute("d", "");
-            minLabel.textContent = "";
-            maxLabel.textContent = "";
-            return;
-          }
-
-          const W = 320;
-          const H = 120;
-          const padX = 12;
-          const padY = 16;
-          const innerW = W - padX * 2;
-          const innerH = H - padY * 2;
           const min = Math.min(...pointsRaw);
           const max = Math.max(...pointsRaw);
           const span = Math.max(2, max - min);
+          const padX = 14;
+          const padY = 18;
+          const innerW = w - padX * 2;
+          const innerH = h - padY * 2;
 
           const pts = pointsRaw.map((v, i) => {
             const x = padX + (i / (pointsRaw.length - 1)) * innerW;
             const y = padY + (1 - (v - min) / span) * innerH;
             return { x, y, v };
           });
-
-          path.setAttribute("d", buildSmoothPath(pts));
 
           let minIdx = 0;
           let maxIdx = 0;
@@ -861,22 +912,56 @@
             if (pts[i].v > pts[maxIdx].v) maxIdx = i;
           }
 
-          const pMin = pts[minIdx];
-          const pMax = pts[maxIdx];
+          // light baseline grid
+          ctx.strokeStyle = "rgba(90,90,90,0.08)";
+          ctx.lineWidth = 1;
+          for (let i = 1; i <= 2; i++) {
+            const y = padY + (i / 3) * innerH;
+            ctx.beginPath();
+            ctx.moveTo(padX, y);
+            ctx.lineTo(w - padX, y);
+            ctx.stroke();
+          }
 
-          minDot.setAttribute("cx", String(pMin.x));
-          minDot.setAttribute("cy", String(pMin.y));
-          maxDot.setAttribute("cx", String(pMax.x));
-          maxDot.setAttribute("cy", String(pMax.y));
+          // Smooth line (midpoint quadratic)
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length - 1; i++) {
+            const midX = (pts[i].x + pts[i + 1].x) / 2;
+            const midY = (pts[i].y + pts[i + 1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, midX, midY);
+          }
+          ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
 
-          minLabel.textContent = `${Math.round(pMin.v)}°`;
-          maxLabel.textContent = `${Math.round(pMax.v)}°`;
+          // glow
+          ctx.save();
+          ctx.strokeStyle = "rgba(247,241,225,0.85)";
+          ctx.lineWidth = 5;
+          ctx.shadowColor = "rgba(255,159,137,0.18)";
+          ctx.shadowBlur = 14;
+          ctx.stroke();
+          ctx.restore();
 
-          // Position labels with a small offset
-          minLabel.setAttribute("x", String(pMin.x + 6));
-          minLabel.setAttribute("y", String(pMin.y + 14));
-          maxLabel.setAttribute("x", String(pMax.x + 6));
-          maxLabel.setAttribute("y", String(Math.max(14, pMax.y - 8)));
+          ctx.strokeStyle = "rgba(247,241,225,0.95)";
+          ctx.lineWidth = 3;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.stroke();
+
+          // min/max dots + labels
+          const drawDot = (p) => {
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(255,159,137,0.75)";
+            ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
+            ctx.fill();
+          };
+          drawDot(pts[minIdx]);
+          drawDot(pts[maxIdx]);
+
+          ctx.font = "800 12px Quicksand, system-ui";
+          ctx.fillStyle = "rgba(90,90,90,0.82)";
+          ctx.fillText(`${Math.round(pts[minIdx].v)}°`, pts[minIdx].x + 6, pts[minIdx].y + 16);
+          ctx.fillText(`${Math.round(pts[maxIdx].v)}°`, pts[maxIdx].x + 6, Math.max(14, pts[maxIdx].y - 8));
         }
 
         // ===== Weather theming =====
@@ -891,10 +976,9 @@
           return "cloud";
         }
 
-        function applyHeroTheme(theme) {
-          const hero = $("home-hero");
-          if (!hero) return;
-          hero.classList.toggle("is-rain", theme === "rain");
+        function applyWeatherTheme(iconCode) {
+          const theme = iconToTheme(iconCode);
+          document.body.dataset.sky = theme;
         }
 
         // ===== Data extraction =====
@@ -944,27 +1028,33 @@
           const level = getOutfitLevel(calculated);
 
           setText("ui-temp-now", now ? `${Number(now.temp)}°` : "—");
-          setText("ui-temp-perceived", calculated == null ? "—" : `${calculated.toFixed(1)}°`);
-          setText("ui-cond", now?.text ? now.text : "—");
+          setText("ui-temp-perceived", calculated == null ? "—" : `${calculated.toFixed(1)}°C`);
+          setText("ui-cond", now?.text ? (state.usedMock ? `${now.text}（示例）` : now.text) : "—");
 
           setText("ui-level", calculated == null ? "Lv —" : `Lv ${level}`);
           setText("ui-outfit-items", calculated == null ? "—" : formatOutfit(level));
 
-          setText("ui-offset", String(state.tempOffset));
-          setText("ui-offset-badge", String(state.tempOffset));
+          setText("ui-offset", formatOffset(state.tempOffset));
+          setText("ui-offset-label", offsetToLabel(state.tempOffset));
+          setText("ui-offset-badge", formatOffset(state.tempOffset));
+          setText("ui-offset-badge-2", formatOffset(state.tempOffset));
           setText("ui-feedback-count", String(state.feedbackCount));
           setText("ui-wardrobe-count", String(state.wardrobeCount));
 
-          // Trend note + SVG
+          // Keep slider synced even when quick feedback changes the offset.
+          const slider = $("offset-slider");
+          if (slider && slider.value !== String(state.tempOffset)) slider.value = String(state.tempOffset);
+
+          // Trend note + Canvas
           const temps = state.hourly24.map((h) => Number(h.temp)).filter((n) => Number.isFinite(n));
           if (temps.length) {
             const min = Math.min(...temps);
             const max = Math.max(...temps);
-            setText("ui-trend-note", `min ${Math.round(min)}° · max ${Math.round(max)}°`);
+            setText("ui-trend-note", `最低 ${Math.round(min)}° · 最高 ${Math.round(max)}°`);
           } else {
             setText("ui-trend-note", "—");
           }
-          renderTrendSvg(temps);
+          drawTrendCanvas(temps);
 
           // Insight text
           const uvIndex = getUvIndex();
@@ -981,9 +1071,12 @@
             level,
           });
           const insightEl = $("ui-insight");
-          if (insightEl) insightEl.textContent = insight;
+          if (insightEl) {
+            const prefix = state.error ? `${state.error}\n` : "";
+            insightEl.textContent = `${prefix}${insight}`;
+          }
 
-          applyHeroTheme(iconToTheme(now?.icon));
+          applyWeatherTheme(now?.icon);
         }
 
         function setLoading(isLoading) {
@@ -1039,6 +1132,9 @@
           const idxUrl = api("/v7/indices/1d") + "&type=0";
 
           try {
+            state.error = null;
+            state.usedMock = false;
+
             const [nowData, hourlyData, dailyData, idxData] = await Promise.all([
               fetchJson(nowUrl),
               fetchJson(h24Url),
@@ -1046,20 +1142,30 @@
               fetchJson(idxUrl),
             ]);
 
-            if (nowData?.code === "200" && nowData?.now) state.now = nowData.now;
-            if (hourlyData?.code === "200" && Array.isArray(hourlyData?.hourly))
-              state.hourly24 = hourlyData.hourly;
-            if (dailyData?.code === "200" && Array.isArray(dailyData?.daily)) state.daily3 = dailyData.daily;
-            if (idxData?.code === "200" && Array.isArray(idxData?.daily)) state.indices = idxData.daily;
+            const ok = (d) => d?.code === "200";
+            if (!ok(nowData) || !nowData?.now) throw new Error(`qweather now ${nowData?.code || "?"}`);
+            if (!ok(hourlyData) || !Array.isArray(hourlyData?.hourly))
+              throw new Error(`qweather 24h ${hourlyData?.code || "?"}`);
+            if (!ok(dailyData) || !Array.isArray(dailyData?.daily))
+              throw new Error(`qweather 3d ${dailyData?.code || "?"}`);
+            if (!ok(idxData) || !Array.isArray(idxData?.daily))
+              throw new Error(`qweather indices ${idxData?.code || "?"}`);
+
+            state.now = nowData.now;
+            state.hourly24 = hourlyData.hourly;
+            state.daily3 = dailyData.daily;
+            state.indices = idxData.daily;
           } catch (e) {
             console.warn("Weather fetch failed, using mock data", e);
+            state.error = "暂时没连上天气服务，我先用示例数据陪你看看；稍后刷新就会恢复。";
+            state.usedMock = true;
             state.now = {
               temp: 18,
               humidity: 65,
               windSpeed: 12,
               windScale: 3,
               icon: 100,
-              text: "Mock",
+              text: "晴",
             };
             state.hourly24 = Array.from({ length: 24 }, (_, i) => ({
               temp: 16 + Math.sin(((i - 10) / 12) * Math.PI) * 3.6,
