@@ -12,17 +12,23 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
       :root {
         --bg: #faf9f6;
         --card: #ffffff;
-        --ink: #1f2328;
-        --muted: rgba(31, 35, 40, 0.62);
-        --muted2: rgba(31, 35, 40, 0.42);
-        --line: rgba(31, 35, 40, 0.08);
-        --shadow: 0 12px 38px rgba(27, 24, 19, 0.06);
-        --shadow2: 0 18px 58px rgba(27, 24, 19, 0.1);
-        --r: 20px;
+        --ink: #5f5f5f;
+        --muted: rgba(95, 95, 95, 0.78);
+        --muted2: rgba(95, 95, 95, 0.6);
+        --line: rgba(95, 95, 95, 0.14);
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        --r: 24px;
 
         --rose: #dba7a6;
         --rose2: #f1d7d6;
@@ -45,8 +51,8 @@
         margin: 0;
         background: var(--bg);
         color: var(--ink);
-        font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
-          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        font-family: "Quicksand", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+          Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         overscroll-behavior: none;
@@ -57,7 +63,8 @@
         max-width: var(--maxw);
         margin: 0 auto;
         min-height: 100vh;
-        padding: calc(16px + env(safe-area-inset-top)) 16px calc(92px + env(safe-area-inset-bottom));
+        padding: calc(28px + env(safe-area-inset-top)) 28px
+          calc(110px + env(safe-area-inset-bottom));
       }
 
       .topbar {
@@ -65,7 +72,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 14px;
+        margin-bottom: 22px;
       }
 
       .brand {
@@ -107,12 +114,12 @@
         background: var(--card);
         border-radius: var(--r);
         box-shadow: var(--shadow);
-        border: 1px solid rgba(31, 35, 40, 0.06);
-        padding: 18px;
+        border: 1px solid rgba(95, 95, 95, 0.12);
+        padding: 24px;
       }
       .stack {
         display: grid;
-        gap: 14px;
+        gap: 20px;
       }
 
       .hero {
@@ -145,7 +152,7 @@
         position: relative;
         z-index: 1;
         display: grid;
-        gap: 14px;
+        gap: 18px;
       }
 
       .meta-row {
@@ -172,16 +179,16 @@
         margin-top: 8px;
         font-size: 16px;
         font-weight: 800;
-        color: rgba(31, 35, 40, 0.86);
+        color: var(--ink);
       }
 
       .mini {
         border-radius: 16px;
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         background: rgba(255, 255, 255, 0.75);
         padding: 12px 12px;
         min-width: 92px;
-        box-shadow: 0 10px 26px rgba(27, 24, 19, 0.05);
+        box-shadow: var(--shadow);
         text-align: right;
       }
       .mini .k {
@@ -198,7 +205,7 @@
 
       .primary-text {
         margin: 0;
-        padding: 14px 14px;
+        padding: 18px 18px;
         border-radius: 16px;
         background: linear-gradient(135deg, rgba(219, 167, 166, 0.18), rgba(230, 196, 138, 0.14));
         border: 1px solid rgba(219, 167, 166, 0.2);
@@ -217,7 +224,7 @@
       .stat {
         padding: 12px 10px;
         border-radius: 16px;
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         background: rgba(255, 255, 255, 0.7);
         text-align: center;
       }
@@ -234,7 +241,7 @@
 
       .trend {
         padding-top: 10px;
-        border-top: 1px dashed rgba(31, 35, 40, 0.12);
+        border-top: 1px dashed rgba(95, 95, 95, 0.18);
       }
       .trend-row {
         display: flex;
@@ -264,7 +271,7 @@
         min-width: 0;
         height: 18px;
         border-radius: 999px;
-        background: rgba(31, 35, 40, 0.06);
+        background: rgba(95, 95, 95, 0.08);
         position: relative;
         overflow: hidden;
       }
@@ -280,7 +287,7 @@
         flex: 1;
         min-width: 0;
         border-radius: 999px;
-        background: rgba(31, 35, 40, 0.06);
+        background: rgba(95, 95, 95, 0.08);
         position: relative;
         overflow: hidden;
       }
@@ -303,7 +310,7 @@
         place-items: center;
         font-size: 10px;
         font-weight: 950;
-        color: rgba(31, 35, 40, 0.78);
+        color: rgba(95, 95, 95, 0.9);
       }
       .trend-hours {
         margin-top: 6px;
@@ -312,7 +319,7 @@
         gap: 6px;
         font-size: 10px;
         font-weight: 900;
-        color: rgba(31, 35, 40, 0.5);
+        color: rgba(95, 95, 95, 0.6);
         user-select: none;
       }
 
@@ -323,7 +330,7 @@
         letter-spacing: -0.2px;
       }
       .section-desc {
-        margin: 0 0 14px;
+        margin: 0 0 18px;
         color: var(--muted);
         font-size: 13px;
         font-weight: 700;
@@ -336,30 +343,32 @@
         gap: 10px;
       }
       .feedback-btn {
-        border: 1px solid rgba(31, 35, 40, 0.08);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 249, 246, 0.9));
-        border-radius: 18px;
-        padding: 14px 10px;
+        border: 1px solid rgba(95, 95, 95, 0.12);
+        background: #f7f1e1;
+        border-radius: 999px;
+        padding: 14px 12px;
         cursor: pointer;
         font: inherit;
-        box-shadow: 0 10px 22px rgba(27, 24, 19, 0.06);
-        transition: transform 120ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        box-shadow: var(--shadow);
+        transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 220ms ease,
+          border-color 220ms ease;
         display: grid;
         place-items: center;
         gap: 6px;
         font-weight: 950;
       }
       .feedback-btn:active {
-        transform: scale(var(--tap));
+        transform: scale(1.02);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.04);
       }
       .feedback-btn.cold {
-        border-color: rgba(199, 216, 207, 0.7);
+        border-color: rgba(199, 216, 207, 0.9);
       }
       .feedback-btn.perfect {
-        border-color: rgba(230, 196, 138, 0.55);
+        border-color: rgba(230, 196, 138, 0.75);
       }
       .feedback-btn.hot {
-        border-color: rgba(219, 167, 166, 0.65);
+        border-color: rgba(219, 167, 166, 0.85);
       }
       .feedback-btn .sub {
         font-size: 11px;
@@ -390,23 +399,23 @@
 
       .outfit-item {
         background: rgba(250, 249, 246, 0.6);
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         border-radius: 16px;
         padding: 12px;
         text-align: center;
-        box-shadow: 0 10px 20px rgba(27, 24, 19, 0.04);
+        box-shadow: var(--shadow);
       }
       /* The first cell is the algorithm's recommendation hint card (inserted by JS). */
       .outfit-grid .outfit-item:first-child {
         background: linear-gradient(135deg, rgba(219, 167, 166, 0.17), rgba(199, 216, 207, 0.14));
         border-color: rgba(219, 167, 166, 0.25);
-        box-shadow: var(--shadow2);
+        box-shadow: var(--shadow);
         text-align: left;
       }
       .outfit-item-image {
         width: 100%;
         height: 84px;
-        background: rgba(31, 35, 40, 0.06);
+        background: rgba(95, 95, 95, 0.08);
         border-radius: 14px;
         margin-bottom: 8px;
         display: flex;
@@ -417,7 +426,7 @@
       .outfit-item-name {
         font-size: 12px;
         font-weight: 950;
-        color: rgba(31, 35, 40, 0.9);
+        color: var(--ink);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -438,7 +447,7 @@
         cursor: pointer;
         font: inherit;
         font-weight: 950;
-        color: rgba(31, 35, 40, 0.92);
+        color: var(--ink);
         background: linear-gradient(135deg, rgba(219, 167, 166, 0.28), rgba(230, 196, 138, 0.22));
         box-shadow: var(--shadow);
         border: 1px solid rgba(219, 167, 166, 0.24);
@@ -456,7 +465,7 @@
       }
       .wardrobe-item {
         background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         border-radius: var(--r);
         padding: 14px;
         box-shadow: var(--shadow);
@@ -470,7 +479,7 @@
         width: 28px;
         height: 28px;
         border-radius: 999px;
-        border: 1px solid rgba(31, 35, 40, 0.1);
+        border: 1px solid rgba(95, 95, 95, 0.2);
         background: rgba(255, 255, 255, 0.85);
         cursor: pointer;
         font-weight: 950;
@@ -483,7 +492,7 @@
       .wardrobe-item-image {
         width: 100%;
         height: 130px;
-        background: rgba(31, 35, 40, 0.06);
+        background: rgba(95, 95, 95, 0.08);
         border-radius: 16px;
         margin-bottom: 10px;
         overflow: hidden;
@@ -519,7 +528,7 @@
         width: 7px;
         height: 7px;
         border-radius: 999px;
-        background: rgba(31, 35, 40, 0.12);
+        background: rgba(95, 95, 95, 0.18);
       }
       .warmth-dot.active {
         background: rgba(219, 167, 166, 0.95);
@@ -541,7 +550,7 @@
         border-radius: 999px;
         background: linear-gradient(90deg, rgba(199, 216, 207, 0.7), rgba(219, 167, 166, 0.75));
         outline: none;
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
       }
       .slider::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -550,7 +559,7 @@
         height: 26px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(31, 35, 40, 0.12);
+        border: 1px solid rgba(95, 95, 95, 0.18);
         box-shadow: 0 10px 24px rgba(27, 24, 19, 0.12);
       }
       .slider::-moz-range-thumb {
@@ -558,7 +567,7 @@
         height: 26px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(31, 35, 40, 0.12);
+        border: 1px solid rgba(95, 95, 95, 0.18);
         box-shadow: 0 10px 24px rgba(27, 24, 19, 0.12);
       }
       .label {
@@ -576,7 +585,7 @@
       }
       .stat-box {
         border-radius: var(--r);
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         background: rgba(255, 255, 255, 0.9);
         padding: 14px;
         text-align: center;
@@ -600,10 +609,10 @@
         transform: translateX(-50%);
         width: 100%;
         max-width: var(--maxw);
-        padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+        padding: 14px 28px calc(14px + env(safe-area-inset-bottom));
         background: rgba(250, 249, 246, 0.72);
         backdrop-filter: blur(14px);
-        border-top: 1px solid rgba(31, 35, 40, 0.08);
+        border-top: 1px solid rgba(95, 95, 95, 0.14);
       }
       .nav-row {
         display: grid;
@@ -611,13 +620,13 @@
         gap: 10px;
       }
       .nav-item {
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         background: rgba(255, 255, 255, 0.82);
         border-radius: 18px;
         padding: 10px 10px;
         cursor: pointer;
         font: inherit;
-        transition: transform 120ms ease, box-shadow 200ms ease;
+        transition: transform 120ms ease, box-shadow 200ms ease, border-color 200ms ease;
         display: grid;
         place-items: center;
         gap: 6px;
@@ -626,21 +635,21 @@
         transform: scale(var(--tap));
       }
       .nav-item.active {
-        box-shadow: var(--shadow2);
+        box-shadow: var(--shadow);
         border-color: rgba(219, 167, 166, 0.32);
       }
       .nav-label {
         font-size: 12px;
         font-weight: 950;
-        color: rgba(31, 35, 40, 0.72);
+        color: var(--muted);
       }
       .nav-item.active .nav-label {
-        color: rgba(31, 35, 40, 0.9);
+        color: var(--ink);
       }
       .nav-ico {
         width: 20px;
         height: 20px;
-        stroke: rgba(31, 35, 40, 0.78);
+        stroke: rgba(95, 95, 95, 0.86);
         stroke-width: 2.1;
         fill: none;
       }
@@ -652,7 +661,7 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(31, 35, 40, 0.28);
+        background: rgba(95, 95, 95, 0.22);
         backdrop-filter: blur(10px);
         z-index: 1000;
         align-items: center;
@@ -667,7 +676,7 @@
         max-width: 420px;
         background: rgba(255, 255, 255, 0.98);
         border-radius: 22px;
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
         box-shadow: 0 30px 90px rgba(27, 24, 19, 0.24);
         padding: 18px;
         max-height: 85vh;
@@ -693,7 +702,7 @@
       .form-select {
         width: 100%;
         border-radius: 16px;
-        border: 1px solid rgba(31, 35, 40, 0.12);
+        border: 1px solid rgba(95, 95, 95, 0.18);
         background: rgba(250, 249, 246, 0.55);
         padding: 12px 12px;
         font: inherit;
@@ -716,7 +725,7 @@
         max-height: 220px;
         object-fit: cover;
         border-radius: 16px;
-        border: 1px solid rgba(31, 35, 40, 0.08);
+        border: 1px solid rgba(95, 95, 95, 0.14);
       }
       .modal-buttons {
         display: grid;
@@ -726,7 +735,7 @@
       }
       .modal-btn {
         border-radius: 16px;
-        border: 1px solid rgba(31, 35, 40, 0.12);
+        border: 1px solid rgba(95, 95, 95, 0.18);
         padding: 12px 12px;
         cursor: pointer;
         font: inherit;
@@ -738,12 +747,12 @@
       }
       .modal-btn-cancel {
         background: rgba(250, 249, 246, 0.8);
-        color: rgba(31, 35, 40, 0.82);
+        color: var(--ink);
       }
       .modal-btn-submit {
         background: linear-gradient(135deg, rgba(219, 167, 166, 0.9), rgba(230, 196, 138, 0.84));
         border-color: rgba(219, 167, 166, 0.5);
-        color: rgba(31, 35, 40, 0.92);
+        color: var(--ink);
       }
 
       .empty-state {
@@ -751,13 +760,13 @@
         padding: 44px 12px;
         color: var(--muted);
         border-radius: 18px;
-        border: 1px dashed rgba(31, 35, 40, 0.12);
+        border: 1px dashed rgba(95, 95, 95, 0.2);
         background: rgba(250, 249, 246, 0.6);
       }
       .empty-title {
         margin-top: 6px;
         font-weight: 950;
-        color: rgba(31, 35, 40, 0.86);
+        color: var(--ink);
       }
       .empty-desc {
         margin-top: 6px;
@@ -1369,14 +1378,12 @@
           saveJson(STORAGE_KEYS.feedbackHistory, feedbackHistory);
 
           const btn = evt?.target?.closest(".feedback-btn");
-          if (btn) btn.style.transform = "scale(0.95)";
 
           // Immediate UI refresh so user can feel the feedback loop right away.
           updateRecommendation();
           updateSettings();
 
           setTimeout(() => {
-            if (btn) btn.style.transform = "";
             askWhatWorn();
           }, 80);
         }
