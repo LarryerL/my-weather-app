@@ -1116,9 +1116,9 @@
 
         let currentWeather = null;
 
-        // ===== Perceived temperature formula =====
-        // calculatedPerceivedTemp = realTemp + (humidity * 0.1) - (windSpeed * 0.2) + userPreference.tempOffset
-        function calculatePerceivedTemp() {
+        // ===== Calculated temperature (core) =====
+        // calculatedTemp = realTemp + humidity*0.15 - windSpeed*0.2 + userPreference.tempOffset
+        function calculateTemp() {
           if (!currentWeather) return null;
 
           const realTemp = Number(currentWeather.temp);
@@ -1129,37 +1129,94 @@
           if (![realTemp, humidity, windSpeed, offset].every((n) => Number.isFinite(n)))
             return null;
 
-          return realTemp + humidity * 0.1 - windSpeed * 0.2 + offset;
+          return realTemp + humidity * 0.15 - windSpeed * 0.2 + offset;
         }
 
-        function buildSubjectiveLine(perceivedTemp) {
-          if (perceivedTemp <= 0) return "今天体感很冷，建议最里面保暖打底，再叠加厚外套。";
-          if (perceivedTemp <= 8) return "今天体感偏冷，建议毛衣+外套，注意脖子和脚部保暖。";
-          if (perceivedTemp <= 15) return "今天体感偏凉，长袖打底配薄外套会比较舒服。";
-          if (perceivedTemp <= 22) return "今天体感刚刚好，薄长袖或短袖+轻薄外搭就很合适。";
-          if (perceivedTemp <= 28) return "今天体感偏暖，轻薄短袖为主，出汗多可以选更透气的面料。";
-          return "今天体感偏热，尽量选择宽松、透气、浅色的衣服，多补水。";
+        function getTempDescription(level) {
+          const TEXT = {
+            10: "极地保暖：长款加厚羽绒服里，记得叠发热内衣和羊绒衫。",
+            9: "深冬严寒：厚羽绒配毛衣，保暖裤别省。",
+            8: "结冰预警：羽绒或羊羔毛外套，搭厚针织最安心。",
+            7: "零度边缘：大衣里记得加件高领羊绒，风一吹就不慌。",
+            6: "萧瑟秋凉：大衣或夹克棉服，里面一件衬衫/打底更精致。",
+            5: "清爽春秋：风衣或西装外套，薄针织/长袖就很高级。",
+            4: "舒适春秋：卫衣或针织开衫，内搭 T 恤很温柔。",
+            3: "微热初夏：长袖衬衫或衬衫裙，卷袖更松弛。",
+            2: "标准夏季：短袖或吊带裙，记得备件防晒衫。",
+            1: "酷暑模式：极简清爽排汗，真丝/亚麻会更舒服。",
+          };
+
+          return TEXT[level] || "今天穿得舒服最重要。";
         }
 
-        // ===== Outfit engine: perceived temp -> warmth level (1-10) and labels =====
-        function getOutfitPlan(perceivedTemp) {
-          // From warm to cold.
-          const buckets = [
-            { min: 28, warmth: 1, label: "清凉透气", pieces: ["短袖/背心", "短裤/薄裤"] },
-            { min: 26, warmth: 2, label: "轻薄通勤", pieces: ["短袖", "薄衬衫/防晒衫"] },
-            { min: 24, warmth: 3, label: "微风可加", pieces: ["短袖/薄衬衫", "轻薄外搭"] },
-            { min: 22, warmth: 4, label: "舒适过渡", pieces: ["长袖打底", "薄外套"] },
-            // 20-22C: thin knit (example requested)
-            { min: 20, warmth: 5, label: "薄针织", pieces: ["薄针织/长袖T", "轻便长裤"] },
-            // 18-20C: trench coat (example requested)
-            { min: 18, warmth: 6, label: "风衣", pieces: ["风衣/夹克", "长袖打底"] },
-            { min: 16, warmth: 7, label: "卫衣外套", pieces: ["卫衣", "外套"] },
-            { min: 14, warmth: 8, label: "毛衣外套", pieces: ["毛衣", "中等外套"] },
-            { min: 10, warmth: 9, label: "保暖加强", pieces: ["加绒/叠穿", "厚外套"] },
-            { min: -999, warmth: 10, label: "重度保暖", pieces: ["羽绒/棉服", "保暖内衣"] },
-          ];
+        // ===== Commercial-grade 1-10 mapping (female-optimized) =====
+        // This mapping is based on calculatedTemp (humidity/wind + offset included).
+        function getOutfitPlan(calculatedTemp) {
+          const t = Number(calculatedTemp);
+          if (!Number.isFinite(t)) return { warmth: 5, label: "外套", pieces: ["外套", "薄针织/长袖"], tempDescription: getTempDescription(5) };
 
-          return buckets.find((b) => perceivedTemp >= b.min) || buckets[buckets.length - 1];
+          let level = 5;
+          if (t <= -15) level = 10;
+          else if (t <= -5) level = 9;
+          else if (t <= 0) level = 8;
+          else if (t <= 6) level = 7;
+          else if (t <= 12) level = 6;
+          else if (t <= 18) level = 5;
+          else if (t <= 22) level = 4;
+          else if (t <= 26) level = 3;
+          else if (t <= 30) level = 2;
+          else level = 1;
+
+          const LEVELS = {
+            10: {
+              label: "极地保暖",
+              pieces: ["长款加厚羽绒服", "发热内衣", "羊绒衫", "暖宝宝", "围巾帽子"],
+            },
+            9: {
+              label: "深冬严寒",
+              pieces: ["厚羽绒服", "毛衣", "保暖裤"],
+            },
+            8: {
+              label: "结冰预警",
+              pieces: ["标准羽绒服/羊羔毛外套", "厚针织"],
+            },
+            7: {
+              label: "初冬/深秋",
+              pieces: ["厚呢大衣/轻薄羽绒服", "中厚毛衣"],
+            },
+            6: {
+              label: "萧瑟秋凉",
+              pieces: ["大衣/夹克棉服", "衬衫内搭"],
+            },
+            5: {
+              label: "清爽春秋",
+              pieces: ["风衣/西装外套", "薄针织/长袖"],
+            },
+            4: {
+              label: "舒适春秋",
+              pieces: ["卫衣/针织开衫", "T 恤"],
+            },
+            3: {
+              label: "微热初夏",
+              pieces: ["长袖衬衫", "衬衫裙（可卷袖）"],
+            },
+            2: {
+              label: "标准夏季",
+              pieces: ["短袖 T 恤/吊带裙", "防晒衫"],
+            },
+            1: {
+              label: "酷暑",
+              pieces: ["极简清爽排汗", "真丝/亚麻材质"],
+            },
+          };
+
+          const def = LEVELS[level];
+          return {
+            warmth: level,
+            label: def.label,
+            pieces: def.pieces,
+            tempDescription: getTempDescription(level),
+          };
         }
 
         // ===== Date =====
@@ -1192,15 +1249,14 @@
             return;
           }
 
-          const perceived = calculatePerceivedTemp();
+          const calculatedTemp = calculateTemp();
 
           tempEl.textContent = `${Number(currentWeather.temp)}°`;
           condEl.textContent = currentWeather.condition || "—";
           humEl.textContent = `${Number(currentWeather.humidity)}%`;
           windEl.textContent = `${Number(currentWeather.windSpeed)} km/h`;
-          feelsEl.textContent = perceived == null ? "—" : `${perceived.toFixed(1)}°`;
-          if (subjEl)
-            subjEl.textContent = perceived == null ? "正在计算体感..." : buildSubjectiveLine(perceived);
+          feelsEl.textContent = calculatedTemp == null ? "—" : `${calculatedTemp.toFixed(1)}°`;
+          if (subjEl) subjEl.textContent = "正在生成穿搭建议...";
         }
 
         // ===== Trends =====
@@ -1269,13 +1325,13 @@
             return;
           }
 
-          const perceived = calculatePerceivedTemp();
-          if (perceived == null) {
+          const calculatedTemp = calculateTemp();
+          if (calculatedTemp == null) {
             container.innerHTML = "";
             return;
           }
 
-          const plan = getOutfitPlan(perceived);
+          const plan = getOutfitPlan(calculatedTemp);
           const warmthEl = $("#suggested-warmth");
           if (warmthEl) warmthEl.textContent = String(plan.warmth);
 
@@ -1283,7 +1339,7 @@
           // This is derived from the same outfit engine output.
           const subjEl = $("#subjective-text");
           if (subjEl) {
-            subjEl.textContent = `建议：${plan.label}（厚度 ${plan.warmth} 级）\n${plan.pieces.join(" · ")}`;
+            subjEl.textContent = `${plan.tempDescription}\n\n推荐：Lv ${plan.warmth} · ${plan.label}\n${plan.pieces.join(" + ")}\n\n体感温度：${calculatedTemp.toFixed(1)}°（已包含湿度/风速/偏好）`;
           }
 
           const suitableClothes = (Array.isArray(wardrobe) ? wardrobe : [])
@@ -1293,7 +1349,7 @@
               const maxT = Number(item?.maxTemp);
               if (![w, minT, maxT].every((n) => Number.isFinite(n))) return false;
               const warmthOk = Math.abs(w - plan.warmth) <= 1;
-              const tempOk = perceived >= minT && perceived <= maxT;
+              const tempOk = calculatedTemp >= minT && calculatedTemp <= maxT;
               return warmthOk && tempOk;
             })
             .sort(
@@ -1341,17 +1397,20 @@
                 .join("");
           }
 
-          renderTrends(perceived);
+          renderTrends(calculatedTemp);
         }
 
         // ===== Feedback loop =====
         const OFFSET_MIN = -6;
         const OFFSET_MAX = 6;
-        const OFFSET_STEP = 0.5;
+        const OFFSET_STEP = 1.0;
 
         // Note: Because the formula uses "+ tempOffset", to make "偏冷 => 更厚" work,
         // we adjust tempOffset downwards on "cold" (lower perceived temp => thicker recommendation).
         function applyFeedbackToOffset(feeling) {
+          // NOTE: calculatedTemp includes "+ tempOffset".
+          // For the user experience we want (偏冷 -> 更厚 / 偏热 -> 更薄),
+          // we move calculatedTemp down on "cold" and up on "hot".
           if (feeling === "cold") userPreference.tempOffset -= OFFSET_STEP;
           else if (feeling === "hot") userPreference.tempOffset += OFFSET_STEP;
           userPreference.tempOffset = clamp(userPreference.tempOffset, OFFSET_MIN, OFFSET_MAX);
@@ -1362,13 +1421,13 @@
           applyFeedbackToOffset(feeling);
           persistUserPreference();
 
-          const perceived = calculatePerceivedTemp();
+          const perceived = calculateTemp();
           const entry = {
             date: new Date().toISOString(),
             realTemp: currentWeather?.temp,
             humidity: currentWeather?.humidity,
             windSpeed: currentWeather?.windSpeed,
-            perceivedTemp: perceived,
+            calculatedTemp: perceived,
             feeling,
             tempOffset: userPreference.tempOffset,
           };
@@ -1492,8 +1551,8 @@
           const maxInput = $("#clothes-max-temp");
           if (!nameInput || !typeInput || !warmthInput || !minInput || !maxInput) return;
 
-          const perceived = calculatePerceivedTemp() ?? Number(currentWeather?.temp ?? 18);
-          const plan = getOutfitPlan(perceived);
+          const calculated = calculateTemp() ?? Number(currentWeather?.temp ?? 18);
+          const plan = getOutfitPlan(calculated);
 
           const warmth = plan.warmth;
           const baseName =
