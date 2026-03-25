@@ -561,7 +561,7 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
         <label class="form-label">密码</label>
         <input type="password" class="form-input" id="loginPassword" placeholder="请输入密码" autocomplete="current-password"/>
       </div>
-      <button class="auth-primary" onclick="login()">登录继续</button>
+      <button class="auth-primary" onclick="submitLogin()">登录继续</button>
     </div>
     <div class="auth-panel" id="authPanelRegister">
       <div class="form-group">
@@ -728,26 +728,43 @@ const STORAGE_KEYS={
 function clamp(num,min,max){return Math.max(min,Math.min(max,num));}
 function toNum(value,fallback=0){const n=Number(value);return Number.isFinite(n)?n:fallback;}
 function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-function readJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback;}catch{return fallback;}}
-function writeJSON(key,value){localStorage.setItem(key,JSON.stringify(value));}
+const memoryStore={};
+function storageGet(key){
+  if(Object.prototype.hasOwnProperty.call(memoryStore,key))return memoryStore[key];
+  try{
+    const value=localStorage.getItem(key);
+    return value===null && Object.prototype.hasOwnProperty.call(memoryStore,key) ? memoryStore[key] : value;
+  }catch{
+    return Object.prototype.hasOwnProperty.call(memoryStore,key)?memoryStore[key]:null;
+  }
+}
+function storageSet(key,value){
+  memoryStore[key]=String(value);
+  try{localStorage.setItem(key,value);}catch{}
+}
+function storageRemove(key){
+  delete memoryStore[key];
+  try{localStorage.removeItem(key);}catch{}
+}
+function readJSON(key,fallback){try{const raw=storageGet(key);return raw?JSON.parse(raw):fallback;}catch{return fallback;}}
+function writeJSON(key,value){storageSet(key,JSON.stringify(value));}
 function readSession(){return readJSON(STORAGE_KEYS.session,null);}
-function persistSession(session){if(session)writeJSON(STORAGE_KEYS.session,session);else localStorage.removeItem(STORAGE_KEYS.session);}
+function persistSession(session){if(session)writeJSON(STORAGE_KEYS.session,session);else storageRemove(STORAGE_KEYS.session);}
 function getActiveSessionId(){
-  if(typeof S!=='undefined' && S && S.session && S.session.id)return S.session.id;
   const session=readSession();
   return session?.id || 'local-default';
 }
 function scopedKey(key,sessionId=getActiveSessionId()){return `wengan:${key}:${sessionId}`;}
 function readScopedString(key,fallbackKeys=[]){
-  const scoped=localStorage.getItem(scopedKey(key));
+  const scoped=storageGet(scopedKey(key));
   if(scoped!==null)return scoped;
   for(const fallbackKey of fallbackKeys){
-    const legacy=localStorage.getItem(fallbackKey);
+    const legacy=storageGet(fallbackKey);
     if(legacy!==null)return legacy;
   }
   return null;
 }
-function writeScopedString(key,value){localStorage.setItem(scopedKey(key),String(value));}
+function writeScopedString(key,value){storageSet(scopedKey(key),String(value));}
 function readScopedJSON(key,fallbackKeys=[],fallback=[]){
   const raw=readScopedString(key,fallbackKeys);
   if(raw===null)return fallback;
@@ -761,8 +778,8 @@ function persistOffset(){writeScopedString(STORAGE_KEYS.userOffset,S.tempOffset.
 function persistFeedbackCount(){writeScopedString(STORAGE_KEYS.feedbackCount,String(S.feedbackCount));}
 function readOutfitLogs(){return readScopedJSON(STORAGE_KEYS.outfitLogs,[STORAGE_KEYS.outfitLogs],[]);}
 function persistOutfitLogs(logs){writeScopedString(STORAGE_KEYS.outfitLogs,JSON.stringify((logs||[]).slice(0,30)));}
-function readActiveTab(){return localStorage.getItem(STORAGE_KEYS.activeTab) || 'home';}
-function persistActiveTab(tab){localStorage.setItem(STORAGE_KEYS.activeTab,tab);}
+function readActiveTab(){return storageGet(STORAGE_KEYS.activeTab) || 'home';}
+function persistActiveTab(tab){storageSet(STORAGE_KEYS.activeTab,tab);}
 function isGuideDismissed(){return readScopedString(STORAGE_KEYS.onboardingHidden,[])==='1';}
 function persistGuideDismissed(value){writeScopedString(STORAGE_KEYS.onboardingHidden,value?'1':'0');}
 function showToast(message,tone='default'){
@@ -1202,15 +1219,24 @@ function clearAuthInputs(){
   });
 }
 function setSession(session){
-  S.session=session;
-  persistSession(session);
-  persistGuideDismissed(false);
-  loadSessionData();
-  syncAuthState();
-  switchPage('home');
-  clearAuthInputs();
-  setAuthMessage('');
-  showToast(session?.isGuest?'已进入游客模式':'欢迎回来，温感已接入你的偏好','success');
+  try{
+    S.session=session;
+    persistSession(session);
+    persistGuideDismissed(false);
+    loadSessionData();
+    syncAuthState();
+    switchPage('home');
+    clearAuthInputs();
+    setAuthMessage('');
+    showToast(session?.isGuest?'已进入游客模式':'欢迎回来，温感已接入你的偏好','success');
+  }catch(err){
+    console.error('setSession failed',err);
+    S.session=null;
+    persistSession(null);
+    syncAuthState();
+    setAuthMessage('进入失败了，我已经拦住异常。请再试一次。');
+    showToast('进入失败，请再试一次','warn');
+  }
 }
 function openProfileModal(){
   if(!S.session){syncAuthState();return;}
@@ -1252,34 +1278,52 @@ function openCalibrationTab(){
   const slider=document.getElementById('bodySlider');
   slider?.scrollIntoView({behavior:'smooth',block:'center'});
 }
-function login(){
-  const account=normalizeAccountId(document.getElementById('loginAccount')?.value);
-  const password=String(document.getElementById('loginPassword')?.value||'').trim();
-  if(!account || !password){setAuthMessage('先输入账号和密码，我们再继续。');return;}
-  const user=loadUsers().find(item=>normalizeAccountId(item.account)===account && item.password===password);
-  if(!user){setAuthMessage('账号或密码不对，再确认一下。');return;}
-  setSession({...user,lastLoginAt:Date.now()});
+function submitLogin(){
+  try{
+    const account=normalizeAccountId(document.getElementById('loginAccount')?.value);
+    const password=String(document.getElementById('loginPassword')?.value||'').trim();
+    if(!account || !password){setAuthMessage('先输入账号和密码，我们再继续。');return;}
+    const user=loadUsers().find(item=>normalizeAccountId(item.account)===account && item.password===password);
+    if(!user){setAuthMessage('账号或密码不对，再确认一下。');return;}
+    setSession({...user,lastLoginAt:Date.now()});
+  }catch(err){
+    console.error('login failed',err);
+    setAuthMessage('登录时出了点问题，请再试一次。');
+    showToast('登录失败，请再试一次','warn');
+  }
 }
 function registerAccount(){
-  const name=String(document.getElementById('registerName')?.value||'').trim();
-  const account=normalizeAccountId(document.getElementById('registerAccount')?.value);
-  const password=String(document.getElementById('registerPassword')?.value||'').trim();
-  if(name.length<2){setAuthMessage('昵称至少 2 个字符，会更像真实产品。');return;}
-  if(account.length<4){setAuthMessage('账号至少 4 位，可以用手机号或邮箱。');return;}
-  if(password.length<6){setAuthMessage('密码至少 6 位，方便后续本机登录。');return;}
-  const users=loadUsers();
-  if(users.some(item=>normalizeAccountId(item.account)===account)){
-    setAuthMessage('这个账号已经注册过了，直接登录就好。');
-    return;
+  try{
+    const name=String(document.getElementById('registerName')?.value||'').trim();
+    const account=normalizeAccountId(document.getElementById('registerAccount')?.value);
+    const password=String(document.getElementById('registerPassword')?.value||'').trim();
+    if(name.length<2){setAuthMessage('昵称至少 2 个字符，会更像真实产品。');return;}
+    if(account.length<4){setAuthMessage('账号至少 4 位，可以用手机号或邮箱。');return;}
+    if(password.length<6){setAuthMessage('密码至少 6 位，方便后续本机登录。');return;}
+    const users=loadUsers();
+    if(users.some(item=>normalizeAccountId(item.account)===account)){
+      setAuthMessage('这个账号已经注册过了，直接登录就好。');
+      return;
+    }
+    const user={id:`user-${Date.now()}`,name,account,password,createdAt:Date.now(),isGuest:false};
+    users.unshift(user);
+    saveUsers(users);
+    setAuthMessage('账号已经创建好，正在为你进入首页…','success');
+    setSession(user);
+  }catch(err){
+    console.error('register failed',err);
+    setAuthMessage('创建账号时出了点问题，请再试一次。');
+    showToast('创建账号失败，请再试一次','warn');
   }
-  const user={id:`user-${Date.now()}`,name,account,password,createdAt:Date.now(),isGuest:false};
-  users.unshift(user);
-  saveUsers(users);
-  setAuthMessage('账号已经创建好，正在为你进入首页…','success');
-  setSession(user);
 }
 function continueAsGuest(){
-  setSession({id:`guest-${Date.now()}`,name:'访客',account:'游客模式',isGuest:true,createdAt:Date.now()});
+  try{
+    setSession({id:`guest-${Date.now()}`,name:'访客',account:'游客模式',isGuest:true,createdAt:Date.now()});
+  }catch(err){
+    console.error('continueAsGuest failed',err);
+    setAuthMessage('游客模式进入失败，请再试一次。');
+    showToast('游客模式进入失败','warn');
+  }
 }
 function logout(){
   if(!S.session)return;
