@@ -136,6 +136,9 @@ body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text
 .wardrobe-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .wardrobe-item{background:var(--card-bg);backdrop-filter:blur(16px);border-radius:20px;border:1px solid var(--card-border);box-shadow:var(--shadow);overflow:hidden;position:relative}
 .wardrobe-item.recommended{border-color:rgba(255,159,137,0.42);box-shadow:0 10px 24px rgba(255,159,137,0.12)}
+.item-tools{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
+.item-tool-btn{width:28px;height:28px;background:rgba(255,255,255,0.92);border:none;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.item-tool-btn.edit{color:var(--coral-dark)}
 .item-img{width:100%;height:130px;background:linear-gradient(135deg,#FFF0EC,#FFE8E0);display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
 .item-img img{width:100%;height:100%;object-fit:cover}
 .item-info{padding:10px 12px}
@@ -144,7 +147,6 @@ body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text
 .item-warmth{display:flex;gap:3px;margin-top:6px}
 .warmth-dot{width:7px;height:7px;border-radius:50%;background:#EEE}
 .warmth-dot.on{background:var(--coral)}
-.del-btn{position:absolute;top:8px;right:8px;width:26px;height:26px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 .empty-wardrobe{grid-column:span 2;text-align:center;padding:50px 20px;color:var(--text-light)}
 .empty-icon{font-size:56px;margin-bottom:12px;opacity:.5}
 .empty-text{font-size:14px;font-weight:600}
@@ -212,6 +214,8 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 .processing-text{font-size:14px;font-weight:700;color:var(--text-sub)}
 .preview-confirm-wrap{width:100%;border-radius:20px;overflow:hidden;aspect-ratio:3/4;background:#F8F4F2;margin-bottom:14px;display:flex;align-items:center;justify-content:center}
 #processedPreview{width:100%;height:100%;object-fit:contain;display:block}
+.inline-preview{width:100%;border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#F8F4F2;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--text-light)}
+.inline-preview img{width:100%;height:100%;object-fit:cover}
 
 /* 语音弹窗 */
 .voice-sheet{background:var(--cream);border-radius:28px 28px 0 0;padding:28px 20px calc(32px + env(safe-area-inset-bottom));max-width:430px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.34,1.56,0.64,1);text-align:center}
@@ -237,7 +241,9 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 .loading-overlay.hidden{opacity:0;pointer-events:none}
 .loading-logo{font-size:48px;animation:breathe 2s ease-in-out infinite}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.loading-badge{padding:7px 12px;border-radius:999px;background:rgba(255,159,137,0.12);border:1px solid rgba(255,159,137,0.18);font-size:11px;font-weight:700;color:var(--coral-dark)}
 .loading-text{font-size:14px;color:var(--text-sub);font-weight:600}
+.loading-subtext{font-size:12px;line-height:1.7;color:var(--text-light);font-weight:600;max-width:260px;text-align:center}
 .loading-bar{width:120px;height:3px;background:rgba(255,159,137,0.15);border-radius:99px;overflow:hidden}
 .loading-bar-fill{height:100%;background:var(--coral);border-radius:99px;animation:lanim 1.5s ease-in-out infinite}
 @keyframes lanim{0%{width:0;margin-left:0}50%{width:60%}100%{width:0;margin-left:120px}}
@@ -250,12 +256,87 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 .night-mode .alert-chip b{color:#E8F0FF}
 .night-mode .bottom-nav{background:rgba(20,32,60,0.9)}
 .night-mode .fb-btn{background:rgba(255,255,255,0.08)}
+
+/* 账户与历史 */
+.app.locked{filter:blur(10px);pointer-events:none;user-select:none}
+.auth-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(250,249,246,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:opacity .35s ease,visibility .35s ease}
+.auth-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.auth-card{width:100%;max-width:390px;background:rgba(255,255,255,0.88);border:1px solid rgba(255,255,255,0.94);border-radius:32px;box-shadow:0 22px 50px rgba(0,0,0,0.05);padding:28px 22px 24px}
+.auth-logo{width:64px;height:64px;border-radius:24px;margin:0 auto 16px;background:linear-gradient(135deg,var(--coral),var(--coral-dark));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 12px 24px rgba(255,159,137,0.28)}
+.auth-title{text-align:center;font-size:24px;font-weight:700;color:var(--text-main)}
+.auth-desc{text-align:center;font-size:13px;line-height:1.7;color:var(--text-sub);margin:8px 0 18px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px;background:rgba(255,255,255,0.7);border-radius:18px;margin-bottom:18px}
+.auth-tab{border:none;border-radius:14px;padding:10px 8px;font:inherit;font-size:13px;font-weight:700;color:var(--text-sub);background:transparent;cursor:pointer}
+.auth-tab.active{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;box-shadow:0 8px 18px rgba(255,159,137,0.24)}
+.auth-panel{display:none}
+.auth-panel.active{display:block}
+.auth-error{min-height:18px;font-size:12px;color:#D36A54;font-weight:700;margin:6px 2px 12px}
+.auth-primary,.auth-secondary{width:100%;border:none;border-radius:16px;padding:13px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.auth-primary{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;box-shadow:0 10px 24px rgba(255,159,137,0.25)}
+.auth-secondary{margin-top:10px;background:rgba(255,255,255,0.72);color:var(--text-main);border:1px solid rgba(0,0,0,0.06)}
+.account-card{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.account-meta{display:flex;align-items:center;gap:12px}
+.account-avatar{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--coral),var(--coral-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;box-shadow:0 10px 24px rgba(255,159,137,0.24)}
+.account-name{font-size:16px;font-weight:700;color:var(--text-main)}
+.account-sub{font-size:12px;color:var(--text-sub);line-height:1.6}
+.mini-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.mini-btn{flex:1;min-width:110px;border:none;border-radius:14px;padding:12px 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.mini-btn.primary{background:rgba(255,159,137,0.12);color:var(--coral-dark)}
+.mini-btn.soft{background:rgba(255,255,255,0.8);color:var(--text-main);border:1px solid rgba(0,0,0,0.05)}
+.history-list{display:grid;gap:10px}
+.history-item{background:rgba(255,255,255,0.66);border:1px solid rgba(255,255,255,0.78);border-radius:18px;padding:12px 14px}
+.history-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.history-date{font-size:11px;font-weight:700;color:var(--text-sub)}
+.history-feels{font-size:11px;font-weight:700;color:var(--coral-dark)}
+.history-text{font-size:12px;line-height:1.7;color:var(--text-main);font-weight:600}
+.empty-history{font-size:12px;color:var(--text-light);font-weight:600;text-align:center;padding:18px 8px}
+.auth-note{text-align:center;font-size:12px;line-height:1.7;color:var(--text-sub);margin-top:14px}
+.account-side{text-align:right;font-size:11px;line-height:1.6;color:var(--text-sub);font-weight:700}
+.mini-btn.danger{background:rgba(232,115,90,0.1);color:var(--coral-dark)}
+.welcome-card{background:linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,244,240,0.86));border:1px solid rgba(255,255,255,0.9);border-radius:24px;box-shadow:var(--shadow);padding:18px 18px 16px;margin-bottom:14px}
+.welcome-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.welcome-title{font-size:15px;font-weight:700;color:var(--text-main);margin-bottom:6px}
+.welcome-desc{font-size:12px;line-height:1.75;color:var(--text-sub);font-weight:600}
+.welcome-badge{padding:7px 11px;border-radius:999px;background:rgba(255,159,137,0.12);border:1px solid rgba(255,159,137,0.16);font-size:11px;font-weight:700;color:var(--coral-dark);white-space:nowrap}
+.welcome-metrics{display:flex;flex-wrap:wrap;gap:8px}
+.welcome-metric{padding:8px 11px;border-radius:16px;background:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.84);font-size:11px;font-weight:700;color:var(--text-sub)}
+.guide-card{background:rgba(255,255,255,0.86);border:1px solid rgba(255,255,255,0.9);border-radius:22px;box-shadow:var(--shadow);padding:16px 16px 14px;margin-bottom:14px}
+.guide-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.guide-title{font-size:14px;font-weight:700;color:var(--text-main)}
+.guide-desc{font-size:12px;line-height:1.7;color:var(--text-sub);font-weight:600}
+.guide-points{display:grid;gap:8px;margin-top:10px}
+.guide-point{font-size:12px;color:var(--text-main);font-weight:700;padding:10px 12px;border-radius:16px;background:rgba(255,244,240,0.7)}
+.guide-close{border:none;background:rgba(255,159,137,0.1);color:var(--coral-dark);border-radius:999px;padding:7px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.info-item{background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.84);border-radius:18px;padding:14px 12px}
+.info-label{font-size:11px;font-weight:700;color:var(--text-light);margin-bottom:6px}
+.info-value{font-size:12px;line-height:1.7;color:var(--text-main);font-weight:700}
+.tool-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.tool-row .mini-btn{margin-top:0}
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.quick-action{background:rgba(255,255,255,0.86);border:1px solid rgba(255,255,255,0.9);border-radius:20px;box-shadow:var(--shadow);padding:14px 10px 12px;text-align:center;cursor:pointer}
+.quick-action-icon{font-size:22px;margin-bottom:8px}
+.quick-action-title{font-size:12px;font-weight:700;color:var(--text-main);margin-bottom:3px}
+.quick-action-desc{font-size:10px;line-height:1.5;color:var(--text-light);font-weight:700}
+.delivery-list{display:grid;gap:10px}
+.delivery-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.84)}
+.delivery-copy{font-size:12px;line-height:1.7;color:var(--text-main);font-weight:700}
+.delivery-state{padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.delivery-state.ok{background:rgba(168,216,184,0.18);color:#5C8A68}
+.delivery-state.warn{background:rgba(255,159,137,0.14);color:var(--coral-dark)}
+.toast-stack{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(calc(100% - 32px),390px);display:grid;gap:10px;z-index:450;pointer-events:none}
+.toast{background:rgba(255,255,255,0.94);border:1px solid rgba(255,255,255,0.95);box-shadow:0 18px 40px rgba(0,0,0,0.06);border-radius:18px;padding:13px 14px;font-size:12px;line-height:1.6;color:var(--text-main);font-weight:700;opacity:0;transform:translateY(10px);animation:toastIn .25s ease forwards}
+.toast.success{border-color:rgba(168,216,184,0.6)}
+.toast.warn{border-color:rgba(255,159,137,0.4)}
+@keyframes toastIn{to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loading">
   <div class="loading-logo">🌡️</div>
+  <div class="loading-badge">温感 · 商业演示版</div>
+  <div class="loading-subtext">正在准备天气、体感校准和你的私人衣橱顾问体验，让首屏进入就更像一款完整 App。</div>
   <div class="loading-text">正在感知你的气候…</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
@@ -298,10 +379,29 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
           <div class="trend-times" id="trendTimes"></div>
         </div>
       </div>
+      <div class="welcome-card" id="welcomeCard"></div>
+      <div id="guideCard"></div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-icon">💧</div><div class="stat-val" id="humidity">--%</div><div class="stat-lbl">湿度</div></div>
         <div class="stat-card"><div class="stat-icon">🌬️</div><div class="stat-val" id="windSpeed">--</div><div class="stat-lbl">风速</div></div>
         <div class="stat-card"><div class="stat-icon">☀️</div><div class="stat-val" id="uvIndex">--</div><div class="stat-lbl">紫外线</div></div>
+      </div>
+      <div class="quick-actions">
+        <button class="quick-action" onclick="openCameraModal()">
+          <div class="quick-action-icon">📷</div>
+          <div class="quick-action-title">收纳单品</div>
+          <div class="quick-action-desc">拍一件常穿衣服</div>
+        </button>
+        <button class="quick-action" onclick="openCalibrationTab()">
+          <div class="quick-action-icon">🌡️</div>
+          <div class="quick-action-title">校准偏好</div>
+          <div class="quick-action-desc">调整怕冷怕热</div>
+        </button>
+        <button class="quick-action" onclick="retryWeather()">
+          <div class="quick-action-icon">⟳</div>
+          <div class="quick-action-title">刷新天气</div>
+          <div class="quick-action-desc">重新同步实时数据</div>
+        </button>
       </div>
       <div class="outfit-decision">
         <div class="outfit-header">
@@ -327,6 +427,10 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
       <div class="page-header">
         <div><div class="page-title">我的衣橱</div><div class="page-count" id="wardrobeCount">共 0 件单品</div></div>
         <button class="add-btn" onclick="openCameraModal()">📷 拍照收纳</button>
+      </div>
+      <div class="tool-row">
+        <button class="mini-btn soft" onclick="openImportWardrobe()">导入备份</button>
+        <button class="mini-btn primary" onclick="seedStarterWardrobe()">一键生成灵感衣橱</button>
       </div>
       <div class="wardrobe-grid" id="wardrobeGrid">
         <div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">拍张照片，开始收纳第一件</div></div>
@@ -361,6 +465,57 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
           <div class="wardrobe-stat-lbl">件收纳单品</div>
         </div>
       </div>
+      <div class="settings-section">
+        <div class="set-title">我的账户</div>
+        <div class="set-desc">登录后会在本机持续记住你的体感偏好、最近反馈和衣橱整理进度</div>
+        <div id="accountBox"></div>
+        <div class="mini-actions">
+          <button class="mini-btn soft" onclick="openProfileModal()">编辑资料</button>
+          <button class="mini-btn primary" onclick="exportWardrobe()">导出我的衣橱</button>
+          <button class="mini-btn soft" onclick="clearHistory()">清空最近记录</button>
+          <button class="mini-btn danger" onclick="logout()">退出当前账户</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="set-title">最近记录</div>
+        <div class="set-desc">每次点首页反馈后，我都会帮你把当时的体感和穿搭建议记下来，越用越懂你</div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+      <div class="settings-section">
+        <div class="set-title">维护操作</div>
+        <div class="set-desc">需要时可以重置私人校准或整理整套数据，方便演示、试用和交付前验收</div>
+        <div class="mini-actions">
+          <button class="mini-btn soft" onclick="resetCalibration()">重置体感校准</button>
+          <button class="mini-btn danger" onclick="clearWardrobe()">清空当前衣橱</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="set-title">应用信息</div>
+        <div class="set-desc">这一版已经具备天气、体感、衣橱、账户、本地持久化和历史记录等核心交付链路。</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">版本阶段</div>
+            <div class="info-value">商业演示版 V1.0</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">数据方式</div>
+            <div class="info-value">本地浏览器持久化</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">推荐逻辑</div>
+            <div class="info-value">优先组合你的衣橱单品</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">封装准备</div>
+            <div class="info-value">适合继续封成 H5 / WebView App</div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="set-title">交付检查</div>
+        <div class="set-desc">这里会实时检查当前演示版是否达到封装展示前的基础状态。</div>
+        <div class="delivery-list" id="deliveryCheck"></div>
+      </div>
     </div>
 
   </div>
@@ -384,6 +539,50 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 </div>
 
 <!-- 拍照弹窗 -->
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+<input type="file" id="importWardrobeInput" accept="application/json" hidden/>
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-logo">温</div>
+    <div class="auth-title">欢迎来到温感</div>
+    <div class="auth-desc">先登录或创建一个本地账号，让体感学习、衣橱推荐和反馈记录都稳定地跟着你走。</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login', this)">登录</button>
+      <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register', this)">注册</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-panel active" id="authPanelLogin">
+      <div class="form-group">
+        <label class="form-label">手机号 / 邮箱</label>
+        <input class="form-input" id="loginAccount" placeholder="请输入你的账号" autocomplete="username"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="请输入密码" autocomplete="current-password"/>
+      </div>
+      <button class="auth-primary" onclick="login()">登录继续</button>
+    </div>
+    <div class="auth-panel" id="authPanelRegister">
+      <div class="form-group">
+        <label class="form-label">昵称</label>
+        <input class="form-input" id="registerName" placeholder="比如：Lili" autocomplete="nickname"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">手机号 / 邮箱</label>
+        <input class="form-input" id="registerAccount" placeholder="用于本机登录" autocomplete="username"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">设置密码</label>
+        <input type="password" class="form-input" id="registerPassword" placeholder="至少 6 位" autocomplete="new-password"/>
+      </div>
+      <button class="auth-primary" onclick="registerAccount()">创建账号</button>
+    </div>
+    <button class="auth-secondary" onclick="continueAsGuest()">先以游客模式体验</button>
+    <div class="auth-note">这是前端本地体验版，账号数据会保存在当前浏览器中，方便你直接预览完整产品流程。</div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="cameraOverlay" onclick="closeCameraOnBg(event)">
   <div class="modal-sheet" id="cameraSheet">
     <div class="modal-handle"></div>
@@ -453,6 +652,66 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
   </div>
 </div>
 
+<div class="modal-overlay" id="editOverlay" onclick="closeEditOnBg(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">编辑单品</div>
+    <div class="inline-preview" id="editPreview">👗</div>
+    <div class="form-group">
+      <label class="form-label">更换照片（可选）</label>
+      <input type="file" class="form-input" id="editPhotoInput" accept="image/*"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">单品名称</label>
+      <input class="form-input" id="editItemName" placeholder="例如：奶油白针织开衫" maxlength="20"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">分类</label>
+      <select class="form-select" id="editItemType">
+        <option value="外套">外套</option>
+        <option value="上衣">上衣</option>
+        <option value="下装">下装</option>
+        <option value="连衣裙">连衣裙</option>
+        <option value="配件">配件</option>
+        <option value="鞋履">鞋履</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">厚度（保暖等级）</label>
+      <div class="warmth-picker" id="editWarmthPicker">
+        <button class="warmth-opt" data-val="1" onclick="selectEditWarmth(this)">薄</button>
+        <button class="warmth-opt" data-val="2" onclick="selectEditWarmth(this)">中薄</button>
+        <button class="warmth-opt" data-val="3" onclick="selectEditWarmth(this)">适中</button>
+        <button class="warmth-opt" data-val="4" onclick="selectEditWarmth(this)">偏厚</button>
+        <button class="warmth-opt" data-val="5" onclick="selectEditWarmth(this)">很厚</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+      <button class="btn-save" onclick="saveEditedItem()">保存修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profileOverlay" onclick="closeProfileOnBg(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">编辑资料</div>
+    <div class="form-group">
+      <label class="form-label">昵称</label>
+      <input class="form-input" id="profileName" placeholder="例如：Lili"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">账号标识</label>
+      <input class="form-input" id="profileAccount" placeholder="手机号或邮箱"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeProfileModal()">取消</button>
+      <button class="btn-save" onclick="saveProfile()">保存资料</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const STORAGE_KEYS={
   userOffset:'userTempOffset',
@@ -460,29 +719,87 @@ const STORAGE_KEYS={
   wardrobe:'wardrobe',
   feedbackCount:'feedbackCount',
   outfitLogs:'outfitLogs',
+  users:'weatherUsers',
+  session:'weatherSession',
+  activeTab:'activeTab',
+  onboardingHidden:'onboardingHidden',
 };
 
 function clamp(num,min,max){return Math.max(min,Math.min(max,num));}
 function toNum(value,fallback=0){const n=Number(value);return Number.isFinite(n)?n:fallback;}
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function readJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback;}catch{return fallback;}}
+function writeJSON(key,value){localStorage.setItem(key,JSON.stringify(value));}
+function readSession(){return readJSON(STORAGE_KEYS.session,null);}
+function persistSession(session){if(session)writeJSON(STORAGE_KEYS.session,session);else localStorage.removeItem(STORAGE_KEYS.session);}
+function getActiveSessionId(){
+  if(typeof S!=='undefined' && S && S.session && S.session.id)return S.session.id;
+  const session=readSession();
+  return session?.id || 'local-default';
+}
+function scopedKey(key,sessionId=getActiveSessionId()){return `wengan:${key}:${sessionId}`;}
+function readScopedString(key,fallbackKeys=[]){
+  const scoped=localStorage.getItem(scopedKey(key));
+  if(scoped!==null)return scoped;
+  for(const fallbackKey of fallbackKeys){
+    const legacy=localStorage.getItem(fallbackKey);
+    if(legacy!==null)return legacy;
+  }
+  return null;
+}
+function writeScopedString(key,value){localStorage.setItem(scopedKey(key),String(value));}
+function readScopedJSON(key,fallbackKeys=[],fallback=[]){
+  const raw=readScopedString(key,fallbackKeys);
+  if(raw===null)return fallback;
+  try{return JSON.parse(raw);}catch{return fallback;}
+}
 function readStoredOffset(){
-  const raw=localStorage.getItem(STORAGE_KEYS.userOffset)??localStorage.getItem(STORAGE_KEYS.legacyOffset)??'0';
+  const raw=readScopedString(STORAGE_KEYS.userOffset,[STORAGE_KEYS.userOffset,STORAGE_KEYS.legacyOffset]) ?? '0';
   return clamp(toNum(raw,0),-3,3);
 }
-function persistOffset(){
-  const value=S.tempOffset.toFixed(1);
-  localStorage.setItem(STORAGE_KEYS.userOffset,value);
-  localStorage.setItem(STORAGE_KEYS.legacyOffset,value);
+function persistOffset(){writeScopedString(STORAGE_KEYS.userOffset,S.tempOffset.toFixed(1));}
+function persistFeedbackCount(){writeScopedString(STORAGE_KEYS.feedbackCount,String(S.feedbackCount));}
+function readOutfitLogs(){return readScopedJSON(STORAGE_KEYS.outfitLogs,[STORAGE_KEYS.outfitLogs],[]);}
+function persistOutfitLogs(logs){writeScopedString(STORAGE_KEYS.outfitLogs,JSON.stringify((logs||[]).slice(0,30)));}
+function readActiveTab(){return localStorage.getItem(STORAGE_KEYS.activeTab) || 'home';}
+function persistActiveTab(tab){localStorage.setItem(STORAGE_KEYS.activeTab,tab);}
+function isGuideDismissed(){return readScopedString(STORAGE_KEYS.onboardingHidden,[])==='1';}
+function persistGuideDismissed(value){writeScopedString(STORAGE_KEYS.onboardingHidden,value?'1':'0');}
+function showToast(message,tone='default'){
+  const stack=document.getElementById('toastStack');
+  if(!stack || !message)return;
+  const toast=document.createElement('div');
+  toast.className=`toast ${tone}`;
+  toast.textContent=message;
+  stack.appendChild(toast);
+  setTimeout(()=>{toast.style.opacity='0';toast.style.transform='translateY(8px)';},2200);
+  setTimeout(()=>toast.remove(),2600);
 }
-function persistFeedbackCount(){localStorage.setItem(STORAGE_KEYS.feedbackCount,String(S.feedbackCount));}
+function getStarterWardrobe(){
+  return [
+    {name:'奶油白长风衣',type:'外套',warmth:2},
+    {name:'浅杏西装外套',type:'外套',warmth:2},
+    {name:'燕麦色针织开衫',type:'上衣',warmth:2},
+    {name:'高领羊绒打底',type:'上衣',warmth:4},
+    {name:'柔雾白长袖T恤',type:'上衣',warmth:1},
+    {name:'缎面衬衫裙',type:'连衣裙',warmth:1},
+    {name:'冰丝阔腿裤',type:'下装',warmth:1},
+    {name:'羊毛呢长裤',type:'下装',warmth:3},
+    {name:'围巾',type:'配件',warmth:2},
+    {name:'短靴',type:'鞋履',warmth:1},
+  ].map((item,index)=>normalizeWardrobeItem({...item,id:`starter-${Date.now()}-${index}`,addedAt:Date.now()+index}));
+}
 
 const S={
   apiKey:'63d45dfa246b4e38bcef997d971d5f4e',
   apiHost:'https://q53yfrupmn.re.qweatherapi.com',
   locationId:'101090501',
   cityName:'唐山市',
+  session:readSession(),
+  activeTab:readActiveTab(),
   tempOffset:readStoredOffset(),
-  feedbackCount:Math.max(0,Math.floor(toNum(localStorage.getItem(STORAGE_KEYS.feedbackCount),0))),
-  wardrobe:JSON.parse(localStorage.getItem(STORAGE_KEYS.wardrobe)||'[]'),
+  feedbackCount:Math.max(0,Math.floor(toNum(readScopedString(STORAGE_KEYS.feedbackCount,[STORAGE_KEYS.feedbackCount]),0))),
+  wardrobe:readScopedJSON(STORAGE_KEYS.wardrobe,[STORAGE_KEYS.wardrobe],[]),
   weather:null,
   hourly:[],
   daily:[],
@@ -491,16 +808,18 @@ const S={
   feels:0,
   error:'',
   selectedWarmth:1,
+  editWarmth:1,
+  editingIndex:-1,
   photoData:null,
   processedPhoto:null,
+  editPhotoData:null,
   pendingFeedbackDir:0,
   activeRecommendationIds:[],
   mediaStream:null,
   recognition:null,
   isRecording:false,
   voiceText:'',
-};
-const BODY_LABELS=['极度怕冷','较怕冷','偏怕冷','体感正常','偏怕热','较怕热','极度怕热'];
+};const BODY_LABELS=['极度怕冷','较怕冷','偏怕冷','体感正常','偏怕热','较怕热','极度怕热'];
 const TYPE_WEIGHT={'外套':1.4,'上衣':1.0,'下装':0.9,'连衣裙':0.85,'配件':0.45,'鞋履':0.35};
 const TYPE_DEFAULT_NAMES={外套:'质感外套',上衣:'柔软上衣',下装:'舒适下装',连衣裙:'轻盈连衣裙',配件:'搭配配件',鞋履:'日常鞋履'};
 const TYPE_ICONS={外套:'🧥',上衣:'👚',下装:'👖',连衣裙:'👗',配件:'🧣',鞋履:'👢'};
@@ -580,9 +899,7 @@ function normalizeWardrobeItem(item){
   };
 }
 
-function persistWardrobe(){
-  localStorage.setItem(STORAGE_KEYS.wardrobe,JSON.stringify(S.wardrobe));
-}
+function persistWardrobe(){writeScopedString(STORAGE_KEYS.wardrobe,JSON.stringify(S.wardrobe));}
 
 function matchKeywords(name,keywords){
   const text=String(name||'');
@@ -672,7 +989,6 @@ function generateInsight(tempMax,tempMin,windScale,pop,uvIndex){
 function handleUserFeedback(feedbackType){
   S.feedbackCount+=1;
   if(feedbackType==='colder'){
-    // 当前页面左侧是“怕冷”，因此向负方向移动更符合滑块语义。
     S.tempOffset=clamp(S.tempOffset-1,-3,3);
   }else if(feedbackType==='hotter'){
     S.tempOffset=clamp(S.tempOffset+1,-3,3);
@@ -683,9 +999,9 @@ function handleUserFeedback(feedbackType){
   persistFeedbackCount();
   document.getElementById('bodySlider').value=Math.round(S.tempOffset);
   updateSliderLabel(Math.round(S.tempOffset));
+  renderAccountSection();
   updateUI();
 }
-
 function deriveWindScale(windSpeed){
   const speed=toNum(windSpeed);
   if(speed>=39)return 6;
@@ -763,6 +1079,289 @@ function renderAlertChips({pop,windScale,uvIndex,tempMax,tempMin}){
   holder.innerHTML=chips.map(chip=>`<div class="alert-chip ${chip.cls}"><span>${chip.icon}</span><span>${chip.label}</span></div>`).join('');
 }
 
+function normalizeAccountId(value){return String(value||'').trim().toLowerCase();}
+function loadUsers(){return readJSON(STORAGE_KEYS.users,[]);}
+function saveUsers(users){writeJSON(STORAGE_KEYS.users,users);}
+function setAuthMessage(message,tone='error'){
+  const el=document.getElementById('authError');
+  if(!el)return;
+  el.textContent=message||'';
+  el.style.color=tone==='success' ? '#6B9278' : '#D36A54';
+}
+function switchAuthTab(tab,btn){
+  document.querySelectorAll('.auth-tab').forEach(node=>node.classList.toggle('active',node===btn));
+  document.querySelectorAll('.auth-panel').forEach(panel=>panel.classList.remove('active'));
+  document.getElementById(tab==='register'?'authPanelRegister':'authPanelLogin')?.classList.add('active');
+  setAuthMessage('');
+}
+function getCurrentUser(){return S.session||null;}
+function syncAuthState(){
+  const overlay=document.getElementById('authOverlay');
+  const app=document.getElementById('app');
+  const hasSession=Boolean(S.session);
+  overlay?.classList.toggle('hidden',hasSession);
+  app?.classList.toggle('locked',!hasSession);
+}
+function renderAccountSection(){
+  const box=document.getElementById('accountBox');
+  if(!box)return;
+  const user=getCurrentUser();
+  if(!user){
+    box.innerHTML='<div class="empty-history">登录后即可查看你的账户信息、校准偏好和本地记录。</div>';
+    return;
+  }
+  const preference=BODY_LABELS[Math.round(S.tempOffset)+3] || '体感正常';
+  const primary=user.name || (user.isGuest ? '游客模式' : '温感用户');
+  const secondary=user.isGuest
+    ? '游客体验中 · 数据仅保存在本机当前浏览器'
+    : `${user.account || '本地账号'} · 已累计校准 ${S.feedbackCount} 次`;
+  box.innerHTML=`<div class="account-card"><div class="account-meta"><div class="account-avatar">${escapeHtml(primary.slice(0,1).toUpperCase())}</div><div><div class="account-name">${escapeHtml(primary)}</div><div class="account-sub">${escapeHtml(secondary)}<br/>当前体感画像：${escapeHtml(preference)}</div></div></div><div class="account-side">${user.isGuest?'游客':'账号'}<br/>${S.wardrobe.length} 件衣橱</div></div>`;
+}
+function renderHistoryList(){
+  const holder=document.getElementById('historyList');
+  if(!holder)return;
+  const logs=readOutfitLogs();
+  if(!logs.length){
+    holder.innerHTML='<div class="empty-history">最近还没有记录，回到首页点一次体感反馈，我就会开始记住你的穿搭判断。</div>';
+    return;
+  }
+  holder.innerHTML=logs.map(log=>{
+    const outfit=(log.outfit||[]).join(' + ');
+    const detail=log.note
+      ? `记录：${escapeHtml(log.note)}`
+      : `推荐：${escapeHtml(outfit || log.recommendation || '已完成一次体感校准')}`;
+    return `<div class="history-item"><div class="history-top"><span class="history-date">${escapeHtml(log.date||'')}</span><span class="history-feels">Lv.${escapeHtml(log.level||'--')} · ${escapeHtml(log.feels||'--')}°C</span></div><div class="history-text">${escapeHtml(log.feedback||'体感记录')} · ${detail}</div></div>`;
+  }).join('');
+}
+function renderWelcomeCard(){
+  const card=document.getElementById('welcomeCard');
+  if(!card)return;
+  const user=getCurrentUser();
+  if(!user){
+    card.innerHTML='<div class="welcome-top"><div><div class="welcome-title">先登录，再让我更懂你</div><div class="welcome-desc">登录后会记住你的私人温差偏好、衣橱搭配和最近反馈，整个推荐会更像专属顾问。</div></div><div class="welcome-badge">未登录</div></div><div class="welcome-metrics"><div class="welcome-metric">支持游客体验</div><div class="welcome-metric">本地保存偏好</div><div class="welcome-metric">推荐基于你的衣橱</div></div>';
+    return;
+  }
+  const summary=[
+    `已校准 ${S.feedbackCount} 次`,
+    `已收纳 ${S.wardrobe.length} 件`,
+    `当前偏移 ${S.tempOffset > 0 ? '+' : ''}${S.tempOffset}°C`,
+  ];
+  const tip=S.wardrobe.length
+    ? '今天的推荐会优先从你的衣橱里组合，缺少的单品也会明确提醒。'
+    : '先拍几件常穿衣服进衣橱，首页的推荐就会从“泛推荐”升级成“你的衣服组合”。';
+  card.innerHTML=`<div class="welcome-top"><div><div class="welcome-title">你好，${escapeHtml(user.name || '你')}</div><div class="welcome-desc">${tip}</div></div><div class="welcome-badge">${user.isGuest?'游客模式':'本地账户'}</div></div><div class="welcome-metrics">${summary.map(item=>`<div class="welcome-metric">${item}</div>`).join('')}</div>`;
+}
+function renderGuideCard(){
+  const holder=document.getElementById('guideCard');
+  if(!holder)return;
+  if(!S.session || isGuideDismissed()){
+    holder.innerHTML='';
+    return;
+  }
+  const points=S.wardrobe.length
+    ? ['首页会优先从你的衣橱里组合穿搭。','点“有点冷/热”后，我会立刻重算推荐。','设置页可以导出备份，便于演示交付。']
+    : ['先往衣橱里放 3-5 件高频单品。','之后首页推荐会从你的衣服中自动组合。','也可以先点“一键生成灵感衣橱”快速预览完整效果。'];
+  holder.innerHTML=`<div class="guide-card"><div class="guide-head"><div><div class="guide-title">3 步进入最佳体验</div><div class="guide-desc">这是一张首次使用提示卡，帮你更快把界面跑到最完整的产品状态。</div></div><button class="guide-close" onclick="dismissGuide()">我知道了</button></div><div class="guide-points">${points.map(item=>`<div class="guide-point">${item}</div>`).join('')}</div></div>`;
+}
+function dismissGuide(){
+  persistGuideDismissed(true);
+  renderGuideCard();
+}
+function renderDeliveryCheck(){
+  const holder=document.getElementById('deliveryCheck');
+  if(!holder)return;
+  const checks=[
+    {label:'账号体系可用',ok:Boolean(S.session),okText:'已就绪',warnText:'待登录'},
+    {label:'实时天气已接入',ok:Boolean(S.weather) && !S.error,okText:'已同步',warnText:'示例数据'},
+    {label:'私人衣橱基础数据',ok:S.wardrobe.length>=3,okText:`${S.wardrobe.length} 件`,warnText:`仅 ${S.wardrobe.length} 件`},
+    {label:'体感反馈闭环',ok:S.feedbackCount>=1,okText:`已反馈 ${S.feedbackCount} 次`,warnText:'待体验'},
+    {label:'备份导入导出能力',ok:true,okText:'已具备',warnText:'已具备'},
+  ];
+  holder.innerHTML=checks.map(item=>`<div class="delivery-item"><div class="delivery-copy">${item.label}</div><div class="delivery-state ${item.ok?'ok':'warn'}">${item.ok?item.okText:item.warnText}</div></div>`).join('');
+}
+function loadSessionData(){
+  S.tempOffset=readStoredOffset();
+  S.feedbackCount=Math.max(0,Math.floor(toNum(readScopedString(STORAGE_KEYS.feedbackCount,[STORAGE_KEYS.feedbackCount]),0)));
+  S.wardrobe=readScopedJSON(STORAGE_KEYS.wardrobe,[STORAGE_KEYS.wardrobe],[]).map(normalizeWardrobeItem);
+  persistWardrobe();
+  const slider=document.getElementById('bodySlider');
+  if(slider)slider.value=Math.round(S.tempOffset);
+  updateSliderLabel(Math.round(S.tempOffset));
+  renderWardrobe();
+  renderAccountSection();
+  renderHistoryList();
+  renderWelcomeCard();
+  renderGuideCard();
+  renderDeliveryCheck();
+  if(S.weather)updateUI();
+}
+function clearAuthInputs(){
+  ['loginAccount','loginPassword','registerName','registerAccount','registerPassword'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
+}
+function setSession(session){
+  S.session=session;
+  persistSession(session);
+  persistGuideDismissed(false);
+  loadSessionData();
+  syncAuthState();
+  switchPage('home');
+  clearAuthInputs();
+  setAuthMessage('');
+  showToast(session?.isGuest?'已进入游客模式':'欢迎回来，温感已接入你的偏好','success');
+}
+function openProfileModal(){
+  if(!S.session){syncAuthState();return;}
+  document.getElementById('profileName').value=S.session.name || '';
+  document.getElementById('profileAccount').value=S.session.account || '';
+  document.getElementById('profileAccount').disabled=Boolean(S.session.isGuest);
+  document.getElementById('profileOverlay').classList.add('open');
+}
+function closeProfileModal(){document.getElementById('profileOverlay').classList.remove('open');}
+function closeProfileOnBg(event){if(event.target===document.getElementById('profileOverlay'))closeProfileModal();}
+function saveProfile(){
+  if(!S.session)return;
+  const name=String(document.getElementById('profileName').value||'').trim();
+  const account=String(document.getElementById('profileAccount').value||'').trim();
+  if(name.length<2){showToast('昵称至少 2 个字符','warn');return;}
+  if(!S.session.isGuest && account.length<4){showToast('账号标识至少 4 位','warn');return;}
+  if(S.session.isGuest){
+    S.session={...S.session,name};
+    persistSession(S.session);
+  }else{
+    const users=loadUsers();
+    if(users.some(item=>item.id!==S.session.id && normalizeAccountId(item.account)===normalizeAccountId(account))){
+      showToast('这个账号标识已经被使用了','warn');
+      return;
+    }
+    const nextUser={...S.session,name,account};
+    saveUsers(users.map(item=>item.id===S.session.id?{...item,name,account}:item));
+    S.session=nextUser;
+    persistSession(nextUser);
+  }
+  renderAccountSection();
+  renderWelcomeCard();
+  renderDeliveryCheck();
+  closeProfileModal();
+  showToast('资料已更新','success');
+}
+function openCalibrationTab(){
+  switchPage('settings');
+  const slider=document.getElementById('bodySlider');
+  slider?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function login(){
+  const account=normalizeAccountId(document.getElementById('loginAccount')?.value);
+  const password=String(document.getElementById('loginPassword')?.value||'').trim();
+  if(!account || !password){setAuthMessage('先输入账号和密码，我们再继续。');return;}
+  const user=loadUsers().find(item=>normalizeAccountId(item.account)===account && item.password===password);
+  if(!user){setAuthMessage('账号或密码不对，再确认一下。');return;}
+  setSession({...user,lastLoginAt:Date.now()});
+}
+function registerAccount(){
+  const name=String(document.getElementById('registerName')?.value||'').trim();
+  const account=normalizeAccountId(document.getElementById('registerAccount')?.value);
+  const password=String(document.getElementById('registerPassword')?.value||'').trim();
+  if(name.length<2){setAuthMessage('昵称至少 2 个字符，会更像真实产品。');return;}
+  if(account.length<4){setAuthMessage('账号至少 4 位，可以用手机号或邮箱。');return;}
+  if(password.length<6){setAuthMessage('密码至少 6 位，方便后续本机登录。');return;}
+  const users=loadUsers();
+  if(users.some(item=>normalizeAccountId(item.account)===account)){
+    setAuthMessage('这个账号已经注册过了，直接登录就好。');
+    return;
+  }
+  const user={id:`user-${Date.now()}`,name,account,password,createdAt:Date.now(),isGuest:false};
+  users.unshift(user);
+  saveUsers(users);
+  setAuthMessage('账号已经创建好，正在为你进入首页…','success');
+  setSession(user);
+}
+function continueAsGuest(){
+  setSession({id:`guest-${Date.now()}`,name:'访客',account:'游客模式',isGuest:true,createdAt:Date.now()});
+}
+function logout(){
+  if(!S.session)return;
+  if(!confirm('确认退出当前账户吗？本机保存的数据仍会保留，下次登录还能继续。'))return;
+  stopVoice();
+  stopCamera();
+  closeEditModal();
+  closeProfileModal();
+  S.session=null;
+  persistSession(null);
+  S.tempOffset=0;
+  S.feedbackCount=0;
+  S.wardrobe=[];
+  document.getElementById('bodySlider').value=0;
+  updateSliderLabel(0);
+  renderWardrobe();
+  if(S.weather)updateUI();
+  switchPage('home');
+  syncAuthState();
+  renderAccountSection();
+  renderHistoryList();
+  renderGuideCard();
+  renderDeliveryCheck();
+  clearAuthInputs();
+  const loginTab=document.querySelector('.auth-tab[data-tab="login"]');
+  if(loginTab)switchAuthTab('login',loginTab);
+  setAuthMessage('');
+  showToast('已退出当前账户');
+}
+function exportWardrobe(){
+  if(!S.session){syncAuthState();return;}
+  const payload={
+    exportedAt:new Date().toISOString(),
+    user:S.session.name || '访客',
+    tempOffset:S.tempOffset,
+    feedbackCount:S.feedbackCount,
+    wardrobe:S.wardrobe,
+    history:readOutfitLogs(),
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download=`温感备份-${Date.now()}.json`;
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(link.href),800);
+  showToast('衣橱备份已经导出','success');
+}
+function clearHistory(){
+  if(!confirm('确认清空最近记录吗？这不会影响你已经学到的体感偏好。'))return;
+  persistOutfitLogs([]);
+  renderHistoryList();
+  showToast('最近记录已清空');
+}
+function resetCalibration(){
+  if(!S.session){syncAuthState();return;}
+  if(!confirm('确认把体感校准恢复到初始状态吗？这会把偏移量和反馈次数清零。'))return;
+  S.tempOffset=0;
+  S.feedbackCount=0;
+  persistOffset();
+  persistFeedbackCount();
+  document.getElementById('bodySlider').value=0;
+  updateSliderLabel(0);
+  renderAccountSection();
+  renderWelcomeCard();
+  updateUI();
+  showToast('体感校准已重置');
+}
+function clearWardrobe(){
+  if(!S.session){syncAuthState();return;}
+  if(!S.wardrobe.length){showToast('当前衣橱已经是空的');return;}
+  if(!confirm('确认清空当前账户下的全部衣橱单品吗？此操作无法撤回。'))return;
+  S.wardrobe=[];
+  persistWardrobe();
+  renderWardrobe();
+  renderAccountSection();
+  renderWelcomeCard();
+  renderGuideCard();
+  renderDeliveryCheck();
+  updateUI();
+  showToast('衣橱已清空');
+}
+
 function updateUI(){
   const w=S.weather;if(!w)return;
   const temp=toNum(w.temp),hum=toNum(w.humidity),wind=toNum(w.windSpeed),night=new Date().getHours()>=20||new Date().getHours()<6;
@@ -790,6 +1389,9 @@ function updateUI(){
   const insightText=generateInsight(tempMax,tempMin,windScale,pop,S.uvIndex);
   document.getElementById('insightText').textContent=S.error?`${S.error} ${insightText}`:insightText;
   renderAlertChips({pop,windScale,uvIndex:S.uvIndex,tempMax,tempMin});
+  renderWelcomeCard();
+  renderGuideCard();
+  renderDeliveryCheck();
   renderOutfitSection(S.feels);
   renderWardrobe();
   drawTrend(S.hourly);
@@ -826,6 +1428,10 @@ async function fetchWeather(){
   }
   hideLoading();
 }
+function retryWeather(){
+  showToast('正在重新同步天气…');
+  fetchWeather();
+}
 function useMockData(){
   S.error='天气服务暂时有点慢，我先用示例数据把页面撑起来。';
   S.weather={temp:'18',humidity:'65',windSpeed:'12',windScale:'3',icon:'100',text:'晴',city:S.cityName};
@@ -834,12 +1440,14 @@ function useMockData(){
   S.uvIndex=6;
   S.pop=45;
   updateUI();
+  showToast('天气服务暂时较慢，先用示例天气保证界面可预览','warn');
 }
 function initLocation(){fetchWeather();}
 function hideLoading(){setTimeout(()=>{document.getElementById('loading').classList.add('hidden');setTimeout(()=>document.getElementById('loading').style.display='none',500);},800);}
 
 // ── 体感反馈 → 语音弹窗 ──
 function submitFeedback(dir){
+  if(!S.session){syncAuthState();return;}
   S.pendingFeedbackDir=dir;
   ['fbCold','fbOk','fbHot'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   if(dir===-1)document.getElementById('fbCold').classList.add('selected');
@@ -866,19 +1474,47 @@ function openVoiceModal(dir){
   S.voiceText='';
   document.getElementById('voiceOverlay').classList.add('open');
 }
+function feedbackLabelFromDir(dir){return dir===-1?'有点冷':dir===1?'有点热':'刚刚好';}
+function readVoiceTranscript(){
+  const el=document.getElementById('voiceTranscript');
+  if(!el)return S.voiceText.trim();
+  if(S.voiceText.trim())return S.voiceText.trim();
+  if(el.classList.contains('placeholder'))return '';
+  return String(el.textContent||'').trim();
+}
+function appendOutfitLog(dir,note=''){
+  const result=recommendFromWardrobe(S.feels);
+  const logs=readOutfitLogs();
+  logs.unshift({
+    id:Date.now(),
+    date:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    feels:S.feels.toFixed(1),
+    level:result.recommendation.level,
+    feedback:feedbackLabelFromDir(dir),
+    note,
+    recommendation:result.recommendation.formula,
+    outfit:result.items.map(item=>item.name),
+    createdAt:Date.now(),
+  });
+  persistOutfitLogs(logs);
+}
+function commitPendingFeedback(){
+  const note=readVoiceTranscript();
+  appendOutfitLog(S.pendingFeedbackDir,note);
+  if(S.pendingFeedbackDir===-1)handleUserFeedback('colder');
+  else if(S.pendingFeedbackDir===1)handleUserFeedback('hotter');
+  else handleUserFeedback('ok');
+  renderHistoryList();
+  showToast('体感已记录，推荐已实时更新','success');
+  S.pendingFeedbackDir=0;
+  S.voiceText='';
+}
 function closeVoiceModal(apply){
-  if(apply)applyFeedback(S.pendingFeedbackDir);
+  if(apply)commitPendingFeedback();
   stopVoice();
   document.getElementById('voiceOverlay').classList.remove('open');
 }
-function confirmVoice(){
-  if(S.voiceText){
-    const logs=JSON.parse(localStorage.getItem(STORAGE_KEYS.outfitLogs)||'[]');
-    logs.unshift({date:new Date().toLocaleDateString(),text:S.voiceText,feels:S.feels});
-    localStorage.setItem(STORAGE_KEYS.outfitLogs,JSON.stringify(logs.slice(0,30)));
-  }
-  closeVoiceModal(true);
-}
+function confirmVoice(){closeVoiceModal(true);}
 function toggleVoice(){S.isRecording?stopVoice():startVoice()}
 function startVoice(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -903,6 +1539,7 @@ function stopVoice(){
 
 // ── 拍照 ──
 function openCameraModal(){
+  if(!S.session){syncAuthState();return;}
   document.getElementById('cameraOverlay').classList.add('open');
   showStep('Camera');startCamera();
 }
@@ -976,20 +1613,136 @@ async function processPhoto(dataUrl){
 }
 
 // ── 衣橱 ──
+function openImportWardrobe(){
+  if(!S.session){syncAuthState();return;}
+  document.getElementById('importWardrobeInput')?.click();
+}
+function seedStarterWardrobe(){
+  if(!S.session){syncAuthState();return;}
+  if(S.wardrobe.length && !confirm('灵感衣橱会追加到现有衣橱中，继续吗？'))return;
+  S.wardrobe=[...S.wardrobe,...getStarterWardrobe()];
+  persistWardrobe();
+  renderWardrobe();
+  renderAccountSection();
+  renderWelcomeCard();
+  if(S.weather)updateUI();
+  showToast('已经为你放入一组高频搭配单品','success');
+}
+function importWardrobeFile(event){
+  if(!S.session){syncAuthState();return;}
+  const file=event?.target?.files?.[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    try{
+      const parsed=JSON.parse(String(e.target?.result||'{}'));
+      const source=Array.isArray(parsed) ? parsed : parsed.wardrobe;
+      if(!Array.isArray(source) || !source.length)throw new Error('empty');
+      const imported=source.map(normalizeWardrobeItem);
+      S.wardrobe=imported;
+      persistWardrobe();
+      renderWardrobe();
+      renderAccountSection();
+      renderWelcomeCard();
+      renderGuideCard();
+      renderDeliveryCheck();
+      if(S.weather)updateUI();
+      showToast(`已导入 ${imported.length} 件单品`, 'success');
+    }catch{
+      showToast('这个备份文件暂时无法识别，请换一个 JSON 试试','warn');
+    }finally{
+      event.target.value='';
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+function renderEditPreview(photo,type){
+  const preview=document.getElementById('editPreview');
+  if(!preview)return;
+  preview.innerHTML=photo?`<img src="${photo}" alt="单品预览"/>`:(TYPE_ICONS[type]||'👗');
+}
+function openEditItem(index){
+  if(!S.session){syncAuthState();return;}
+  const item=S.wardrobe[index];
+  if(!item)return;
+  S.editingIndex=index;
+  S.editWarmth=toNum(item.warmth,2);
+  S.editPhotoData=item.photo||null;
+  document.getElementById('editItemName').value=item.name||'';
+  document.getElementById('editItemType').value=item.type||'上衣';
+  document.getElementById('editPhotoInput').value='';
+  document.querySelectorAll('#editWarmthPicker .warmth-opt').forEach(btn=>btn.classList.toggle('selected',Number(btn.dataset.val)===S.editWarmth));
+  renderEditPreview(S.editPhotoData,item.type);
+  document.getElementById('editOverlay').classList.add('open');
+}
+function closeEditModal(){
+  document.getElementById('editOverlay').classList.remove('open');
+  S.editingIndex=-1;
+  S.editPhotoData=null;
+}
+function closeEditOnBg(event){if(event.target===document.getElementById('editOverlay'))closeEditModal();}
+function selectEditWarmth(btn){
+  document.querySelectorAll('#editWarmthPicker .warmth-opt').forEach(node=>node.classList.remove('selected'));
+  btn.classList.add('selected');
+  S.editWarmth=parseInt(btn.dataset.val,10);
+}
+function handleEditPhoto(event){
+  const file=event?.target?.files?.[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    S.editPhotoData=String(e.target?.result||'');
+    renderEditPreview(S.editPhotoData,document.getElementById('editItemType').value);
+  };
+  reader.readAsDataURL(file);
+}
+function syncEditTypePreview(){
+  const type=document.getElementById('editItemType')?.value;
+  if(!S.editPhotoData)renderEditPreview(null,type);
+}
+function saveEditedItem(){
+  if(S.editingIndex<0)return;
+  const current=S.wardrobe[S.editingIndex];
+  if(!current)return;
+  const type=document.getElementById('editItemType').value;
+  const name=document.getElementById('editItemName').value.trim() || TYPE_DEFAULT_NAMES[type] || '日常单品';
+  S.wardrobe[S.editingIndex]=normalizeWardrobeItem({
+    ...current,
+    id:current.id,
+    addedAt:current.addedAt,
+    name,
+    type,
+    warmth:S.editWarmth,
+    photo:S.editPhotoData || current.photo || null,
+    suitableLevels:inferSuitableLevels({type,warmth:S.editWarmth}),
+  });
+  persistWardrobe();
+  closeEditModal();
+  renderWardrobe();
+  renderAccountSection();
+  renderWelcomeCard();
+  renderGuideCard();
+  renderDeliveryCheck();
+  updateUI();
+  showToast('单品信息已更新','success');
+}
 function renderWardrobe(){
   const grid=document.getElementById('wardrobeGrid'),count=S.wardrobe.length;
   document.getElementById('wardrobeCount').textContent=`共 ${count} 件单品`;
   document.getElementById('totalItems').textContent=count;
-  if(!count){grid.innerHTML=`<div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">拍张照片，开始收纳第一件</div></div>`;return;}
+  if(!count){grid.innerHTML=`<div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">先收纳几件常穿单品，推荐就会更像你的私人穿搭顾问</div><div class="tool-row" style="justify-content:center;margin-top:16px"><button class="mini-btn soft" onclick="openImportWardrobe()">导入备份</button><button class="mini-btn primary" onclick="seedStarterWardrobe()">一键生成灵感衣橱</button></div></div>`;return;}
   grid.innerHTML=S.wardrobe.map((item,i)=>`
     <div class="wardrobe-item ${S.activeRecommendationIds.includes(item.id)?'recommended':''}">
+      <div class="item-tools">
+        <button class="item-tool-btn edit" onclick="openEditItem(${i})">✎</button>
+        <button class="item-tool-btn" onclick="deleteItem(${i})">✕</button>
+      </div>
       <div class="item-img">${item.photo?`<img src="${item.photo}" alt="${item.name}"/>`:TYPE_ICONS[item.type]||'👗'}</div>
       <div class="item-info">
         <div class="item-name">${item.name}</div><div class="item-meta">${item.subtype || item.type}</div>
         <div class="item-meta" style="margin-top:4px">适配 Lv.${(item.suitableLevels||[]).join(' / Lv.')}</div>
         <div class="item-warmth">${Array.from({length:5},(_,j)=>`<div class="warmth-dot ${j<item.warmth?'on':''}"></div>`).join('')}</div>
       </div>
-      <button class="del-btn" onclick="deleteItem(${i})">✕</button>
     </div>`).join('');
 }
 function selectWarmth(btn){document.querySelectorAll('.warmth-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');S.selectedWarmth=parseInt(btn.dataset.val);}
@@ -1004,27 +1757,48 @@ function saveItem(){
   const inputType=document.getElementById('itemType').value;
   const inputName=document.getElementById('itemName').value.trim() || TYPE_DEFAULT_NAMES[inputType];
   S.wardrobe.push(normalizeWardrobeItem({id:Date.now(),name:inputName,type:inputType,warmth:S.selectedWarmth,photo:S.processedPhoto||S.photoData,addedAt:Date.now()}));
-  persistWardrobe();closeCameraModal();renderWardrobe();updateUI();
+  persistWardrobe();closeCameraModal();renderWardrobe();renderAccountSection();updateUI();
+  showToast('新单品已经收纳进衣橱','success');
 }
-function deleteItem(i){S.wardrobe.splice(i,1);persistWardrobe();renderWardrobe();updateUI();}
+function deleteItem(i){S.wardrobe.splice(i,1);persistWardrobe();renderWardrobe();renderAccountSection();updateUI();showToast('这件衣服已移出衣橱');}
 
 // ── 设置/导航 ──
 function switchPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');btn.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else{
+    const autoBtn=document.querySelector(`.nav-btn[onclick*="${name}"]`);
+    if(autoBtn)autoBtn.classList.add('active');
+  }
+  S.activeTab=name;
+  persistActiveTab(name);
+  if(name==='settings'){renderAccountSection();renderHistoryList();}
 }
-function onSliderChange(val){S.tempOffset=clamp(parseInt(val,10),-3,3);persistOffset();updateSliderLabel(S.tempOffset);updateUI();}
+function onSliderChange(val){if(!S.session){syncAuthState();return;}S.tempOffset=clamp(parseInt(val,10),-3,3);persistOffset();updateSliderLabel(S.tempOffset);renderAccountSection();updateUI();}
 function updateSliderLabel(val){document.getElementById('sliderCurrent').textContent=BODY_LABELS[val+3];}
 
 // ── 初始化 ──
 function init(){
-  S.wardrobe=S.wardrobe.map(normalizeWardrobeItem);
-  persistWardrobe();
-  document.getElementById('bodySlider').value=Math.round(S.tempOffset);
   document.getElementById('itemType').addEventListener('change',syncItemNameSuggestion);
-  updateSliderLabel(Math.round(S.tempOffset));
-  renderWardrobe();initLocation();
+  document.getElementById('importWardrobeInput')?.addEventListener('change',importWardrobeFile);
+  document.getElementById('editPhotoInput')?.addEventListener('change',handleEditPhoto);
+  document.getElementById('editItemType')?.addEventListener('change',syncEditTypePreview);
+  syncAuthState();
+  if(S.session)loadSessionData();
+  else{
+    document.getElementById('bodySlider').value=0;
+    updateSliderLabel(0);
+    renderWardrobe();
+    renderAccountSection();
+    renderHistoryList();
+    renderWelcomeCard();
+    renderGuideCard();
+    renderDeliveryCheck();
+  }
+  switchPage(S.activeTab || 'home');
+  initLocation();
 }
 init();
 </script>
