@@ -1,1224 +1,1032 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-    />
-    <title>温感 · 体感天气助手</title>
-    <meta name="theme-color" content="#FAF9F6" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="format-detection" content="telephone=no" />
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#FAF9F6"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="温感"/>
+<title>温感 · 私人气候管家</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--cream:#FAF9F6;--coral:#FF9F89;--coral-light:#FFD4CB;--coral-dark:#E8735A;--text-main:#5A5A5A;--text-sub:#9A9A9A;--text-light:#C8C8C8;--card-bg:rgba(255,255,255,0.82);--card-border:rgba(255,255,255,0.9);--shadow:0 10px 30px rgba(0,0,0,0.03);--radius:24px;--blue-cold:#A8C8E8;--green-ok:#A8D8B8}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text-main);overflow:hidden;position:fixed;width:100%;height:100%}
+.bg-canvas{position:fixed;inset:0;z-index:0;transition:background 1.2s ease}
+.bg-canvas.sunny{background:radial-gradient(ellipse at 70% 10%,#FFE8C8 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,#FFD4CB 0%,transparent 50%),linear-gradient(160deg,#FAF9F6 0%,#FFF3EE 100%)}
+.bg-canvas.cloudy{background:radial-gradient(ellipse at 50% 0%,#E8EEF4 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,#DDE8F0 0%,transparent 50%),linear-gradient(160deg,#F4F7FA 0%,#EAF0F6 100%)}
+.bg-canvas.rainy{background:radial-gradient(ellipse at 30% 20%,#D8E8F4 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,#C8D8E8 0%,transparent 50%),linear-gradient(160deg,#EEF4FA 0%,#E0ECF6 100%)}
+.bg-canvas.night{background:radial-gradient(ellipse at 60% 10%,#2A3A5A 0%,transparent 50%),radial-gradient(ellipse at 20% 90%,#1A2A4A 0%,transparent 60%),linear-gradient(160deg,#1E2D48 0%,#152238 100%)}
+.app{position:relative;z-index:1;max-width:430px;margin:0 auto;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;padding:0 18px calc(100px + env(safe-area-inset-bottom));padding-top:calc(env(safe-area-inset-top) + 12px);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s ease,transform .3s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page.active{opacity:1;transform:translateY(0);pointer-events:all}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+/* 首页 */
+.hero{background:linear-gradient(180deg,rgba(255,255,255,0.88),rgba(255,255,255,0.76));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:34px;border:1px solid var(--card-border);box-shadow:0 18px 40px rgba(0,0,0,0.035);padding:30px 26px 24px;margin-bottom:14px;position:relative;overflow:hidden;transition:background .45s ease,border-color .45s ease,box-shadow .45s ease}
+.hero::before{content:'';position:absolute;top:-48px;right:-32px;width:176px;height:176px;background:radial-gradient(circle,rgba(255,159,137,0.18) 0%,transparent 72%);pointer-events:none}
+.hero::after{content:'';position:absolute;left:-38px;bottom:-50px;width:168px;height:168px;background:radial-gradient(circle,rgba(255,255,255,0.85) 0%,transparent 70%);pointer-events:none}
+.hero[data-sky="sunny"]{background:linear-gradient(180deg,rgba(255,248,240,0.96),rgba(255,255,255,0.78));border-color:rgba(255,220,182,0.9);box-shadow:0 18px 44px rgba(255,159,137,0.08)}
+.hero[data-sky="sunny"]::before{animation:sunPulse 7s ease-in-out infinite}
+.hero[data-sky="cloudy"]{background:linear-gradient(180deg,rgba(249,251,255,0.94),rgba(255,255,255,0.78));border-color:rgba(219,228,238,0.9)}
+.hero[data-sky="rainy"]{background:linear-gradient(180deg,rgba(241,247,252,0.95),rgba(255,255,255,0.76));border-color:rgba(206,222,237,0.9);box-shadow:0 18px 44px rgba(168,200,232,0.12)}
+.hero[data-sky="rainy"]::before{background:radial-gradient(circle,rgba(168,200,232,0.22) 0%,transparent 72%)}
+.hero[data-sky="night"]{background:linear-gradient(180deg,rgba(35,49,78,0.92),rgba(28,40,66,0.82));border-color:rgba(255,255,255,0.08);box-shadow:0 18px 44px rgba(16,22,40,0.28)}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;position:relative;z-index:1}
+.hero-top-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.location-row{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-sub);font-weight:600}
+.location-dot{width:6px;height:6px;background:var(--coral);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.date-str{font-size:12px;color:var(--text-light);font-weight:500}
+.hero-status{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,0.64);border:1px solid rgba(255,255,255,0.75);font-size:11px;font-weight:700;color:var(--text-sub);box-shadow:0 6px 16px rgba(0,0,0,0.03)}
+.hero-status-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 5px rgba(255,159,137,0.14)}
+.hero-atmos{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-atmos span{position:absolute;display:block}
+.hero[data-sky="sunny"] .hero-atmos span{border-radius:999px;background:linear-gradient(180deg,rgba(255,237,190,0.7),rgba(255,255,255,0));filter:blur(.2px);animation:sunDrift 12s linear infinite}
+.hero[data-sky="sunny"] .hero-atmos span:nth-child(1){width:110px;height:110px;top:14px;right:24px;opacity:.65}
+.hero[data-sky="sunny"] .hero-atmos span:nth-child(2){width:10px;height:10px;top:66px;right:118px;opacity:.9;animation-duration:7s}
+.hero[data-sky="sunny"] .hero-atmos span:nth-child(3){width:8px;height:8px;top:98px;right:72px;opacity:.8;animation-duration:9s}
+.hero[data-sky="rainy"] .hero-atmos span,.hero[data-sky="cloudy"] .hero-atmos span{width:2px;height:44px;border-radius:999px;background:linear-gradient(180deg,rgba(168,200,232,0),rgba(168,200,232,0.55),rgba(255,255,255,0));animation:rainFall 2.4s linear infinite}
+.hero[data-sky="rainy"] .hero-atmos span:nth-child(1),.hero[data-sky="cloudy"] .hero-atmos span:nth-child(1){left:72%;top:34px}
+.hero[data-sky="rainy"] .hero-atmos span:nth-child(2),.hero[data-sky="cloudy"] .hero-atmos span:nth-child(2){left:82%;top:18px;animation-delay:-.8s}
+.hero[data-sky="rainy"] .hero-atmos span:nth-child(3),.hero[data-sky="cloudy"] .hero-atmos span:nth-child(3){left:88%;top:46px;animation-delay:-1.4s}
+.hero[data-sky="night"] .hero-atmos span{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.9);box-shadow:0 0 10px rgba(255,255,255,0.3);animation:starBlink 3.2s ease-in-out infinite}
+.hero[data-sky="night"] .hero-atmos span:nth-child(1){top:26px;right:34px}
+.hero[data-sky="night"] .hero-atmos span:nth-child(2){top:60px;right:110px;animation-delay:-1s}
+.hero[data-sky="night"] .hero-atmos span:nth-child(3){top:94px;right:72px;animation-delay:-2s}
+@keyframes sunPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.86}}
+@keyframes sunDrift{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.04)}}
+@keyframes rainFall{0%{transform:translateY(-8px);opacity:0}20%{opacity:.7}100%{transform:translateY(72px);opacity:0}}
+@keyframes starBlink{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+.temp-block{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:12px 0 6px;padding:4px 0 0}
+.temp-main{font-size:88px;font-weight:700;line-height:.92;letter-spacing:-3.8px;color:var(--text-main);background:linear-gradient(180deg,#5A5A5A 0%,#7A6660 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 12px 24px rgba(255,159,137,0.08)}
+.night-mode .temp-main{color:#E8F0FF}
+.temp-right{padding:10px 12px 10px 14px;border-radius:20px;background:rgba(255,255,255,0.64);border:1px solid rgba(255,255,255,0.8);box-shadow:0 8px 20px rgba(0,0,0,0.03);position:relative;z-index:1}
+.temp-feels{font-size:12px;color:var(--coral-dark);font-weight:700;margin-bottom:4px;white-space:nowrap}
+.weather-icon-big{font-size:36px;line-height:1}
+.condition-text{font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:12px;opacity:.82;position:relative;z-index:1}
+.night-mode .condition-text{color:#C8D8FF}
+.hero-insight{margin:0 0 14px;padding:14px 16px;background:linear-gradient(135deg,rgba(255,159,137,0.14),rgba(255,255,255,0.72));box-shadow:none;position:relative;z-index:1}
+.hero-insight .insight-text{font-size:13px;line-height:1.75;font-weight:600}
+.alert-chips{display:flex;flex-wrap:wrap;gap:8px;margin:-2px 0 12px;position:relative;z-index:1}
+.alert-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,0.78);border:1px solid rgba(255,255,255,0.82);box-shadow:0 6px 16px rgba(0,0,0,0.03);font-size:11px;font-weight:700;color:var(--text-sub)}
+.alert-chip b{font-weight:700;color:var(--text-main)}
+.alert-chip.rain{background:rgba(168,200,232,0.14);border-color:rgba(168,200,232,0.32)}
+.alert-chip.wind{background:rgba(221,232,240,0.24);border-color:rgba(200,213,230,0.42)}
+.alert-chip.uv{background:rgba(255,159,137,0.12);border-color:rgba(255,159,137,0.24)}
+.alert-chip.temp{background:rgba(255,212,203,0.16);border-color:rgba(255,212,203,0.28)}
+.trend-panel{position:relative;z-index:1;margin-top:10px;padding:14px 14px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.76);border-radius:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+.trend-panel::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0));pointer-events:none}
+.trend-headline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;position:relative;z-index:1}
+.trend-label{font-size:12px;font-weight:700;color:var(--text-sub)}
+.trend-now{font-size:11px;font-weight:700;color:var(--coral-dark);padding:6px 10px;border-radius:999px;background:rgba(255,159,137,0.12);border:1px solid rgba(255,159,137,0.18)}
+.trend-wrap{margin:0;height:68px;position:relative;z-index:1}
+.trend-svg{width:100%;height:100%}
+.trend-times{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding:0 4px;font-size:10px;color:var(--text-light);font-weight:700;letter-spacing:.2px}
+.trend-time{flex:1;text-align:center;white-space:nowrap}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--card-border);box-shadow:var(--shadow);padding:14px 12px;text-align:center}
+.stat-icon{font-size:18px;margin-bottom:4px}
+.stat-val{font-size:17px;font-weight:700;color:var(--text-main)}
+.stat-lbl{font-size:11px;color:var(--text-sub);font-weight:600;margin-top:2px}
+.insight-card{background:linear-gradient(135deg,rgba(255,159,137,0.12),rgba(255,212,203,0.08));border:1px solid rgba(255,159,137,0.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.insight-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.insight-text{font-size:13px;line-height:1.7;color:var(--text-main);font-weight:500}
+.outfit-decision{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:var(--radius);border:1px solid var(--card-border);box-shadow:var(--shadow);padding:22px 20px 18px;margin-bottom:14px}
+.outfit-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px}
+.outfit-head-copy{display:flex;flex-direction:column;gap:5px}
+.outfit-title{font-size:15px;font-weight:700;color:var(--text-main)}
+.outfit-subtitle{font-size:11px;color:var(--text-sub);font-weight:600;letter-spacing:.2px}
+.level-badge{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:white;font-size:11px;font-weight:700;padding:7px 12px;border-radius:999px;box-shadow:0 6px 14px rgba(255,159,137,0.22);white-space:nowrap}
+.recommend-summary{background:rgba(255,255,255,0.68);border:1px solid rgba(255,159,137,0.14);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.recommend-title{font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:4px}
+.recommend-text{font-size:12px;line-height:1.7;color:var(--text-sub);font-weight:600}
+.outfit-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+.outfit-scroll::-webkit-scrollbar{display:none}
+.outfit-card-item{flex-shrink:0;width:98px;background:rgba(255,255,255,0.92);border-radius:18px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.04);border:1.5px solid rgba(255,255,255,0.8);transition:border-color .2s,transform .2s}
+.outfit-card-item.highlight{border-color:rgba(255,159,137,0.35)}
+.outfit-card-img{width:98px;height:96px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFF0EC,#FFE8E0);font-size:32px;overflow:hidden}
+.outfit-card-img img{width:100%;height:100%;object-fit:cover}
+.outfit-card-name{padding:8px 8px 3px;font-size:11px;font-weight:700;color:var(--text-main);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.outfit-card-type{padding:0 8px 10px;font-size:10px;color:var(--text-sub);text-align:center}
+.outfit-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.outfit-tag{background:rgba(255,159,137,0.08);border:1px solid rgba(255,159,137,0.16);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--coral-dark)}
+.outfit-meta{font-size:11px;line-height:1.6;color:var(--text-sub);font-weight:600;margin-bottom:14px;padding-left:2px}
+.feedback-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fb-btn{background:rgba(255,255,255,0.88);border:1px solid rgba(255,255,255,0.82);border-radius:18px;padding:13px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,0.03)}
+.fb-btn:active{transform:scale(0.96)}
+.fb-btn.cold.selected{border-color:rgba(168,200,232,0.55);background:rgba(168,200,232,0.14)}
+.fb-btn.ok.selected{border-color:rgba(168,216,184,0.6);background:rgba(168,216,184,0.12)}
+.fb-btn.hot.selected{border-color:rgba(255,159,137,0.45);background:rgba(255,159,137,0.1)}
+.fb-icon{font-size:24px}
+.fb-label{font-size:11px;font-weight:700;color:var(--text-sub)}
+.feedback-tip{font-size:11px;color:var(--text-light);font-weight:600;text-align:center;margin-top:10px}
 
-    <style>
-      :root {
-        --bg: #faf9f6;
-        --card: #ffffff;
-        --ink: #5a5a5a;
-        --muted: rgba(95, 95, 95, 0.72);
-        --muted2: rgba(95, 95, 95, 0.52);
-        --line: rgba(95, 95, 95, 0.14);
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        --r: 24px;
-        --maxw: 560px;
+/* 衣橱页 */
+.page-header{padding:8px 0 16px;display:flex;justify-content:space-between;align-items:center}
+.page-title{font-size:22px;font-weight:700;color:var(--text-main)}
+.page-count{font-size:13px;color:var(--text-sub);font-weight:600}
+.add-btn{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:white;border:none;border-radius:14px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;box-shadow:0 4px 14px rgba(255,159,137,0.35);transition:all .2s}
+.add-btn:active{transform:scale(0.97)}
+.wardrobe-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.wardrobe-item{background:var(--card-bg);backdrop-filter:blur(16px);border-radius:20px;border:1px solid var(--card-border);box-shadow:var(--shadow);overflow:hidden;position:relative}
+.wardrobe-item.recommended{border-color:rgba(255,159,137,0.42);box-shadow:0 10px 24px rgba(255,159,137,0.12)}
+.item-img{width:100%;height:130px;background:linear-gradient(135deg,#FFF0EC,#FFE8E0);display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
+.item-img img{width:100%;height:100%;object-fit:cover}
+.item-info{padding:10px 12px}
+.item-name{font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{font-size:11px;color:var(--text-sub);font-weight:500}
+.item-warmth{display:flex;gap:3px;margin-top:6px}
+.warmth-dot{width:7px;height:7px;border-radius:50%;background:#EEE}
+.warmth-dot.on{background:var(--coral)}
+.del-btn{position:absolute;top:8px;right:8px;width:26px;height:26px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.empty-wardrobe{grid-column:span 2;text-align:center;padding:50px 20px;color:var(--text-light)}
+.empty-icon{font-size:56px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:14px;font-weight:600}
 
-        --coral: #ff9f89;
-        --coral-2: #ffd2c8;
-        --gold: #ffe7b3;
-        --bluegray: #c8d5e6;
-        --bluegray-2: #eef3fb;
-        --cream: #f7f1e1;
+/* 设置页 */
+.settings-section{background:var(--card-bg);backdrop-filter:blur(16px);border-radius:var(--radius);border:1px solid var(--card-border);box-shadow:var(--shadow);padding:20px 18px;margin-bottom:14px}
+.set-title{font-size:15px;font-weight:700;color:var(--text-main);margin-bottom:4px}
+.set-desc{font-size:12px;color:var(--text-sub);line-height:1.6;margin-bottom:20px}
+/* 滑块修复 */
+.slider-outer{position:relative;height:44px;display:flex;align-items:center;margin-bottom:0}
+.slider-track-bg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:12px;border-radius:99px;background:linear-gradient(90deg,#A8C8E8,#FAF9F6 50%,#FFB8A0);pointer-events:none}
+input[type=range].body-slider{-webkit-appearance:none;appearance:none;width:100%;height:12px;background:transparent;position:relative;z-index:1;cursor:pointer;margin:0;padding:0}
+input[type=range].body-slider::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:white;box-shadow:0 4px 16px rgba(0,0,0,0.15);border:2.5px solid rgba(255,159,137,0.4);margin-top:-9px}
+input[type=range].body-slider::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:white;box-shadow:0 4px 16px rgba(0,0,0,0.15);border:2.5px solid rgba(255,159,137,0.4)}
+input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-radius:99px}
+.slider-labels{display:flex;justify-content:space-between;margin-top:10px}
+.slider-label{font-size:10px;color:var(--text-light);font-weight:600;text-align:center;flex:1}
+.slider-current{text-align:center;margin-top:12px;font-size:15px;font-weight:700;color:var(--coral)}
+.wardrobe-stat-card{background:rgba(255,159,137,0.06);border-radius:16px;padding:20px;text-align:center;margin-top:4px}
+.wardrobe-stat-val{font-size:40px;font-weight:700;color:var(--coral-dark);margin-bottom:4px}
+.wardrobe-stat-lbl{font-size:13px;color:var(--text-sub);font-weight:600}
 
-        --trend: rgba(255, 159, 137, 0.55);
+/* 底部导航 */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:430px;width:100%;background:rgba(250,249,246,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,0.8);padding:10px 20px calc(10px + env(safe-area-inset-bottom));z-index:100}
+.nav-row{display:flex;justify-content:space-around;align-items:center}
+.nav-btn{background:none;border:none;cursor:pointer;padding:8px 20px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Quicksand',sans-serif}
+.nav-icon-wrap{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav-btn.active .nav-icon-wrap{background:linear-gradient(135deg,var(--coral),var(--coral-dark));box-shadow:0 4px 12px rgba(255,159,137,0.35)}
+.nav-icon{width:18px;height:18px;stroke:var(--text-light);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.nav-btn.active .nav-icon{stroke:white}
+.nav-lbl{font-size:10px;font-weight:700;color:var(--text-light);transition:color .2s}
+.nav-btn.active .nav-lbl{color:var(--coral)}
 
-        /* Diffuse mesh palette (overridden by body[data-sky]) */
-        --mesh-1: rgba(255, 231, 179, 0.46);
-        --mesh-2: rgba(255, 159, 137, 0.35);
-        --mesh-3: rgba(255, 255, 255, 0.75);
-        --mesh-4: rgba(247, 241, 225, 0.85);
-      }
+/* 弹窗通用 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--cream);border-radius:28px 28px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom));max-width:430px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.34,1.56,0.64,1);max-height:92vh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:#DDD;border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:18px;font-weight:700;color:var(--text-main);margin-bottom:16px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:700;color:var(--text-sub);margin-bottom:6px;display:block;letter-spacing:.5px}
+.form-input,.form-select{width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;font-size:14px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-main);background:white;outline:none;transition:border-color .2s}
+.form-input:focus,.form-select:focus{border-color:var(--coral)}
+.warmth-picker{display:flex;gap:6px}
+.warmth-opt{flex:1;padding:9px 4px;border:1.5px solid rgba(0,0,0,0.08);border-radius:12px;background:white;cursor:pointer;text-align:center;font-size:11px;font-weight:700;color:var(--text-sub);font-family:'Quicksand',sans-serif;transition:all .2s}
+.warmth-opt.selected{border-color:var(--coral);background:rgba(255,159,137,0.08);color:var(--coral-dark)}
+.modal-actions{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:16px}
+.btn-cancel{background:rgba(0,0,0,0.05);color:var(--text-sub);border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;font-family:'Quicksand',sans-serif;cursor:pointer}
+.btn-save{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;font-family:'Quicksand',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(255,159,137,0.4)}
 
-      * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-      }
-      html,
-      body {
-        height: 100%;
-      }
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: "Quicksand", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
-          Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-        text-rendering: optimizeLegibility;
-        -webkit-font-smoothing: antialiased;
-        overscroll-behavior: none;
-        overflow-x: hidden;
-      }
+/* 拍照弹窗 */
+.camera-preview-wrap{width:100%;border-radius:20px;overflow:hidden;background:#111;aspect-ratio:3/4;position:relative;margin-bottom:14px;display:flex;align-items:center;justify-content:center}
+#cameraVideo{width:100%;height:100%;object-fit:cover;display:block}
+#cameraCanvas{display:none}
+.camera-hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;pointer-events:none}
+.camera-guide{position:absolute;inset:16px;border:2px dashed rgba(255,255,255,0.35);border-radius:14px;pointer-events:none}
+.photo-actions{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px;align-items:center}
+.shutter-btn{width:66px;height:66px;border-radius:50%;background:white;border:4px solid var(--coral);cursor:pointer;margin:0 auto;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,159,137,0.45);font-size:26px;transition:transform .1s}
+.shutter-btn:active{transform:scale(0.93)}
+.photo-side-btn{background:rgba(0,0,0,0.07);color:var(--text-sub);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif}
+.processing-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;aspect-ratio:3/4}
+.processing-spinner{width:40px;height:40px;border:3px solid rgba(255,159,137,0.2);border-top-color:var(--coral);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.processing-text{font-size:14px;font-weight:700;color:var(--text-sub)}
+.preview-confirm-wrap{width:100%;border-radius:20px;overflow:hidden;aspect-ratio:3/4;background:#F8F4F2;margin-bottom:14px;display:flex;align-items:center;justify-content:center}
+#processedPreview{width:100%;height:100%;object-fit:contain;display:block}
 
-      .bg {
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-        background: radial-gradient(circle at 20% 15%, var(--mesh-1), rgba(250, 249, 246, 0) 58%),
-          radial-gradient(circle at 78% 18%, var(--mesh-2), rgba(250, 249, 246, 0) 58%),
-          radial-gradient(circle at 18% 80%, var(--mesh-4), rgba(250, 249, 246, 0) 62%),
-          radial-gradient(circle at 82% 78%, rgba(90, 90, 90, 0.05), rgba(250, 249, 246, 0) 62%);
-        animation: diffuse 14s ease-in-out infinite;
-      }
+/* 语音弹窗 */
+.voice-sheet{background:var(--cream);border-radius:28px 28px 0 0;padding:28px 20px calc(32px + env(safe-area-inset-bottom));max-width:430px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.34,1.56,0.64,1);text-align:center}
+.modal-overlay.open .voice-sheet{transform:translateY(0)}
+.voice-emoji{font-size:52px;margin-bottom:8px}
+.voice-title{font-size:18px;font-weight:700;color:var(--text-main);margin-bottom:6px}
+.voice-subtitle{font-size:13px;color:var(--text-sub);line-height:1.6;margin-bottom:22px}
+.voice-btn-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+.voice-ring{position:absolute;width:92px;height:92px;border-radius:50%;background:rgba(255,159,137,0.15)}
+.voice-ring.recording{animation:rpulse 1s ease-in-out infinite}
+@keyframes rpulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.15}}
+.voice-mic-btn{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--coral-dark));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,159,137,0.45);position:relative;z-index:1;font-size:30px;transition:transform .1s}
+.voice-mic-btn:active{transform:scale(0.95)}
+.voice-status{font-size:12px;color:var(--text-sub);font-weight:600;margin-bottom:14px;min-height:18px}
+.voice-transcript{min-height:52px;background:rgba(255,159,137,0.06);border-radius:14px;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text-main);line-height:1.6;margin-bottom:16px;text-align:left;border:1px solid rgba(255,159,137,0.12)}
+.voice-transcript.placeholder{color:var(--text-light)}
+.voice-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.voice-skip-btn{background:rgba(0,0,0,0.05);color:var(--text-sub);border:none;border-radius:14px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif}
+.voice-confirm-btn{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:white;border:none;border-radius:14px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;box-shadow:0 4px 14px rgba(255,159,137,0.35)}
 
-      @keyframes diffuse {
-        0% {
-          filter: saturate(1) contrast(1);
-          transform: translate3d(0, 0, 0) scale(1);
-        }
-        50% {
-          filter: saturate(1.05) contrast(1.02);
-          transform: translate3d(0, -1.2%, 0) scale(1.02);
-        }
-        100% {
-          filter: saturate(1) contrast(1);
-          transform: translate3d(0, 0, 0) scale(1);
-        }
-      }
+/* 加载 */
+.loading-overlay{position:fixed;inset:0;background:var(--cream);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.loading-logo{font-size:48px;animation:breathe 2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.loading-text{font-size:14px;color:var(--text-sub);font-weight:600}
+.loading-bar{width:120px;height:3px;background:rgba(255,159,137,0.15);border-radius:99px;overflow:hidden}
+.loading-bar-fill{height:100%;background:var(--coral);border-radius:99px;animation:lanim 1.5s ease-in-out infinite}
+@keyframes lanim{0%{width:0;margin-left:0}50%{width:60%}100%{width:0;margin-left:120px}}
+.night-mode .page-title,.night-mode .outfit-title,.night-mode .set-title,.night-mode .stat-val,.night-mode .item-name,.night-mode .modal-title,.night-mode .insight-text,.night-mode .recommend-title{color:#E8F0FF}
+.night-mode .hero,.night-mode .stat-card,.night-mode .outfit-decision,.night-mode .wardrobe-item,.night-mode .settings-section{background:rgba(30,45,80,0.6);border-color:rgba(255,255,255,0.08)}
+.night-mode .hero-status,.night-mode .temp-right,.night-mode .trend-panel{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12)}
+.night-mode .hero-status,.night-mode .date-str,.night-mode .trend-label,.night-mode .trend-time,.night-mode .recommend-text,.night-mode .outfit-meta,.night-mode .fb-label{color:#C8D8FF}
+.night-mode .trend-now{background:rgba(255,159,137,0.18);color:#FFD9CF;border-color:rgba(255,159,137,0.22)}
+.night-mode .alert-chip{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);color:#C8D8FF}
+.night-mode .alert-chip b{color:#E8F0FF}
+.night-mode .bottom-nav{background:rgba(20,32,60,0.9)}
+.night-mode .fb-btn{background:rgba(255,255,255,0.08)}
+</style>
+</head>
+<body>
 
-      body[data-sky="rain"] {
-        --mesh-1: rgba(200, 213, 230, 0.55);
-        --mesh-2: rgba(238, 243, 251, 0.82);
-        --mesh-4: rgba(200, 213, 230, 0.3);
-      }
-      body[data-sky="sun"] {
-        --mesh-1: rgba(255, 231, 179, 0.56);
-        --mesh-2: rgba(255, 159, 137, 0.35);
-        --mesh-4: rgba(247, 241, 225, 0.9);
-      }
-      body[data-sky="cloud"] {
-        --mesh-1: rgba(255, 255, 255, 0.72);
-        --mesh-2: rgba(200, 213, 230, 0.34);
-        --mesh-4: rgba(247, 241, 225, 0.82);
-      }
-      body[data-sky="wind"] {
-        --mesh-1: rgba(247, 241, 225, 0.85);
-        --mesh-2: rgba(200, 213, 230, 0.25);
-        --mesh-4: rgba(255, 231, 179, 0.28);
-      }
-      body[data-sky="snow"] {
-        --mesh-1: rgba(255, 255, 255, 0.82);
-        --mesh-2: rgba(200, 213, 230, 0.36);
-        --mesh-4: rgba(238, 243, 251, 0.82);
-      }
+<div class="loading-overlay" id="loading">
+  <div class="loading-logo">🌡️</div>
+  <div class="loading-text">正在感知你的气候…</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
 
-      .app {
-        max-width: var(--maxw);
-        margin: 0 auto;
-        min-height: 100vh;
-        padding: calc(88px + env(safe-area-inset-top)) 28px
-          calc(86px + env(safe-area-inset-bottom));
-      }
+<div class="bg-canvas sunny" id="bgCanvas"></div>
 
-      .topbar {
-        position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: var(--maxw);
-        z-index: 20;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        padding: calc(14px + env(safe-area-inset-top)) 28px 14px;
-        margin-bottom: 0;
-        background: rgba(255, 255, 255, 0.62);
-        backdrop-filter: blur(14px);
-        border-bottom: 1px solid rgba(90, 90, 90, 0.1);
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.03);
-      }
-      .brand {
-        font-weight: 800;
-        letter-spacing: -0.2px;
-        font-size: 18px;
-      }
-      .loc {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.86);
-        border: 1px solid var(--line);
-        box-shadow: var(--shadow);
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--muted);
-        white-space: nowrap;
-      }
-      .loc-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: radial-gradient(circle at 30% 30%, var(--gold), var(--coral));
-        box-shadow: 0 0 0 4px rgba(255, 159, 137, 0.16);
-      }
+<div class="app" id="app">
+  <div class="pages">
 
-      .tab {
-        display: none;
-      }
-      .tab.active {
-        display: block;
-      }
-      .stack {
-        display: grid;
-        gap: 24px;
-      }
-      .card {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: var(--r);
-        box-shadow: var(--shadow);
-        padding: 24px;
-      }
-      .card-lite {
-        border-radius: var(--r);
-        background: rgba(250, 249, 246, 0.62);
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        box-shadow: var(--shadow);
-        padding: 24px;
-      }
-      .h2 {
-        font-weight: 800;
-        font-size: 16px;
-        margin: 0;
-      }
-      .p {
-        margin: 10px 0 0;
-        color: var(--muted);
-        font-weight: 700;
-        line-height: 1.55;
-      }
-
-      .hero {
-        position: relative;
-        overflow: hidden;
-      }
-      .hero-mesh {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: radial-gradient(circle at 20% 20%, var(--mesh-1), rgba(250, 249, 246, 0) 58%),
-          radial-gradient(circle at 82% 16%, var(--mesh-2), rgba(250, 249, 246, 0) 58%),
-          radial-gradient(circle at 28% 82%, var(--mesh-4), rgba(250, 249, 246, 0) 62%);
-        opacity: 0.95;
-        transition: filter 500ms ease;
-      }
-      .hero-content {
-        position: relative;
-        z-index: 1;
-      }
-
-      .temp-block {
-        display: grid;
-        gap: 10px;
-      }
-      .temp-now {
-        font-size: 82px;
-        font-weight: 800;
-        letter-spacing: -1.6px;
-        line-height: 0.95;
-      }
-      .temp-sub {
-        font-size: 13px;
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .temp-sub-num {
-        font-weight: 800;
-        color: var(--ink);
-      }
-      .cond {
-        margin-top: 0;
-        font-size: 12px;
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.78);
-      }
-
-      .insight {
-        margin-top: 16px;
-        padding: 18px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(255, 159, 137, 0.18);
-        color: rgba(95, 95, 95, 0.92);
-        font-weight: 700;
-        line-height: 1.6;
-        white-space: pre-line;
-      }
-
-      .trend {
-        margin-top: 16px;
-      }
-      .trend-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-      }
-      .trend-title {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .trend-note {
-        font-size: 12px;
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.82);
-      }
-      #trend-canvas {
-        width: 100%;
-        height: 120px;
-        display: block;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.62);
-        border: 1px solid rgba(95, 95, 95, 0.14);
-      }
-
-      .outfit {
-        margin-top: 14px;
-      }
-      .outfit-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 8px;
-      }
-      .outfit-title {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .outfit-lv {
-        padding: 8px 10px;
-        border-radius: 999px;
-        background: rgba(255, 159, 137, 0.12);
-        border: 1px solid rgba(255, 159, 137, 0.22);
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.92);
-        white-space: nowrap;
-      }
-      .outfit-items {
-        font-weight: 700;
-        color: rgba(95, 95, 95, 0.9);
-        line-height: 1.55;
-      }
-
-      .quick-feedback {
-        margin-top: 16px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-      }
-      .qbtn {
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        background: var(--cream);
-        border-radius: 999px;
-        padding: 12px 12px;
-        cursor: pointer;
-        font: inherit;
-        font-weight: 800;
-        box-shadow: var(--shadow);
-        transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
-      }
-      .qbtn:active {
-        transform: scale(1.02);
-      }
-      .qbtn.cold {
-        background: linear-gradient(135deg, rgba(185, 215, 255, 0.55), rgba(247, 241, 225, 0.92));
-      }
-      .qbtn.ok {
-        background: var(--cream);
-      }
-      .qbtn.hot {
-        background: linear-gradient(135deg, rgba(255, 159, 137, 0.32), rgba(247, 241, 225, 0.92));
-      }
-
-      .stat-row {
-        margin-top: 14px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .stat {
-        border-radius: 18px;
-        background: rgba(250, 249, 246, 0.62);
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        box-shadow: var(--shadow);
-        padding: 14px 14px;
-        text-align: center;
-      }
-      .stat .k {
-        font-size: 12px;
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .stat .v {
-        margin-top: 8px;
-        font-size: 22px;
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.92);
-      }
-
-      .slider-block {
-        margin-top: 14px;
-        border-radius: 18px;
-        background: rgba(250, 249, 246, 0.62);
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        box-shadow: var(--shadow);
-        padding: 14px;
-      }
-      .slider-head {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-      }
-      .slider-head .k {
-        font-weight: 800;
-        color: var(--muted);
-      }
-      .slider-head .v {
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.92);
-      }
-      .slider {
-        width: 100%;
-        -webkit-appearance: none;
-        appearance: none;
-        height: 16px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(185, 215, 255, 0.85), rgba(255, 159, 137, 0.85));
-        outline: none;
-        border: 1px solid rgba(95, 95, 95, 0.14);
-      }
-      .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(95, 95, 95, 0.18);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
-      }
-      .slider::-moz-range-thumb {
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(95, 95, 95, 0.18);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
-      }
-      .slider-ends {
-        margin-top: 8px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.6);
-      }
-
-      .tabbar {
-        position: fixed;
-        left: 50%;
-        bottom: 0;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: var(--maxw);
-        height: calc(60px + env(safe-area-inset-bottom));
-        padding: 8px 18px calc(8px + env(safe-area-inset-bottom));
-        background: rgba(250, 249, 246, 0.78);
-        backdrop-filter: blur(14px);
-        border-top: 1px solid rgba(95, 95, 95, 0.14);
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-      }
-      .tabbtn {
-        border: 1px solid rgba(95, 95, 95, 0.14);
-        background: rgba(255, 255, 255, 0.88);
-        border-radius: 18px;
-        padding: 0;
-        cursor: pointer;
-        font: inherit;
-        font-weight: 800;
-        color: rgba(95, 95, 95, 0.86);
-        box-shadow: var(--shadow);
-        transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
-        display: grid;
-        place-items: center;
-      }
-      .tabbtn:active {
-        transform: scale(0.985);
-      }
-      .tabbtn.active {
-        border-color: rgba(255, 159, 137, 0.32);
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.03);
-        color: rgba(95, 95, 95, 0.92);
-      }
-
-      .tabico {
-        width: 22px;
-        height: 22px;
-        stroke: rgba(90, 90, 90, 0.82);
-        stroke-width: 2.1;
-        fill: none;
-      }
-      .tabbtn.active .tabico {
-        stroke: rgba(255, 159, 137, 0.95);
-      }
-
-      /* Loading skeleton */
-      .skeleton {
-        border-radius: 999px;
-        background: linear-gradient(
-          90deg,
-          rgba(95, 95, 95, 0.08),
-          rgba(95, 95, 95, 0.06),
-          rgba(95, 95, 95, 0.08)
-        );
-        background-size: 180% 100%;
-        animation: sk 1.2s ease-in-out infinite;
-      }
-      .sk-line {
-        height: 12px;
-        margin-top: 10px;
-      }
-      .sk-line:first-child {
-        margin-top: 0;
-      }
-      .w60 {
-        width: 60%;
-      }
-      .w80 {
-        width: 80%;
-      }
-      .w95 {
-        width: 95%;
-      }
-      @keyframes sk {
-        0% {
-          background-position: 0% 50%;
-        }
-        100% {
-          background-position: 180% 50%;
-        }
-      }
-
-      @media (max-width: 390px) {
-        .temp-now {
-          font-size: 68px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="bg" aria-hidden="true"></div>
-
-    <main class="app" aria-label="温感">
-      <header class="topbar">
-        <div class="brand">温感</div>
-        <div class="loc" id="loc-pill">
-          <span class="loc-dot" aria-hidden="true"></span>
-          <span id="loc-name">唐山市</span>
+    <!-- 首页 -->
+    <div class="page active" id="page-home">
+      <div class="hero" id="heroCard" data-sky="sunny">
+        <div class="hero-atmos" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="hero-top">
+          <div class="location-row"><div class="location-dot"></div><span id="cityName">定位中…</span></div>
+          <div class="hero-top-right">
+            <div class="date-str" id="dateStr"></div>
+            <div class="hero-status" id="heroStatus"><span class="hero-status-dot"></span><span id="heroStatusText">正在同步天气</span></div>
+          </div>
         </div>
-      </header>
-
-      <section class="tab active" id="tab-home" aria-label="首页">
-        <div class="stack">
-          <section class="hero card" id="home-hero" aria-label="实时体感">
-            <div class="hero-mesh" aria-hidden="true"></div>
-            <div class="hero-content">
-              <div class="temp-block" aria-label="温度">
-                <div class="temp-now" id="ui-temp-now">—</div>
-                <div class="temp-sub">
-                  体感温度 <span class="temp-sub-num" id="ui-temp-perceived">—</span>
-                </div>
-                <div class="cond" id="ui-cond">—</div>
-              </div>
-
-              <div class="insight" id="ui-insight" aria-label="智能洞察">
-                <div class="skeleton sk-line w80"></div>
-                <div class="skeleton sk-line w95"></div>
-                <div class="skeleton sk-line w60"></div>
-              </div>
-
-              <div class="trend card-lite" aria-label="24 小时曲线">
-                <div class="trend-head">
-                  <div class="trend-title">24 小时曲线</div>
-                  <div class="trend-note" id="ui-trend-note">—</div>
-                </div>
-                <canvas id="trend-canvas" aria-label="24小时温度曲线"></canvas>
-              </div>
-
-              <div class="outfit card-lite" aria-label="穿搭建议">
-                <div class="outfit-head">
-                  <div class="outfit-title">穿搭建议</div>
-                  <div class="outfit-lv" id="ui-level">Lv —</div>
-                </div>
-                <div class="outfit-items" id="ui-outfit-items">—</div>
-              </div>
-
-              <div class="quick-feedback" aria-label="快捷反馈">
-                <button class="qbtn cold" id="btn-cold" type="button">有点冷</button>
-                <button class="qbtn ok" id="btn-ok" type="button">刚刚好</button>
-                <button class="qbtn hot" id="btn-hot" type="button">有点热</button>
-              </div>
-            </div>
-          </section>
+        <div class="temp-block">
+          <div class="temp-main" id="tempMain">--°</div>
+          <div class="temp-right">
+            <div class="temp-feels" id="tempFeels">体感 --°</div>
+            <div class="weather-icon-big" id="weatherIcon">⛅</div>
+          </div>
         </div>
-      </section>
-
-      <section class="tab" id="tab-wardrobe" aria-label="数字衣橱">
-        <div class="stack">
-          <section class="card" aria-label="数字衣橱">
-            <div class="h2">数字衣橱</div>
-            <div class="p">这里将展示你收纳的单品，并用于更贴合的推荐。</div>
-            <div class="stat-row">
-              <div class="stat">
-                <div class="k">已收纳</div>
-                <div class="v" id="ui-wardrobe-count">42</div>
-              </div>
-              <div class="stat">
-                <div class="k">偏好偏移</div>
-                <div class="v" id="ui-offset-badge">0</div>
-              </div>
-            </div>
-          </section>
+        <div class="condition-text" id="conditionText">加载中…</div>
+        <div class="insight-card hero-insight">
+          <div class="insight-icon">✨</div>
+          <div class="insight-text" id="insightText">正在分析今日气候特征…</div>
         </div>
-      </section>
-
-      <section class="tab" id="tab-calibration" aria-label="私人偏好校准">
-        <div class="stack">
-          <section class="card" aria-label="私人偏好校准">
-            <div class="h2">私人偏好校准</div>
-            <div class="p">拖动滑块会立刻影响体感温度与穿搭等级。</div>
-
-            <div class="slider-block">
-              <div class="slider-head">
-                <div class="k">偏好刻度</div>
-                <div class="v">
-                  <span id="ui-offset-label">体感正常</span>
-                  <span style="margin-left: 10px" id="ui-offset">0</span>
-                </div>
-              </div>
-              <input
-                id="offset-slider"
-                class="slider"
-                type="range"
-                min="-3"
-                max="3"
-                step="1"
-                value="0"
-                aria-label="偏好滑块"
-              />
-              <div class="slider-ends" aria-hidden="true">
-                <span>怕冷</span>
-                <span>怕热</span>
-              </div>
-            </div>
-          </section>
-
-          <section class="card" aria-label="统计">
-            <div class="h2">统计</div>
-            <div class="p">数字衣橱已收纳：<strong>42</strong> 件单品</div>
-            <div class="stat-row">
-              <div class="stat">
-                <div class="k">反馈次数</div>
-                <div class="v" id="ui-feedback-count">0</div>
-              </div>
-              <div class="stat">
-                <div class="k">当前偏移</div>
-                <div class="v" id="ui-offset-badge-2">0</div>
-              </div>
-            </div>
-          </section>
+        <div class="alert-chips" id="alertChips"></div>
+        <div class="trend-panel">
+          <div class="trend-headline">
+            <div class="trend-label">24 小时体感走势</div>
+            <div class="trend-now" id="trendNow">当前体感 --°</div>
+          </div>
+          <div class="trend-wrap"><svg class="trend-svg" id="trendSvg" viewBox="0 0 340 68" preserveAspectRatio="none"></svg></div>
+          <div class="trend-times" id="trendTimes"></div>
         </div>
-      </section>
-    </main>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-icon">💧</div><div class="stat-val" id="humidity">--%</div><div class="stat-lbl">湿度</div></div>
+        <div class="stat-card"><div class="stat-icon">🌬️</div><div class="stat-val" id="windSpeed">--</div><div class="stat-lbl">风速</div></div>
+        <div class="stat-card"><div class="stat-icon">☀️</div><div class="stat-val" id="uvIndex">--</div><div class="stat-lbl">紫外线</div></div>
+      </div>
+      <div class="outfit-decision">
+        <div class="outfit-header">
+          <div class="outfit-head-copy">
+            <div class="outfit-title">今日穿搭建议</div>
+            <div class="outfit-subtitle">按实时体感与个人偏好柔和校准</div>
+          </div>
+          <div class="level-badge" id="levelBadge">Lv --</div>
+        </div>
+        <div id="outfitItemsWrap"></div>
+        <div class="outfit-meta" id="outfitMeta">正在整理更适合你的搭配方式…</div>
+        <div class="feedback-row">
+          <button class="fb-btn cold" id="fbCold" onclick="submitFeedback(-1)"><div class="fb-icon">🧊</div><div class="fb-label">有点冷</div></button>
+          <button class="fb-btn ok" id="fbOk" onclick="submitFeedback(0)"><div class="fb-icon">✅</div><div class="fb-label">刚刚好</div></button>
+          <button class="fb-btn hot" id="fbHot" onclick="submitFeedback(1)"><div class="fb-icon">🔥</div><div class="fb-label">有点热</div></button>
+        </div>
+        <div class="feedback-tip">点一下就会立刻重新校准推荐厚度</div>
+      </div>
+    </div>
 
-    <nav class="tabbar" aria-label="底部导航">
-      <button class="tabbtn active" data-tab="home" type="button" aria-label="首页">
-        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-10.5Z"></path>
-        </svg>
+    <!-- 衣橱 -->
+    <div class="page" id="page-wardrobe">
+      <div class="page-header">
+        <div><div class="page-title">我的衣橱</div><div class="page-count" id="wardrobeCount">共 0 件单品</div></div>
+        <button class="add-btn" onclick="openCameraModal()">📷 拍照收纳</button>
+      </div>
+      <div class="wardrobe-grid" id="wardrobeGrid">
+        <div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">拍张照片，开始收纳第一件</div></div>
+      </div>
+    </div>
+
+    <!-- 设置 -->
+    <div class="page" id="page-settings">
+      <div class="page-header"><div class="page-title">私人实验室</div></div>
+      <div class="settings-section">
+        <div class="set-title">体质校准</div>
+        <div class="set-desc">拖动滑块，让穿搭建议完全贴合你的体感偏好</div>
+        <div class="slider-outer">
+          <div class="slider-track-bg"></div>
+          <input type="range" class="body-slider" id="bodySlider" min="-3" max="3" step="1" value="0" oninput="onSliderChange(this.value)"/>
+        </div>
+        <div class="slider-labels">
+          <span class="slider-label">极度<br/>怕冷</span>
+          <span class="slider-label">较<br/>怕冷</span>
+          <span class="slider-label">偏<br/>怕冷</span>
+          <span class="slider-label">正常</span>
+          <span class="slider-label">偏<br/>怕热</span>
+          <span class="slider-label">较<br/>怕热</span>
+          <span class="slider-label">极度<br/>怕热</span>
+        </div>
+        <div class="slider-current" id="sliderCurrent">体感正常</div>
+      </div>
+      <div class="settings-section">
+        <div class="set-title">衣橱概况</div>
+        <div class="wardrobe-stat-card">
+          <div class="wardrobe-stat-val" id="totalItems">0</div>
+          <div class="wardrobe-stat-lbl">件收纳单品</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-row">
+      <button class="nav-btn active" onclick="switchPage('home',this)">
+        <div class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <span class="nav-lbl">今日</span>
       </button>
-      <button class="tabbtn" data-tab="wardrobe" type="button" aria-label="数字衣橱">
-        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 5c2.2 2 5 3 8 3s5.8-1 8-3"></path>
-          <path d="M6 5v3.5c0 1.2.8 2.4 2 3l2.5 1.5"></path>
-          <path d="M18 5v3.5c0 1.2-.8 2.4-2 3L13.5 13"></path>
-          <path d="M7 22V12.5"></path>
-          <path d="M17 22V12.5"></path>
-        </svg>
+      <button class="nav-btn" onclick="switchPage('wardrobe',this)">
+        <div class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+        <span class="nav-lbl">衣橱</span>
       </button>
-      <button class="tabbtn" data-tab="calibration" type="button" aria-label="私人偏好校准">
-        <svg class="tabico" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
-          <path
-            d="M19.4 15a7.8 7.8 0 0 0 .1-1 7.8 7.8 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1l-.3-2.6H9l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1 7.8 7.8 0 0 0 .1 1l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.3 2.6h6l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5Z"
-          ></path>
-        </svg>
+      <button class="nav-btn" onclick="switchPage('settings',this)">
+        <div class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <span class="nav-lbl">校准</span>
       </button>
-    </nav>
-
-    <script>
-      (() => {
-        "use strict";
-
-        // ===== Config =====
-        const QWEATHER_KEY = "63d45dfa246b4e38bcef997d971d5f4e";
-        const QWEATHER_LOCATION = "101090501"; // Tangshan
-        const QWEATHER_HOST = "https://q53yfrupmn.re.qweatherapi.com";
-
-        const STORAGE_KEYS = {
-          tempOffset: "tempOffset",
-          feedbackCount: "feedbackCount",
-          wardrobeCount: "wardrobeCount",
-        };
-
-        const OFFSET_MIN = -3;
-        const OFFSET_MAX = 3;
-        const FEEDBACK_STEP = 1; // quick feedback delta
-
-        // ===== State =====
-        const state = {
-          loading: true,
-          error: null,
-          usedMock: false,
-          now: null,
-          hourly24: [],
-          daily3: null,
-          indices: [],
-          tempOffset: 0,
-          feedbackCount: 0,
-          wardrobeCount: 42,
-        };
-
-        // ===== Utils =====
-        const $ = (id) => document.getElementById(id);
-        function clamp(n, min, max) {
-          return Math.max(min, Math.min(max, n));
-        }
-
-        const OFFSET_LABELS = {
-          "-3": "极度怕冷",
-          "-2": "较怕冷",
-          "-1": "偏怕冷",
-          "0": "体感正常",
-          "1": "偏怕热",
-          "2": "较怕热",
-          "3": "极度怕热",
-        };
-
-        function offsetToLabel(v) {
-          const n = clamp(Math.round(Number(v) || 0), OFFSET_MIN, OFFSET_MAX);
-          return OFFSET_LABELS[String(n)] || "体感正常";
-        }
-
-        function formatOffset(v) {
-          const n = Number(v);
-          if (!Number.isFinite(n) || n === 0) return "0";
-          return n > 0 ? `+${n}` : String(n);
-        }
-
-        function readNum(key, fallback) {
-          const v = Number(localStorage.getItem(key));
-          return Number.isFinite(v) ? v : fallback;
-        }
-
-        function writeNum(key, value) {
-          localStorage.setItem(key, String(value));
-        }
-
-        function api(path) {
-          return `${QWEATHER_HOST}${path}?location=${QWEATHER_LOCATION}&key=${QWEATHER_KEY}&lang=zh`;
-        }
-
-        async function fetchJson(url) {
-          const res = await fetch(url);
-          const data = await res.json();
-          if (!res.ok) throw new Error(`http ${res.status}`);
-          return data;
-        }
-
-        // ===== Algorithm =====
-        // calculatedTemp = realTemp + humidity*0.15 - windSpeed*0.2 + tempOffset
-        // Here tempOffset is user calibration:
-        // negative -> user feels colder -> recommend thicker (lower calculatedTemp band)
-        // positive -> user feels warmer -> recommend thinner (higher band)
-        function calculateTemp(now, tempOffset) {
-          if (!now) return null;
-          const realTemp = Number(now.temp);
-          const humidity = Number(now.humidity);
-          const windSpeed = Number(now.windSpeed);
-          const offset = Number(tempOffset) || 0;
-          if (![realTemp, humidity, windSpeed, offset].every((n) => Number.isFinite(n))) return null;
-          return realTemp + humidity * 0.15 - windSpeed * 0.2 + offset;
-        }
-
-        // 10-level mapping from -20..35+ (no seasonal words)
-        const OUTFIT_TABLE = {
-          10: ["长款加厚羽绒服", "发热内衣", "羊绒衫", "围巾帽子", "保暖手套"],
-          9: ["厚羽绒服", "高领毛衣", "保暖裤"],
-          8: ["羽绒服/羊羔毛外套", "厚针织", "加厚袜"],
-          7: ["厚呢外套/轻薄羽绒", "中厚毛衣"],
-          6: ["外套", "衬衫/打底", "长裤"],
-          5: ["风衣/西装外套", "薄针织/长袖"],
-          4: ["卫衣/针织开衫", "T 恤"],
-          3: ["长袖衬衫", "轻薄连衣裙/半裙"],
-          2: ["短袖/吊带", "防晒衫"],
-          1: ["极简清爽", "亚麻/真丝/速干面料"],
-        };
-
-        function getOutfitLevel(t) {
-          const temp = Number(t);
-          if (!Number.isFinite(temp)) return 5;
-          // [-20..35+] bands
-          if (temp <= -15) return 10;
-          if (temp <= -5) return 9;
-          if (temp <= 0) return 8;
-          if (temp <= 6) return 7;
-          if (temp <= 12) return 6;
-          if (temp <= 18) return 5;
-          if (temp <= 22) return 4;
-          if (temp <= 26) return 3;
-          if (temp <= 30) return 2;
-          return 1;
-        }
-
-        function formatOutfit(level) {
-          const items = OUTFIT_TABLE[level] || OUTFIT_TABLE[5];
-          return items.join(" · ");
-        }
-
-        function pickEmotion(level) {
-          const TEXT = {
-            10: "今天真的很冷，你值得被好好包裹住。",
-            9: "今天冷得有点锋利，保暖要更认真一点。",
-            8: "今天空气偏冷，厚针织会让你更安心。",
-            7: "今天风一吹就凉，外层选更防风的会舒服很多。",
-            6: "今天体感偏凉，穿搭做一点层次会更精致。",
-            5: "今天刚刚好，利落外套会很显气质。",
-            4: "今天很舒服，轻松一点也很好看。",
-            3: "今天微微偏热，轻薄长袖会更松弛。",
-            2: "今天偏热，防晒和补水记得安排上。",
-            1: "今天很热，选择透气面料会让你更自在。",
-          };
-          return TEXT[level] || "今天穿得舒服最重要。";
-        }
-
-        // ===== Insight =====
-        // Soft, helpful, single-paragraph Chinese advice.
-        function generateInsight(input) {
-          const parts = [];
-
-          const pop = Number(input.pop);
-          const windScale = Number(input.windScale);
-          const uvIndex = Number(input.uvIndex);
-          const tMax = Number(input.tempMax);
-          const tMin = Number(input.tempMin);
-
-          if (Number.isFinite(input.level)) parts.push(pickEmotion(input.level));
-
-          if (Number.isFinite(pop)) {
-            if (pop >= 70) parts.push("降水概率偏高，带伞会更从容");
-            else if (pop >= 40) parts.push("可能会有零星降水，备一把轻便伞更安心");
-          }
-
-          if (Number.isFinite(windScale)) {
-            if (windScale >= 6) parts.push("风力偏强，体感会被吹冷，外层尽量选防风材质");
-            else if (windScale >= 4) parts.push("有点风，脖颈和脚踝记得照顾一下");
-          }
-
-          if (Number.isFinite(tMax) && Number.isFinite(tMin)) {
-            const diff = Math.abs(tMax - tMin);
-            if (diff >= 12) parts.push(`温差约 ${Math.round(diff)}°，晚上出门建议多带一件`);
-            else if (diff >= 8) parts.push(`温差约 ${Math.round(diff)}°，随手带件薄外搭更稳`);
-          }
-
-          if (Number.isFinite(uvIndex)) {
-            if (uvIndex >= 8) parts.push("紫外线较强，记得防晒与遮阳");
-            else if (uvIndex >= 6) parts.push("紫外线偏高，防晒可以补涂一次");
-          }
-
-          if (!parts.length) return "今天整体比较平稳，按体感温度挑一套舒服的层次就好。";
-          return parts.join("；") + "。";
-        }
-
-        // ===== 24h Curve (Canvas) =====
-        function drawTrendCanvas(temps) {
-          const canvas = $("trend-canvas");
-          if (!canvas) return;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-
-          const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-          const w = Math.max(280, canvas.clientWidth);
-          const h = Math.max(120, canvas.clientHeight);
-          canvas.width = w * dpr;
-          canvas.height = h * dpr;
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          ctx.clearRect(0, 0, w, h);
-
-          const pointsRaw = temps
-            .map((t) => Number(t))
-            .filter((n) => Number.isFinite(n))
-            .slice(0, 24);
-          if (pointsRaw.length < 6) return;
-
-          const min = Math.min(...pointsRaw);
-          const max = Math.max(...pointsRaw);
-          const span = Math.max(2, max - min);
-          const padX = 14;
-          const padY = 18;
-          const innerW = w - padX * 2;
-          const innerH = h - padY * 2;
-
-          const pts = pointsRaw.map((v, i) => {
-            const x = padX + (i / (pointsRaw.length - 1)) * innerW;
-            const y = padY + (1 - (v - min) / span) * innerH;
-            return { x, y, v };
-          });
-
-          let minIdx = 0;
-          let maxIdx = 0;
-          for (let i = 1; i < pts.length; i++) {
-            if (pts[i].v < pts[minIdx].v) minIdx = i;
-            if (pts[i].v > pts[maxIdx].v) maxIdx = i;
-          }
-
-          // light baseline grid
-          ctx.strokeStyle = "rgba(90,90,90,0.08)";
-          ctx.lineWidth = 1;
-          for (let i = 1; i <= 2; i++) {
-            const y = padY + (i / 3) * innerH;
-            ctx.beginPath();
-            ctx.moveTo(padX, y);
-            ctx.lineTo(w - padX, y);
-            ctx.stroke();
-          }
-
-          // Smooth line (midpoint quadratic)
-          ctx.beginPath();
-          ctx.moveTo(pts[0].x, pts[0].y);
-          for (let i = 1; i < pts.length - 1; i++) {
-            const midX = (pts[i].x + pts[i + 1].x) / 2;
-            const midY = (pts[i].y + pts[i + 1].y) / 2;
-            ctx.quadraticCurveTo(pts[i].x, pts[i].y, midX, midY);
-          }
-          ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
-
-          // glow
-          ctx.save();
-          ctx.strokeStyle = "rgba(247,241,225,0.85)";
-          ctx.lineWidth = 5;
-          ctx.shadowColor = "rgba(255,159,137,0.18)";
-          ctx.shadowBlur = 14;
-          ctx.stroke();
-          ctx.restore();
-
-          ctx.strokeStyle = "rgba(247,241,225,0.95)";
-          ctx.lineWidth = 3;
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.stroke();
-
-          // min/max dots + labels
-          const drawDot = (p) => {
-            ctx.beginPath();
-            ctx.fillStyle = "rgba(255,159,137,0.75)";
-            ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
-            ctx.fill();
-          };
-          drawDot(pts[minIdx]);
-          drawDot(pts[maxIdx]);
-
-          ctx.font = "800 12px Quicksand, system-ui";
-          ctx.fillStyle = "rgba(90,90,90,0.82)";
-          ctx.fillText(`${Math.round(pts[minIdx].v)}°`, pts[minIdx].x + 6, pts[minIdx].y + 16);
-          ctx.fillText(`${Math.round(pts[maxIdx].v)}°`, pts[maxIdx].x + 6, Math.max(14, pts[maxIdx].y - 8));
-        }
-
-        // ===== Weather theming =====
-        function iconToTheme(iconCode) {
-          const code = Number(iconCode);
-          if (!Number.isFinite(code)) return "sun";
-          if (code >= 300 && code < 400) return "rain";
-          if (code >= 400 && code < 500) return "snow";
-          if (code >= 200 && code < 300) return "wind";
-          if (code === 100) return "sun";
-          if (code >= 101 && code <= 104) return "cloud";
-          return "cloud";
-        }
-
-        function applyWeatherTheme(iconCode) {
-          const theme = iconToTheme(iconCode);
-          document.body.dataset.sky = theme;
-        }
-
-        // ===== Data extraction =====
-        function getUvIndex() {
-          const list = state.indices;
-          if (!Array.isArray(list)) return null;
-          const uv = list.find((x) => typeof x?.name === "string" && x.name.includes("紫外线"));
-          if (!uv) return null;
-          const level = Number(uv.level);
-          if (Number.isFinite(level)) return level;
-          const cat = String(uv.category || "");
-          if (cat.includes("强")) return 8;
-          if (cat.includes("中")) return 6;
-          if (cat.includes("弱")) return 3;
-          return null;
-        }
-
-        function calcPopMaxNext12h() {
-          const hourly = state.hourly24 || [];
-          const slice = hourly.slice(0, 12);
-          const pops = slice.map((h) => Number(h.pop)).filter((n) => Number.isFinite(n));
-          if (!pops.length) return null;
-          return Math.max(...pops);
-        }
-
-        function getTodayMinMax() {
-          const d = state.daily3?.[0];
-          if (!d) return { min: null, max: null };
-          const min = Number(d.tempMin);
-          const max = Number(d.tempMax);
-          return {
-            min: Number.isFinite(min) ? min : null,
-            max: Number.isFinite(max) ? max : null,
-          };
-        }
-
-        // ===== UI =====
-        function setText(id, text) {
-          const el = $(id);
-          if (!el) return;
-          el.textContent = text;
-        }
-
-        function updateUI() {
-          const now = state.now;
-          const calculated = calculateTemp(now, state.tempOffset);
-          const level = getOutfitLevel(calculated);
-
-          setText("ui-temp-now", now ? `${Number(now.temp)}°` : "—");
-          setText("ui-temp-perceived", calculated == null ? "—" : `${calculated.toFixed(1)}°C`);
-          setText("ui-cond", now?.text ? (state.usedMock ? `${now.text}（示例）` : now.text) : "—");
-
-          setText("ui-level", calculated == null ? "Lv —" : `Lv ${level}`);
-          setText("ui-outfit-items", calculated == null ? "—" : formatOutfit(level));
-
-          setText("ui-offset", formatOffset(state.tempOffset));
-          setText("ui-offset-label", offsetToLabel(state.tempOffset));
-          setText("ui-offset-badge", formatOffset(state.tempOffset));
-          setText("ui-offset-badge-2", formatOffset(state.tempOffset));
-          setText("ui-feedback-count", String(state.feedbackCount));
-          setText("ui-wardrobe-count", String(state.wardrobeCount));
-
-          // Keep slider synced even when quick feedback changes the offset.
-          const slider = $("offset-slider");
-          if (slider && slider.value !== String(state.tempOffset)) slider.value = String(state.tempOffset);
-
-          // Trend note + Canvas
-          const temps = state.hourly24.map((h) => Number(h.temp)).filter((n) => Number.isFinite(n));
-          if (temps.length) {
-            const min = Math.min(...temps);
-            const max = Math.max(...temps);
-            setText("ui-trend-note", `最低 ${Math.round(min)}° · 最高 ${Math.round(max)}°`);
-          } else {
-            setText("ui-trend-note", "—");
-          }
-          drawTrendCanvas(temps);
-
-          // Insight text
-          const uvIndex = getUvIndex();
-          const pop = calcPopMaxNext12h();
-          const mm = getTodayMinMax();
-          const windScale = now?.windScale != null ? Number(now.windScale) : null;
-
-          const insight = generateInsight({
-            windScale,
-            pop,
-            uvIndex,
-            tempMax: mm.max,
-            tempMin: mm.min,
-            level,
-          });
-          const insightEl = $("ui-insight");
-          if (insightEl) {
-            const prefix = state.error ? `${state.error}\n` : "";
-            insightEl.textContent = `${prefix}${insight}`;
-          }
-
-          applyWeatherTheme(now?.icon);
-        }
-
-        function setLoading(isLoading) {
-          state.loading = isLoading;
-          const insightEl = $("ui-insight");
-          if (!insightEl) return;
-          if (isLoading) {
-            insightEl.innerHTML =
-              '<div class="skeleton sk-line w80"></div><div class="skeleton sk-line w95"></div><div class="skeleton sk-line w60"></div>';
-          }
-        }
-
-        // ===== Tabs =====
-        function setActiveTab(name) {
-          ["home", "wardrobe", "calibration"].forEach((t) => {
-            const el = document.getElementById(`tab-${t}`);
-            if (el) el.classList.toggle("active", t === name);
-          });
-          document.querySelectorAll(".tabbtn").forEach((b) => {
-            b.classList.toggle("active", b.dataset.tab === name);
-          });
-        }
-
-        // ===== Feedback & Slider =====
-        function persistOffset() {
-          writeNum(STORAGE_KEYS.tempOffset, state.tempOffset);
-        }
-
-        function persistFeedbackCount() {
-          writeNum(STORAGE_KEYS.feedbackCount, state.feedbackCount);
-        }
-
-        function applyOffsetDelta(delta) {
-          state.tempOffset = clamp(state.tempOffset + delta, OFFSET_MIN, OFFSET_MAX);
-          persistOffset();
-          updateUI();
-        }
-
-        function recordFeedback(kind) {
-          state.feedbackCount += 1;
-          persistFeedbackCount();
-
-          if (kind === "cold") applyOffsetDelta(-FEEDBACK_STEP);
-          else if (kind === "hot") applyOffsetDelta(+FEEDBACK_STEP);
-          else updateUI();
-        }
-
-        // ===== Weather fetch =====
-        async function loadWeather() {
-          const nowUrl = api("/v7/weather/now");
-          const h24Url = api("/v7/weather/24h");
-          const d3Url = api("/v7/weather/3d");
-          const idxUrl = api("/v7/indices/1d") + "&type=0";
-
-          try {
-            state.error = null;
-            state.usedMock = false;
-
-            const [nowData, hourlyData, dailyData, idxData] = await Promise.all([
-              fetchJson(nowUrl),
-              fetchJson(h24Url),
-              fetchJson(d3Url),
-              fetchJson(idxUrl),
-            ]);
-
-            const ok = (d) => d?.code === "200";
-            if (!ok(nowData) || !nowData?.now) throw new Error(`qweather now ${nowData?.code || "?"}`);
-            if (!ok(hourlyData) || !Array.isArray(hourlyData?.hourly))
-              throw new Error(`qweather 24h ${hourlyData?.code || "?"}`);
-            if (!ok(dailyData) || !Array.isArray(dailyData?.daily))
-              throw new Error(`qweather 3d ${dailyData?.code || "?"}`);
-            if (!ok(idxData) || !Array.isArray(idxData?.daily))
-              throw new Error(`qweather indices ${idxData?.code || "?"}`);
-
-            state.now = nowData.now;
-            state.hourly24 = hourlyData.hourly;
-            state.daily3 = dailyData.daily;
-            state.indices = idxData.daily;
-          } catch (e) {
-            console.warn("Weather fetch failed, using mock data", e);
-            state.error = "暂时没连上天气服务，我先用示例数据陪你看看；稍后刷新就会恢复。";
-            state.usedMock = true;
-            state.now = {
-              temp: 18,
-              humidity: 65,
-              windSpeed: 12,
-              windScale: 3,
-              icon: 100,
-              text: "晴",
-            };
-            state.hourly24 = Array.from({ length: 24 }, (_, i) => ({
-              temp: 16 + Math.sin(((i - 10) / 12) * Math.PI) * 3.6,
-              pop: i >= 9 && i <= 16 ? 35 : 10,
-            }));
-            state.daily3 = [{ tempMax: 21, tempMin: 9 }];
-            state.indices = [{ name: "紫外线指数", level: "6", category: "中等" }];
-          }
-        }
-
-        // ===== Init =====
-        function bindEvents() {
-          document.querySelectorAll(".tabbtn").forEach((btn) => {
-            btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
-          });
-
-          const cold = $("btn-cold");
-          const ok = $("btn-ok");
-          const hot = $("btn-hot");
-          if (cold) cold.addEventListener("click", () => recordFeedback("cold"));
-          if (ok) ok.addEventListener("click", () => recordFeedback("ok"));
-          if (hot) hot.addEventListener("click", () => recordFeedback("hot"));
-
-          const slider = $("offset-slider");
-          if (slider) {
-            slider.addEventListener("input", (e) => {
-              const v = Number(e.target.value);
-              state.tempOffset = clamp(Number.isFinite(v) ? v : 0, OFFSET_MIN, OFFSET_MAX);
-              persistOffset();
-              updateUI();
-            });
-          }
-        }
-
-        async function init() {
-          state.tempOffset = clamp(readNum(STORAGE_KEYS.tempOffset, 0), OFFSET_MIN, OFFSET_MAX);
-          state.feedbackCount = Math.max(0, Math.floor(readNum(STORAGE_KEYS.feedbackCount, 0)));
-          state.wardrobeCount = Math.max(0, Math.floor(readNum(STORAGE_KEYS.wardrobeCount, 42)));
-
-          const slider = $("offset-slider");
-          if (slider) slider.value = String(state.tempOffset);
-
-          bindEvents();
-          setLoading(true);
-          await loadWeather();
-          setLoading(false);
-          updateUI();
-        }
-
-        window.addEventListener("load", () => {
-          init();
-        });
-      })();
-    </script>
-  </body>
+    </div>
+  </nav>
+</div>
+
+<!-- 拍照弹窗 -->
+<div class="modal-overlay" id="cameraOverlay" onclick="closeCameraOnBg(event)">
+  <div class="modal-sheet" id="cameraSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="cameraTitle">拍摄衣物</div>
+    <div id="stepCamera">
+      <div class="camera-preview-wrap">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <canvas id="cameraCanvas"></canvas>
+        <div class="camera-guide"></div>
+        <div class="camera-hint">将衣物置于框内，背景尽量简洁</div>
+      </div>
+      <div class="photo-actions">
+        <button class="photo-side-btn" onclick="closeCameraModal()">取消</button>
+        <button class="shutter-btn" onclick="capturePhoto()">📷</button>
+        <div></div>
+      </div>
+    </div>
+    <div id="stepProcessing" style="display:none">
+      <div class="processing-wrap">
+        <div class="processing-spinner"></div>
+        <div class="processing-text">智能抠图处理中…</div>
+      </div>
+    </div>
+    <div id="stepPreview" style="display:none">
+      <div class="preview-confirm-wrap"><img id="processedPreview" alt="预览"/></div>
+      <div class="form-group"><label class="form-label">单品名称</label><input class="form-input" id="itemName" placeholder="例：米色羊绒大衣" maxlength="20"/></div>
+      <div class="form-group"><label class="form-label">分类</label>
+        <select class="form-select" id="itemType">
+          <option value="外套">外套</option><option value="上衣">上衣</option><option value="下装">下装</option>
+          <option value="连衣裙">连衣裙</option><option value="配件">配件</option><option value="鞋履">鞋履</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">厚度（保暖等级）</label>
+        <div class="warmth-picker" id="warmthPicker">
+          <button class="warmth-opt selected" data-val="1" onclick="selectWarmth(this)">薄</button>
+          <button class="warmth-opt" data-val="2" onclick="selectWarmth(this)">中</button>
+          <button class="warmth-opt" data-val="3" onclick="selectWarmth(this)">厚</button>
+          <button class="warmth-opt" data-val="4" onclick="selectWarmth(this)">很厚</button>
+          <button class="warmth-opt" data-val="5" onclick="selectWarmth(this)">极厚</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="retakePhoto()">重拍</button>
+        <button class="btn-save" onclick="saveItem()">收纳入橱</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 语音反馈弹窗 -->
+<div class="modal-overlay" id="voiceOverlay">
+  <div class="voice-sheet">
+    <div class="modal-handle"></div>
+    <div class="voice-emoji" id="voiceEmoji">🤔</div>
+    <div class="voice-title" id="voiceTitle">今天穿了什么？</div>
+    <div class="voice-subtitle">说说今天的穿搭，帮我更准确地了解你的体感习惯</div>
+    <div class="voice-btn-wrap">
+      <div class="voice-ring" id="voiceRing"></div>
+      <button class="voice-mic-btn" id="voiceMicBtn" onclick="toggleVoice()">🎙️</button>
+    </div>
+    <div class="voice-status" id="voiceStatus">点击麦克风开始录音</div>
+    <div class="voice-transcript placeholder" id="voiceTranscript">你说的内容会显示在这里…</div>
+    <div class="voice-actions">
+      <button class="voice-skip-btn" onclick="closeVoiceModal(true)">跳过</button>
+      <button class="voice-confirm-btn" onclick="confirmVoice()">确认记录</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEYS={
+  userOffset:'userTempOffset',
+  legacyOffset:'tempOffset',
+  wardrobe:'wardrobe',
+  feedbackCount:'feedbackCount',
+  outfitLogs:'outfitLogs',
+};
+
+function clamp(num,min,max){return Math.max(min,Math.min(max,num));}
+function toNum(value,fallback=0){const n=Number(value);return Number.isFinite(n)?n:fallback;}
+function readStoredOffset(){
+  const raw=localStorage.getItem(STORAGE_KEYS.userOffset)??localStorage.getItem(STORAGE_KEYS.legacyOffset)??'0';
+  return clamp(toNum(raw,0),-3,3);
+}
+function persistOffset(){
+  const value=S.tempOffset.toFixed(1);
+  localStorage.setItem(STORAGE_KEYS.userOffset,value);
+  localStorage.setItem(STORAGE_KEYS.legacyOffset,value);
+}
+function persistFeedbackCount(){localStorage.setItem(STORAGE_KEYS.feedbackCount,String(S.feedbackCount));}
+
+const S={
+  apiKey:'63d45dfa246b4e38bcef997d971d5f4e',
+  apiHost:'https://q53yfrupmn.re.qweatherapi.com',
+  locationId:'101090501',
+  cityName:'唐山市',
+  tempOffset:readStoredOffset(),
+  feedbackCount:Math.max(0,Math.floor(toNum(localStorage.getItem(STORAGE_KEYS.feedbackCount),0))),
+  wardrobe:JSON.parse(localStorage.getItem(STORAGE_KEYS.wardrobe)||'[]'),
+  weather:null,
+  hourly:[],
+  daily:[],
+  uvIndex:null,
+  pop:null,
+  feels:0,
+  error:'',
+  selectedWarmth:1,
+  photoData:null,
+  processedPhoto:null,
+  pendingFeedbackDir:0,
+  activeRecommendationIds:[],
+  mediaStream:null,
+  recognition:null,
+  isRecording:false,
+  voiceText:'',
+};
+const BODY_LABELS=['极度怕冷','较怕冷','偏怕冷','体感正常','偏怕热','较怕热','极度怕热'];
+const TYPE_WEIGHT={'外套':1.4,'上衣':1.0,'下装':0.9,'连衣裙':0.85,'配件':0.45,'鞋履':0.35};
+const TYPE_DEFAULT_NAMES={外套:'质感外套',上衣:'柔软上衣',下装:'舒适下装',连衣裙:'轻盈连衣裙',配件:'搭配配件',鞋履:'日常鞋履'};
+const TYPE_ICONS={外套:'🧥',上衣:'👚',下装:'👖',连衣裙:'👗',配件:'🧣',鞋履:'👢'};
+const RECOMMENDATION_TABLE=[
+  {max:-12,level:10,title:'Lv.10 极寒重装',formula:'长款加厚羽绒服 + 发热内衣 + 羊绒衫 + 加绒防风裤 + 全套防风配件',logic:'一切以锁温和防风为主，不考虑轻薄感。',items:['长款加厚羽绒服','发热内衣','羊绒衫','加绒防风裤','冷帽 / 围巾 / 手套'],slots:[{type:'外套',warmth:5,keywords:['羽绒','派克','长款','大衣']},{type:'上衣',warmth:5,keywords:['发热','保暖','内衣','打底']},{type:'上衣',warmth:4,keywords:['羊绒','毛衣','高领','针织']},{type:'下装',warmth:5,keywords:['加绒','防风','保暖裤','厚裤']},{type:'配件',warmth:2,keywords:['帽','围巾','手套']}]},
+  {max:-5,level:9,title:'Lv.9 严寒防冻',formula:'中长款厚羽绒服 / 派克大衣 + 羊毛保暖打底 + 厚毛衣 + 蓄热加绒裤',logic:'需要重度羽绒材质和内层蓄热来稳住体感。',items:['中长款厚羽绒服','派克大衣','羊毛保暖打底','厚毛衣','蓄热加绒裤'],slots:[{type:'外套',warmth:5,keywords:['羽绒','派克','厚外套']},{type:'上衣',warmth:4,keywords:['羊毛','保暖','打底','内衣']},{type:'上衣',warmth:4,keywords:['毛衣','针织','高领']},{type:'下装',warmth:4,keywords:['加绒','保暖裤','厚裤']}]},
+  {max:0,level:8,title:'Lv.8 冰点防护',formula:'标准厚度羽绒服 / 环保皮草 / 厚羊羔毛外套 + 保暖内衣 + 常规针织衫',logic:'外套要有空气层保暖，内搭不需要过度堆叠。',items:['标准厚度羽绒服','环保皮草','厚羊羔毛外套','保暖内衣','常规针织衫'],slots:[{type:'外套',warmth:4,keywords:['羽绒','皮草','羊羔毛','厚外套']},{type:'上衣',warmth:3,keywords:['保暖','打底','内衣']},{type:'上衣',warmth:3,keywords:['针织','毛衣']}]},
+  {max:6,level:7,title:'Lv.7 重度叠穿',formula:'厚款呢大衣 / 轻薄羽绒服 / 绗缝棉服 + 贴身羊绒打底 / 高领毛衣 + 羊毛呢裤',logic:'冷空气明显，是大衣叠穿最能体现层次感的温段。',items:['厚款呢大衣','轻薄羽绒服','绗缝棉服','贴身羊绒打底','高领毛衣','羊毛呢裤'],slots:[{type:'外套',warmth:4,keywords:['呢大衣','羽绒','棉服','绗缝']},{type:'上衣',warmth:3,keywords:['羊绒','高领','打底','毛衣']},{type:'下装',warmth:3,keywords:['羊毛','呢裤','长裤']}]},
+  {max:12,level:6,title:'Lv.6 中厚外套',formula:'中厚夹克棉服 / 粗棒针织厚开衫 / 呢子短外套 + 长袖衬衫 / 薄高领打底',logic:'外层要挡风，内层保持透气，已经不必上羽绒。',items:['中厚夹克棉服','粗棒针织厚开衫','呢子短外套','长袖衬衫','薄高领打底'],slots:[{type:'外套',warmth:3,keywords:['夹克','开衫','短外套','棉服','呢子']},{type:'上衣',warmth:2,keywords:['长袖','衬衫','高领','打底']}]},
+  {max:18,level:5,title:'Lv.5 轻薄外衣',formula:'经典风衣 / 廓形西装外套 / 皮夹克 + 薄款针织 / 质感长袖 T 恤',logic:'单层防风外套配轻薄内搭，是最舒服的黄金区间。',items:['经典风衣','廓形西装外套','皮夹克','薄款针织','质感长袖T恤'],slots:[{type:'外套',warmth:2,keywords:['风衣','西装','夹克','皮衣']},{type:'上衣',warmth:2,keywords:['针织','长袖','T恤']}]},
+  {max:22,level:4,title:'Lv.4 适中长袖',formula:'长袖卫衣 / 法式针织开衫 / 粗花呢短外套 + 吊带 / 短袖 T 恤打底',logic:'适合随时穿脱的两件套，也适合单穿有一定厚度的长袖。',items:['长袖卫衣','法式针织开衫','粗花呢短外套','吊带','短袖T恤'],slots:[{type:'外套',warmth:2,keywords:['开衫','短外套','花呢'],optional:true},{type:'上衣',warmth:1,keywords:['卫衣','长袖','吊带','T恤']}]},
+  {max:26,level:3,title:'Lv.3 微热薄织',formula:'长袖衬衫 / 丝面长袖裙 / 莫代尔长袖（可随时卷袖）',logic:'适合单层透气长袖，兼顾早晚微凉和轻防晒。',items:['长袖衬衫','丝面长袖裙','莫代尔长袖'],slots:[{types:['上衣','连衣裙'],warmth:1,keywords:['长袖','衬衫','莫代尔','长袖裙','衬衫裙','丝面']}]},
+  {max:30,level:2,title:'Lv.2 暑热轻装',formula:'短袖 T 恤 / 吊带裙 / 冰丝阔腿裤 + 轻薄防晒衫',logic:'核心需求是排汗、轻盈和防晒隔离。',items:['短袖T恤','吊带裙','冰丝阔腿裤','轻薄防晒衫'],slots:[{types:['上衣','连衣裙'],warmth:1,keywords:['短袖','吊带','背心','吊带裙']},{type:'下装',warmth:1,keywords:['冰丝','阔腿裤','短裤'],optional:true},{type:'外套',warmth:1,keywords:['防晒','薄外套'],optional:true}]},
+  {max:999,level:1,title:'Lv.1 酷暑极简',formula:'极简清爽排汗，真丝 / 亚麻材质无袖单品 / 凉感透气夏装',logic:'放弃多余层次，只保留最透气的面料和最少的重量。',items:['真丝单品','亚麻单品','无袖上衣','凉感夏装'],slots:[{types:['上衣','连衣裙'],warmth:1,keywords:['无袖','真丝','亚麻','背心','无袖裙','吊带裙']},{type:'下装',warmth:1,keywords:['短裤','薄裤'],optional:true}]},
+];
+
+const NAME_RULES=[
+  {match:['羽绒','派克'],subtype:'羽绒外套',type:'外套',warmth:5},
+  {match:['羊羔毛','皮草'],subtype:'厚绒外套',type:'外套',warmth:4},
+  {match:['大衣','风衣'],subtype:'长外套',type:'外套',warmth:3},
+  {match:['西装','夹克'],subtype:'利落外套',type:'外套',warmth:2},
+  {match:['毛衣','针织','羊绒'],subtype:'针织上衣',type:'上衣',warmth:3},
+  {match:['卫衣','长袖'],subtype:'长袖上衣',type:'上衣',warmth:2},
+  {match:['短袖','背心','吊带'],subtype:'轻薄上衣',type:'上衣',warmth:1},
+  {match:['衬衫'],subtype:'衬衫',type:'上衣',warmth:2},
+  {match:['裙'],subtype:'连衣裙',type:'连衣裙',warmth:1},
+  {match:['裤'],subtype:'长裤',type:'下装',warmth:2},
+  {match:['围巾','帽','手套'],subtype:'保暖配件',type:'配件',warmth:2},
+  {match:['靴','鞋'],subtype:'鞋履',type:'鞋履',warmth:1},
+];
+
+function calculatePerceivedTemp(realTemp,humidity,windSpeed){
+  const perceived=toNum(realTemp)+(toNum(humidity)*0.15)-(toNum(windSpeed)*0.2)+S.tempOffset;
+  return Number(perceived.toFixed(1));
+}
+
+function getClothingRecommendation(perceivedTemp){
+  const rec=RECOMMENDATION_TABLE.find(item=>perceivedTemp<=item.max)||RECOMMENDATION_TABLE[RECOMMENDATION_TABLE.length-1];
+  return {...rec};
+}
+
+function inferItemMeta(name,type,warmth){
+  const safeName=String(name||'').trim();
+  const rule=NAME_RULES.find(item=>item.match.some(keyword=>safeName.includes(keyword)));
+  const finalType=rule?.type || type || '上衣';
+  const finalWarmth=clamp(toNum(warmth,rule?.warmth||2),1,5);
+  const subtype=rule?.subtype || TYPE_DEFAULT_NAMES[finalType] || '日常单品';
+  return {type:finalType,warmth:finalWarmth,subtype};
+}
+
+function inferSuitableLevels(item){
+  const warmth=toNum(item.warmth,2);
+  const ranges={
+    5:[8,9,10],
+    4:[6,7,8,9],
+    3:[5,6,7],
+    2:[3,4,5,6],
+    1:[1,2,3,4],
+  };
+  const base=ranges[warmth]||[4,5,6];
+  if(item.type==='配件') return [7,8,9,10];
+  if(item.type==='鞋履') return [2,3,4,5,6];
+  return base;
+}
+
+function normalizeWardrobeItem(item){
+  const meta=inferItemMeta(item?.name,item?.type,item?.warmth);
+  return {
+    id:item?.id || Date.now()+Math.random(),
+    name:item?.name || TYPE_DEFAULT_NAMES[meta.type],
+    type:meta.type,
+    subtype:item?.subtype || meta.subtype,
+    warmth:meta.warmth,
+    photo:item?.photo || null,
+    addedAt:item?.addedAt || Date.now(),
+    suitableLevels:item?.suitableLevels || inferSuitableLevels({...item,...meta}),
+  };
+}
+
+function persistWardrobe(){
+  localStorage.setItem(STORAGE_KEYS.wardrobe,JSON.stringify(S.wardrobe));
+}
+
+function matchKeywords(name,keywords){
+  const text=String(name||'');
+  return (keywords||[]).some(keyword=>text.includes(keyword));
+}
+
+function getSlotTypes(slot){
+  return Array.isArray(slot.types) && slot.types.length ? slot.types : [slot.type];
+}
+
+function scoreItemForSlot(item,slot){
+  const types=getSlotTypes(slot);
+  const typeMatch=types.includes(item.type) ? 42 : 0;
+  const warmthScore=18-Math.abs(toNum(item.warmth,1)-toNum(slot.warmth,1))*4;
+  const keywordScore=matchKeywords(item.name,slot.keywords) ? 26 : 0;
+  return typeMatch+warmthScore+keywordScore;
+}
+
+function recommendFromWardrobe(feels){
+  const rec=getClothingRecommendation(feels);
+  if(!S.wardrobe.length)return{recommendation:rec,items:[],missing:rec.items.slice(),sufficient:false};
+  const used=new Set();
+  const selected=[];
+  const missing=[];
+  for(const slot of rec.slots){
+    const types=getSlotTypes(slot);
+    const candidates=S.wardrobe
+      .map((item,idx)=>({...item,idx,slotScore:scoreItemForSlot(item,slot)}))
+      .filter(item=>!used.has(item.idx))
+      .filter(item=>types.includes(item.type))
+      .sort((a,b)=>b.slotScore-a.slotScore);
+    if(candidates.length && candidates[0].slotScore>24){
+      selected.push({...candidates[0],slotLabel:(slot.keywords&&slot.keywords[0]) || types[0]});
+      used.add(candidates[0].idx);
+    }else if(!slot.optional){
+      const label=(slot.keywords&&slot.keywords[0]) || getSlotTypes(slot)[0] || '单品';
+      missing.push(label);
+    }
+  }
+  return{
+    recommendation:rec,
+    items:selected,
+    missing,
+    sufficient:missing.length===0 && selected.length>=Math.max(1,Math.ceil(rec.slots.filter(slot=>!slot.optional).length*0.8)),
+  };
+}
+
+function renderOutfitSection(feels){
+  const wrap=document.getElementById('outfitItemsWrap');
+  const meta=document.getElementById('outfitMeta');
+  const result=recommendFromWardrobe(feels);
+  const rec=result.recommendation;
+  S.activeRecommendationIds=result.items.map(item=>item.id);
+  document.getElementById('levelBadge').textContent=`Lv.${rec.level}`;
+  const summary=`<div class="recommend-summary"><div class="recommend-title">${rec.title}</div><div class="recommend-text">${rec.formula}</div><div class="recommend-text" style="margin-top:6px;opacity:.82">${rec.logic}</div></div>`;
+  if(meta){
+    const offsetText=S.tempOffset===0?'当前按你的默认体感推荐。':`当前已按 ${Math.abs(S.tempOffset)} 档${S.tempOffset<0?'怕冷':'怕热'}偏好做了微调。`;
+    meta.textContent=result.items&&result.items.length
+      ? `${offsetText}${result.sufficient?' 已优先从你的衣橱里组合可穿的一套。':` 先从你的衣橱里拼出了核心单品，还缺：${result.missing.join('、')}。`}`
+      : `${offsetText} 你的衣橱里还没有可匹配的单品，先按当前等级给出公式参考。`;
+  }
+  if(result.items&&result.items.length){
+    const cards=result.items.map(item=>`
+      <div class="outfit-card-item highlight">
+        <div class="outfit-card-img">${item.photo?`<img src="${item.photo}" alt="${item.name}"/>`:'👗'}</div>
+        <div class="outfit-card-name">${item.name}</div>
+        <div class="outfit-card-type">${item.subtype || item.type} · ${item.slotLabel}</div>
+      </div>`).join('');
+    const extra=result.missing?.length?`<div class="outfit-card-item"><div class="outfit-card-img" style="font-size:16px;color:#CCC;flex-direction:column;gap:4px">➕<span style="font-size:9px">还缺单品</span></div><div class="outfit-card-name">${result.missing[0]}</div><div class="outfit-card-type">${result.missing.length>1?`另缺 ${result.missing.length-1} 件`:'建议补齐'}</div></div>`:'';
+    wrap.innerHTML=`${summary}<div class="outfit-scroll">${cards}${extra}</div>`;
+    return;
+  }
+  wrap.innerHTML=`${summary}<div class="outfit-tags">${rec.items.map(item=>`<div class="outfit-tag">${item}</div>`).join('')}</div>`;
+}
+
+function generateInsight(tempMax,tempMin,windScale,pop,uvIndex){
+  const insights=[];
+  const diff=toNum(tempMax)-toNum(tempMin);
+  if(diff>=10)insights.push(`今日温差达 ${Math.round(diff)}°C，像换了个季节，早晚出门务必带件薄外套。`);
+  if(toNum(windScale)>=4)insights.push('风力较大，不建议穿易飘起的裙装，注意头部防风。');
+  if(toNum(pop)>=40)insights.push('今天有降水概率，出门记得带上一把伞。');
+  if(toNum(uvIndex)>=6)insights.push('紫外线较强，请做好物理防晒或涂抹防晒霜。');
+  if(!insights.length)return '今天天气比较平稳，按推荐的厚度穿搭刚刚好。';
+  return insights.join(' ');
+}
+
+function handleUserFeedback(feedbackType){
+  S.feedbackCount+=1;
+  if(feedbackType==='colder'){
+    // 当前页面左侧是“怕冷”，因此向负方向移动更符合滑块语义。
+    S.tempOffset=clamp(S.tempOffset-1,-3,3);
+  }else if(feedbackType==='hotter'){
+    S.tempOffset=clamp(S.tempOffset+1,-3,3);
+  }else if(feedbackType==='ok'){
+    console.log('当前校准值完美匹配！');
+  }
+  persistOffset();
+  persistFeedbackCount();
+  document.getElementById('bodySlider').value=Math.round(S.tempOffset);
+  updateSliderLabel(Math.round(S.tempOffset));
+  updateUI();
+}
+
+function deriveWindScale(windSpeed){
+  const speed=toNum(windSpeed);
+  if(speed>=39)return 6;
+  if(speed>=29)return 5;
+  if(speed>=20)return 4;
+  if(speed>=12)return 3;
+  if(speed>=6)return 2;
+  return 1;
+}
+
+// ── 天气工具 ──
+function getIcon(code,night){
+  if(code<=100)return night?'🌙':'☀️';if(code<=101)return'⛅';if(code<=104)return'☁️';
+  if(code<=213)return'🌧️';if(code<=220)return'⛈️';if(code<=404)return'❄️';return'🌫️';
+}
+function getBg(code,night){if(night)return'night';if(code<=101)return'sunny';if(code<=104)return'cloudy';return'rainy'}
+function getHeroStatus(code,night){
+  if(night)return'夜色轻柔模式';
+  if(code<=100)return'晴光在线';
+  if(code<=104)return'云层轻覆';
+  if(code<=220)return'雨意明显';
+  if(code<=404)return'空气偏冷';
+  return'实时感知中';
+}
+function createTrendTag(x,y,text,fill,textColor){
+  const width=Math.max(30,text.length*7.2+12);
+  const left=Math.max(2,Math.min(338-width,x-width/2));
+  return `<g><rect x="${left}" y="${y-16}" rx="10" ry="10" width="${width}" height="18" fill="${fill}"></rect><text x="${left+width/2}" y="${y-4}" text-anchor="middle" font-size="9.5" fill="${textColor}" font-family="Quicksand" font-weight="700">${text}</text></g>`;
+}
+function drawTrend(hourly){
+  const svg=document.getElementById('trendSvg');if(!hourly||hourly.length<2)return;
+  const W=340,H=68,PAD=8,temps=hourly.slice(0,24).map(h=>parseFloat(h.temp));
+  const mn=Math.min(...temps),mx=Math.max(...temps),rng=mx-mn||1;
+  const pts=temps.map((t,i)=>[PAD+(i/(temps.length-1))*(W-PAD*2),H-PAD-((t-mn)/rng)*(H-PAD*2-22)]);
+  let d=`M ${pts[0][0]} ${pts[0][1]}`;
+  for(let i=1;i<pts.length;i++){const cx=(pts[i-1][0]+pts[i][0])/2;d+=` C ${cx} ${pts[i-1][1]} ${cx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`}
+  const fd=d+` L ${pts[pts.length-1][0]} ${H} L ${pts[0][0]} ${H} Z`,mi=temps.indexOf(mn),xi=temps.indexOf(mx);
+  const ci=0;
+  const current=pts[ci];
+  const min=pts[mi];
+  const max=pts[xi];
+  svg.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF9F89" stop-opacity="0.24"/><stop offset="100%" stop-color="#FF9F89" stop-opacity="0"/></linearGradient><filter id="trendGlow"><feGaussianBlur stdDeviation="4.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="${fd}" fill="url(#tg)"/><path d="${d}" fill="none" stroke="rgba(255,159,137,0.22)" stroke-width="7" stroke-linecap="round" filter="url(#trendGlow)"/><path d="${d}" fill="none" stroke="#FF9F89" stroke-width="2.6" stroke-linecap="round"/><line x1="${current[0]}" y1="8" x2="${current[0]}" y2="${H-6}" stroke="rgba(255,159,137,0.18)" stroke-dasharray="3 4"/><circle cx="${min[0]}" cy="${min[1]}" r="3.4" fill="#FFFFFF" stroke="#C7C7C7" stroke-width="2"/><circle cx="${max[0]}" cy="${max[1]}" r="3.6" fill="#FFFFFF" stroke="#FF9F89" stroke-width="2.2"/><circle cx="${current[0]}" cy="${current[1]}" r="5.3" fill="#FFFFFF" stroke="#FF9F89" stroke-width="3"/><circle cx="${current[0]}" cy="${current[1]}" r="10" fill="rgba(255,159,137,0.14)"/>${createTrendTag(min[0],min[1],`最低 ${mn.toFixed(0)}°`,'rgba(255,255,255,0.96)','#8F8F8F')}${createTrendTag(max[0],max[1]-8,`最高 ${mx.toFixed(0)}°`,'rgba(255,159,137,0.16)','#D56652')}${createTrendTag(current[0],current[1]-18,`现在 ${temps[0].toFixed(0)}°`,'rgba(255,255,255,0.98)','#D56652')}`;
+}
+
+function formatTrendHour(entry,index){
+  const raw=entry?.fxTime;
+  if(raw){
+    const date=new Date(raw);
+    if(!Number.isNaN(date.getTime())) return `${String(date.getHours()).padStart(2,'0')}:00`;
+  }
+  return `${String(index).padStart(2,'0')}:00`;
+}
+
+function renderTrendTimes(hourly){
+  const holder=document.getElementById('trendTimes');
+  if(!holder)return;
+  const list=(hourly||[]).slice(0,24);
+  if(!list.length){
+    holder.innerHTML='';
+    return;
+  }
+  const marks=[0,6,12,18,23].filter((idx,pos,arr)=>idx<list.length&&arr.indexOf(idx)===pos);
+  holder.innerHTML=marks.map(idx=>`<span class="trend-time">${formatTrendHour(list[idx],idx)}</span>`).join('');
+}
+
+function renderAlertChips({pop,windScale,uvIndex,tempMax,tempMin}){
+  const holder=document.getElementById('alertChips');
+  if(!holder)return;
+  const chips=[];
+  const diff=toNum(tempMax)-toNum(tempMin);
+  if(toNum(pop)>=40)chips.push({cls:'rain',icon:'☔',label:`降雨 <b>${Math.round(pop)}%</b>`});
+  if(toNum(windScale)>=4)chips.push({cls:'wind',icon:'🌬️',label:`风力 <b>${Math.round(windScale)}级</b>`});
+  if(toNum(uvIndex)>=6)chips.push({cls:'uv',icon:'☀️',label:`紫外线 <b>${Math.round(uvIndex)}级</b>`});
+  if(diff>=10)chips.push({cls:'temp',icon:'🧥',label:`温差 <b>${Math.round(diff)}°</b>`});
+  holder.innerHTML=chips.map(chip=>`<div class="alert-chip ${chip.cls}"><span>${chip.icon}</span><span>${chip.label}</span></div>`).join('');
+}
+
+function updateUI(){
+  const w=S.weather;if(!w)return;
+  const temp=toNum(w.temp),hum=toNum(w.humidity),wind=toNum(w.windSpeed),night=new Date().getHours()>=20||new Date().getHours()<6;
+  S.feels=calculatePerceivedTemp(temp,hum,wind);
+  const windScale=toNum(w.windScale,deriveWindScale(wind));
+  const tempMax=S.daily.length?toNum(S.daily[0].tempMax,temp+2):Math.max(temp,...S.hourly.map(h=>toNum(h.temp,temp)));
+  const tempMin=S.daily.length?toNum(S.daily[0].tempMin,temp-2):Math.min(temp,...S.hourly.map(h=>toNum(h.temp,temp)));
+  const pop=S.pop??Math.max(0,...S.hourly.slice(0,12).map(h=>toNum(h.pop,0)));
+  const sky=getBg(parseInt(w.icon||100,10),night);
+  document.getElementById('bgCanvas').className='bg-canvas '+sky;
+  document.getElementById('heroCard').dataset.sky=sky;
+  document.getElementById('app').classList.toggle('night-mode',night);
+  document.getElementById('tempMain').textContent=`${Math.round(temp)}°`;
+  document.getElementById('tempFeels').textContent=`体感 ${S.feels.toFixed(1)}°`;
+  document.getElementById('weatherIcon').textContent=getIcon(parseInt(w.icon||100,10),night);
+  document.getElementById('conditionText').textContent=w.text||'晴';
+  document.getElementById('heroStatusText').textContent=getHeroStatus(parseInt(w.icon||100,10),night);
+  document.getElementById('cityName').textContent=w.city||S.cityName;
+  document.getElementById('humidity').textContent=`${Math.round(hum)}%`;
+  document.getElementById('windSpeed').textContent=`${Math.round(wind)} km/h`;
+  document.getElementById('uvIndex').textContent=S.uvIndex??'--';
+  document.getElementById('trendNow').textContent=`当前体感 ${S.feels.toFixed(1)}°`;
+  const now=new Date(),days=['周日','周一','周二','周三','周四','周五','周六'];
+  document.getElementById('dateStr').textContent=`${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}`;
+  const insightText=generateInsight(tempMax,tempMin,windScale,pop,S.uvIndex);
+  document.getElementById('insightText').textContent=S.error?`${S.error} ${insightText}`:insightText;
+  renderAlertChips({pop,windScale,uvIndex:S.uvIndex,tempMax,tempMin});
+  renderOutfitSection(S.feels);
+  renderWardrobe();
+  drawTrend(S.hourly);
+  renderTrendTimes(S.hourly);
+}
+
+// ── 天气API ──
+async function fetchQWeather(path){
+  const url=`${S.apiHost}${path}?location=${S.locationId}&key=${S.apiKey}&lang=zh`;
+  const res=await fetch(url);
+  const data=await res.json();
+  if(!res.ok||data?.code!=='200')throw new Error(`qweather ${path} ${data?.code||res.status}`);
+  return data;
+}
+async function fetchWeather(){
+  try{
+    S.error='';
+    const [nd,hd,dd,idata]=await Promise.all([
+      fetchQWeather('/v7/weather/now'),
+      fetchQWeather('/v7/weather/24h'),
+      fetchQWeather('/v7/weather/3d'),
+      fetchQWeather('/v7/indices/1d&type=0'),
+    ]);
+    const uv=(idata.daily||[]).find(item=>String(item.name||'').includes('紫外线'));
+    S.weather={...nd.now,city:S.cityName};
+    S.hourly=hd.hourly||[];
+    S.daily=dd.daily||[];
+    S.uvIndex=uv?toNum(uv.level,null):null;
+    S.pop=Math.max(0,...S.hourly.slice(0,12).map(h=>toNum(h.pop,0)));
+    updateUI();
+  }catch(err){
+    console.warn('Weather fetch failed, using mock data',err);
+    useMockData();
+  }
+  hideLoading();
+}
+function useMockData(){
+  S.error='天气服务暂时有点慢，我先用示例数据把页面撑起来。';
+  S.weather={temp:'18',humidity:'65',windSpeed:'12',windScale:'3',icon:'100',text:'晴',city:S.cityName};
+  S.hourly=Array.from({length:24},(_,i)=>({temp:String(15+Math.sin(i/4)*5+Math.random()*1.5),pop:i>10&&i<15?'45':'10'}));
+  S.daily=[{tempMax:'22',tempMin:'11'}];
+  S.uvIndex=6;
+  S.pop=45;
+  updateUI();
+}
+function initLocation(){fetchWeather();}
+function hideLoading(){setTimeout(()=>{document.getElementById('loading').classList.add('hidden');setTimeout(()=>document.getElementById('loading').style.display='none',500);},800);}
+
+// ── 体感反馈 → 语音弹窗 ──
+function submitFeedback(dir){
+  S.pendingFeedbackDir=dir;
+  ['fbCold','fbOk','fbHot'].forEach(id=>document.getElementById(id).classList.remove('selected'));
+  if(dir===-1)document.getElementById('fbCold').classList.add('selected');
+  else if(dir===1)document.getElementById('fbHot').classList.add('selected');
+  else document.getElementById('fbOk').classList.add('selected');
+  openVoiceModal(dir);
+}
+function applyFeedback(dir){
+  if(dir===-1)handleUserFeedback('colder');
+  else if(dir===1)handleUserFeedback('hotter');
+  else handleUserFeedback('ok');
+}
+
+// ── 语音弹窗 ──
+function openVoiceModal(dir){
+  const emo={'-1':'🥶','0':'😊','1':'🥵'},ttl={'-1':'有点冷？告诉我你穿了什么','0':'正合适～今天穿了什么？','1':'有点热？今天穿了什么？'};
+  document.getElementById('voiceEmoji').textContent=emo[dir]||'🤔';
+  document.getElementById('voiceTitle').textContent=ttl[dir]||'今天穿了什么？';
+  document.getElementById('voiceTranscript').textContent='你说的内容会显示在这里…';
+  document.getElementById('voiceTranscript').className='voice-transcript placeholder';
+  document.getElementById('voiceStatus').textContent='点击麦克风开始录音';
+  document.getElementById('voiceRing').classList.remove('recording');
+  document.getElementById('voiceMicBtn').style.background='';
+  S.voiceText='';
+  document.getElementById('voiceOverlay').classList.add('open');
+}
+function closeVoiceModal(apply){
+  if(apply)applyFeedback(S.pendingFeedbackDir);
+  stopVoice();
+  document.getElementById('voiceOverlay').classList.remove('open');
+}
+function confirmVoice(){
+  if(S.voiceText){
+    const logs=JSON.parse(localStorage.getItem(STORAGE_KEYS.outfitLogs)||'[]');
+    logs.unshift({date:new Date().toLocaleDateString(),text:S.voiceText,feels:S.feels});
+    localStorage.setItem(STORAGE_KEYS.outfitLogs,JSON.stringify(logs.slice(0,30)));
+  }
+  closeVoiceModal(true);
+}
+function toggleVoice(){S.isRecording?stopVoice():startVoice()}
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    document.getElementById('voiceStatus').textContent='浏览器暂不支持语音，请手动输入';
+    const el=document.getElementById('voiceTranscript');el.contentEditable='true';el.className='voice-transcript';el.textContent='';el.focus();return;
+  }
+  const r=new SR();r.lang='zh-CN';r.continuous=true;r.interimResults=true;
+  S.recognition=r;S.isRecording=true;
+  document.getElementById('voiceRing').classList.add('recording');
+  document.getElementById('voiceStatus').textContent='正在聆听…';
+  document.getElementById('voiceMicBtn').style.background='linear-gradient(135deg,#E8735A,#C85A40)';
+  r.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;S.voiceText=t;const el=document.getElementById('voiceTranscript');el.textContent=t;el.className='voice-transcript';};
+  r.onend=()=>{if(S.isRecording)stopVoice()};r.onerror=()=>stopVoice();r.start();
+}
+function stopVoice(){
+  S.isRecording=false;S.recognition?.stop();S.recognition=null;
+  document.getElementById('voiceRing').classList.remove('recording');
+  document.getElementById('voiceStatus').textContent=S.voiceText?'录音完成，可确认或重录':'点击麦克风开始录音';
+  document.getElementById('voiceMicBtn').style.background='';
+}
+
+// ── 拍照 ──
+function openCameraModal(){
+  document.getElementById('cameraOverlay').classList.add('open');
+  showStep('Camera');startCamera();
+}
+function closeCameraModal(){stopCamera();document.getElementById('cameraOverlay').classList.remove('open');}
+function closeCameraOnBg(e){if(e.target===document.getElementById('cameraOverlay'))closeCameraModal();}
+function showStep(name){['Camera','Processing','Preview'].forEach(s=>document.getElementById('step'+s).style.display=s===name?'block':'none');}
+async function startCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:1600}}});
+    S.mediaStream=stream;document.getElementById('cameraVideo').srcObject=stream;
+  }catch{
+    stopCamera();const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.capture='environment';
+    inp.onchange=e=>{if(e.target.files[0])handleFile(e.target.files[0])};inp.click();
+  }
+}
+function stopCamera(){S.mediaStream?.getTracks().forEach(t=>t.stop());S.mediaStream=null;}
+function capturePhoto(){
+  const v=document.getElementById('cameraVideo'),c=document.getElementById('cameraCanvas');
+  c.width=v.videoWidth||640;c.height=v.videoHeight||800;c.getContext('2d').drawImage(v,0,0);
+  S.photoData=c.toDataURL('image/jpeg',0.92);stopCamera();processPhoto(S.photoData);
+}
+function handleFile(file){const r=new FileReader();r.onload=e=>{S.photoData=e.target.result;processPhoto(S.photoData)};r.readAsDataURL(file);}
+function retakePhoto(){showStep('Camera');startCamera();document.getElementById('cameraTitle').textContent='拍摄衣物';}
+
+// 抠图算法（边缘背景色采样 + 颜色距离阈值 + 形态学噪点去除）
+async function processPhoto(dataUrl){
+  showStep('Processing');
+  await new Promise(r=>setTimeout(r,200));
+  const img=new Image();
+  img.onload=()=>{
+    const MAX=640,scale=Math.min(MAX/img.width,MAX/img.height,1),w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+    const src=document.createElement('canvas');src.width=w;src.height=h;
+    const sCtx=src.getContext('2d');sCtx.drawImage(img,0,0,w,h);
+    const id=sCtx.getImageData(0,0,w,h),d=id.data;
+    // 边缘采样
+    const edge=Math.max(4,Math.floor(Math.min(w,h)*0.05)),bg=[];
+    for(let x=0;x<w;x++)for(let y=0;y<edge;y++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
+    for(let x=0;x<w;x++)for(let y=h-edge;y<h;y++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
+    for(let y=0;y<h;y++)for(let x=0;x<edge;x++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
+    for(let y=0;y<h;y++)for(let x=w-edge;x<w;x++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
+    const bgR=bg.reduce((s,c)=>s+c[0],0)/bg.length,bgG=bg.reduce((s,c)=>s+c[1],0)/bg.length,bgB=bg.reduce((s,c)=>s+c[2],0)/bg.length;
+    const bgVar=bg.reduce((s,c)=>s+Math.pow(c[0]-bgR,2)+Math.pow(c[1]-bgG,2)+Math.pow(c[2]-bgB,2),0)/bg.length;
+    const thr=Math.min(65,Math.max(22,Math.sqrt(bgVar)*1.9));
+    const out=document.createElement('canvas');out.width=w;out.height=h;
+    const oCtx=out.getContext('2d');oCtx.fillStyle='#FFFFFF';oCtx.fillRect(0,0,w,h);
+    const od=oCtx.getImageData(0,0,w,h),o=od.data;
+    for(let i=0;i<d.length;i+=4){
+      const dr=d[i]-bgR,dg=d[i+1]-bgG,db=d[i+2]-bgB,dist=Math.sqrt(dr*dr+dg*dg+db*db);
+      if(dist>thr){o[i]=d[i];o[i+1]=d[i+1];o[i+2]=d[i+2];o[i+3]=255;}
+    }
+    // 去噪
+    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+      const ci=(y*w+x)*4;
+      if(o[ci+3]>0){const nb=[[-1,0],[1,0],[0,-1],[0,1]].filter(([dx,dy])=>o[((y+dy)*w+(x+dx))*4+3]>0);if(!nb.length){o[ci]=o[ci+1]=o[ci+2]=255;o[ci+3]=255;}}
+    }
+    oCtx.putImageData(od,0,0);
+    S.processedPhoto=out.toDataURL('image/png');
+    document.getElementById('processedPreview').src=S.processedPhoto;
+    document.getElementById('cameraTitle').textContent='确认单品';
+    const recommendation=getClothingRecommendation(S.feels || 18);
+    const suggestedType=recommendation.level>=7?'外套':recommendation.level>=3?'上衣':'上衣';
+    const suggestedWarmth=recommendation.level>=9?5:recommendation.level>=7?4:recommendation.level>=5?3:recommendation.level>=3?2:1;
+    document.getElementById('itemType').value=suggestedType;
+    document.getElementById('itemName').value=TYPE_DEFAULT_NAMES[suggestedType];
+    document.querySelectorAll('.warmth-opt').forEach(b=>b.classList.remove('selected'));
+    document.querySelector(`.warmth-opt[data-val="${suggestedWarmth}"]`)?.classList.add('selected');
+    S.selectedWarmth=suggestedWarmth;
+    showStep('Preview');
+  };
+  img.src=dataUrl;
+}
+
+// ── 衣橱 ──
+function renderWardrobe(){
+  const grid=document.getElementById('wardrobeGrid'),count=S.wardrobe.length;
+  document.getElementById('wardrobeCount').textContent=`共 ${count} 件单品`;
+  document.getElementById('totalItems').textContent=count;
+  if(!count){grid.innerHTML=`<div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">拍张照片，开始收纳第一件</div></div>`;return;}
+  grid.innerHTML=S.wardrobe.map((item,i)=>`
+    <div class="wardrobe-item ${S.activeRecommendationIds.includes(item.id)?'recommended':''}">
+      <div class="item-img">${item.photo?`<img src="${item.photo}" alt="${item.name}"/>`:TYPE_ICONS[item.type]||'👗'}</div>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div><div class="item-meta">${item.subtype || item.type}</div>
+        <div class="item-meta" style="margin-top:4px">适配 Lv.${(item.suitableLevels||[]).join(' / Lv.')}</div>
+        <div class="item-warmth">${Array.from({length:5},(_,j)=>`<div class="warmth-dot ${j<item.warmth?'on':''}"></div>`).join('')}</div>
+      </div>
+      <button class="del-btn" onclick="deleteItem(${i})">✕</button>
+    </div>`).join('');
+}
+function selectWarmth(btn){document.querySelectorAll('.warmth-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');S.selectedWarmth=parseInt(btn.dataset.val);}
+function syncItemNameSuggestion(){
+  const type=document.getElementById('itemType').value;
+  const input=document.getElementById('itemName');
+  if(!input)return;
+  const defaults=Object.values(TYPE_DEFAULT_NAMES);
+  if(!input.value.trim() || defaults.includes(input.value.trim())) input.value=TYPE_DEFAULT_NAMES[type] || '日常单品';
+}
+function saveItem(){
+  const inputType=document.getElementById('itemType').value;
+  const inputName=document.getElementById('itemName').value.trim() || TYPE_DEFAULT_NAMES[inputType];
+  S.wardrobe.push(normalizeWardrobeItem({id:Date.now(),name:inputName,type:inputType,warmth:S.selectedWarmth,photo:S.processedPhoto||S.photoData,addedAt:Date.now()}));
+  persistWardrobe();closeCameraModal();renderWardrobe();updateUI();
+}
+function deleteItem(i){S.wardrobe.splice(i,1);persistWardrobe();renderWardrobe();updateUI();}
+
+// ── 设置/导航 ──
+function switchPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');btn.classList.add('active');
+}
+function onSliderChange(val){S.tempOffset=clamp(parseInt(val,10),-3,3);persistOffset();updateSliderLabel(S.tempOffset);updateUI();}
+function updateSliderLabel(val){document.getElementById('sliderCurrent').textContent=BODY_LABELS[val+3];}
+
+// ── 初始化 ──
+function init(){
+  S.wardrobe=S.wardrobe.map(normalizeWardrobeItem);
+  persistWardrobe();
+  document.getElementById('bodySlider').value=Math.round(S.tempOffset);
+  document.getElementById('itemType').addEventListener('change',syncItemNameSuggestion);
+  updateSliderLabel(Math.round(S.tempOffset));
+  renderWardrobe();initLocation();
+}
+init();
+</script>
+</body>
 </html>
