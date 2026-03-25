@@ -261,10 +261,24 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 .app.locked{filter:blur(10px);pointer-events:none;user-select:none}
 .auth-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(250,249,246,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:opacity .35s ease,visibility .35s ease}
 .auth-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.auth-card{width:100%;max-width:390px;background:rgba(255,255,255,0.88);border:1px solid rgba(255,255,255,0.94);border-radius:32px;box-shadow:0 22px 50px rgba(0,0,0,0.05);padding:28px 22px 24px}
-.auth-logo{width:64px;height:64px;border-radius:24px;margin:0 auto 16px;background:linear-gradient(135deg,var(--coral),var(--coral-dark));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 12px 24px rgba(255,159,137,0.28)}
+.auth-card{width:100%;max-width:390px;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.94);border-radius:32px;box-shadow:0 22px 50px rgba(0,0,0,0.05);padding:30px 22px 24px}
+.auth-logo{width:84px;height:84px;border-radius:28px;margin:0 auto 18px;background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,245,239,0.92));display:grid;place-items:center;box-shadow:0 18px 32px rgba(255,159,137,0.18);position:relative;overflow:hidden}
+.auth-logo::before{content:'';position:absolute;inset:8px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,0.96),rgba(255,240,233,0.84));border:1px solid rgba(255,255,255,0.92)}
+.auth-logo-core{position:relative;width:54px;height:54px;z-index:1;animation:floatLogo 4.8s ease-in-out infinite}
+.auth-logo-sun{position:absolute;top:2px;right:0;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFD9A6 0%,#FFB58F 48%,#FF8F78 100%);box-shadow:0 0 0 8px rgba(255,183,143,0.16)}
+.auth-logo-cloud{position:absolute;left:4px;bottom:12px;width:34px;height:18px;border-radius:999px;background:linear-gradient(180deg,#FFFDF9,#F7EDE5);box-shadow:0 6px 14px rgba(186,164,154,0.12)}
+.auth-logo-cloud::before,.auth-logo-cloud::after{content:'';position:absolute;border-radius:50%;background:inherit}
+.auth-logo-cloud::before{width:16px;height:16px;left:4px;top:-8px}
+.auth-logo-cloud::after{width:20px;height:20px;left:14px;top:-10px}
+.auth-logo-wave{position:absolute;left:8px;right:6px;bottom:6px;height:18px;border-bottom:3px solid rgba(255,159,137,0.88);border-radius:0 0 18px 18px;transform:skewX(-12deg)}
+.auth-logo-wave::after{content:'';position:absolute;left:10px;right:-2px;top:3px;border-bottom:3px solid rgba(255,205,177,0.92);border-radius:0 0 18px 18px}
+.auth-logo-spark{position:absolute;left:10px;top:8px;width:8px;height:8px;border-radius:2px;background:rgba(255,159,137,0.18);transform:rotate(45deg)}
+.auth-logo-spark::before,.auth-logo-spark::after{content:'';position:absolute;background:rgba(255,159,137,0.65);border-radius:999px}
+.auth-logo-spark::before{width:2px;height:12px;left:3px;top:-2px}
+.auth-logo-spark::after{width:12px;height:2px;left:-2px;top:3px}
 .auth-title{text-align:center;font-size:24px;font-weight:700;color:var(--text-main)}
 .auth-desc{text-align:center;font-size:13px;line-height:1.7;color:var(--text-sub);margin:8px 0 18px}
+@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px;background:rgba(255,255,255,0.7);border-radius:18px;margin-bottom:18px}
 .auth-tab{border:none;border-radius:14px;padding:10px 8px;font:inherit;font-size:13px;font-weight:700;color:var(--text-sub);background:transparent;cursor:pointer}
 .auth-tab.active{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;box-shadow:0 8px 18px rgba(255,159,137,0.24)}
@@ -544,7 +558,14 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
-    <div class="auth-logo">温</div>
+    <div class="auth-logo" aria-hidden="true">
+      <div class="auth-logo-core">
+        <span class="auth-logo-spark"></span>
+        <span class="auth-logo-sun"></span>
+        <span class="auth-logo-cloud"></span>
+        <span class="auth-logo-wave"></span>
+      </div>
+    </div>
     <div class="auth-title">欢迎来到温感</div>
     <div class="auth-desc">先登录或创建一个本地账号，让体感学习、衣橱推荐和反馈记录都稳定地跟着你走。</div>
     <div class="auth-tabs">
