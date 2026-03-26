@@ -37,11 +37,31 @@ body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text
 .hero[data-sky="rainy"]{background:linear-gradient(180deg,rgba(241,247,252,0.95),rgba(255,255,255,0.76));border-color:rgba(206,222,237,0.9);box-shadow:0 18px 44px rgba(168,200,232,0.12)}
 .hero[data-sky="rainy"]::before{background:radial-gradient(circle,rgba(168,200,232,0.22) 0%,transparent 72%)}
 .hero[data-sky="night"]{background:linear-gradient(180deg,rgba(35,49,78,0.92),rgba(28,40,66,0.82));border-color:rgba(255,255,255,0.08);box-shadow:0 18px 44px rgba(16,22,40,0.28)}
-.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;position:relative;z-index:1}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;position:relative;z-index:1;gap:12px}
 .hero-top-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.location-row{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-sub);font-weight:600}
+.location-stack{display:flex;flex-direction:column;gap:7px;min-width:0;padding:10px 12px;border-radius:18px;background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.82);box-shadow:0 8px 20px rgba(0,0,0,0.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background .28s ease,border-color .28s ease,box-shadow .28s ease,transform .28s ease}
+.location-stack.live{background:rgba(250,255,251,0.78);border-color:rgba(168,216,184,0.42);box-shadow:0 10px 24px rgba(168,216,184,0.08)}
+.location-stack.mock{background:rgba(255,248,244,0.82);border-color:rgba(255,159,137,0.34);box-shadow:0 10px 24px rgba(255,159,137,0.08)}
+.location-stack.loading{background:rgba(248,251,253,0.8);border-color:rgba(185,200,214,0.42)}
+.location-row{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-sub);font-weight:700}
 .location-dot{width:6px;height:6px;background:var(--coral);border-radius:50%;animation:pulse 2s infinite}
+.location-stack.live .location-dot{background:#8EC9A2}
+.location-stack.mock .location-dot{background:var(--coral)}
+.location-stack.loading .location-dot{background:#B9C8D6}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.weather-inline-status{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--text-sub);min-width:0}
+.weather-inline-dot{width:8px;height:8px;border-radius:50%;background:#D6D6D6;box-shadow:0 0 0 5px rgba(214,214,214,0.18);flex-shrink:0}
+.weather-inline-status.live .weather-inline-dot{background:#8EC9A2;box-shadow:0 0 0 5px rgba(142,201,162,0.18)}
+.weather-inline-status.mock .weather-inline-dot{background:var(--coral);box-shadow:0 0 0 5px rgba(255,159,137,0.16)}
+.weather-inline-status.loading .weather-inline-dot{background:#B9C8D6;box-shadow:0 0 0 5px rgba(185,200,214,0.18)}
+.weather-inline-status.live{color:#6D8B78}
+.weather-inline-status.mock{color:#B26A58}
+.weather-inline-status.loading{color:#7D8D9D}
+.weather-inline-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.weather-inline-btn{width:22px;height:22px;display:grid;place-items:center;border:none;border-radius:999px;background:rgba(255,255,255,0.84);padding:0;font:inherit;font-size:13px;font-weight:700;color:var(--coral-dark);cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+.weather-inline-btn:active{transform:scale(.98)}
+.weather-inline-btn.is-spinning{animation:spinRefresh .9s linear infinite}
+@keyframes spinRefresh{to{transform:rotate(360deg)}}
 .date-str{font-size:12px;color:var(--text-light);font-weight:500}
 .hero-status{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,0.64);border:1px solid rgba(255,255,255,0.75);font-size:11px;font-weight:700;color:var(--text-sub);box-shadow:0 6px 16px rgba(0,0,0,0.03)}
 .hero-status-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 5px rgba(255,159,137,0.14)}
@@ -64,7 +84,9 @@ body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text
 @keyframes rainFall{0%{transform:translateY(-8px);opacity:0}20%{opacity:.7}100%{transform:translateY(72px);opacity:0}}
 @keyframes starBlink{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
 .temp-block{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:12px 0 6px;padding:4px 0 0}
-.temp-main{font-size:88px;font-weight:700;line-height:.92;letter-spacing:-3.8px;color:var(--text-main);background:linear-gradient(180deg,#5A5A5A 0%,#7A6660 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 12px 24px rgba(255,159,137,0.08)}
+.temp-main{display:flex;align-items:flex-start;gap:4px;font-weight:700;line-height:.92;color:var(--text-main);background:linear-gradient(180deg,#5A5A5A 0%,#7A6660 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 12px 24px rgba(255,159,137,0.08);white-space:nowrap;padding-right:6px}
+.temp-main-value{font-size:88px;letter-spacing:-3.8px}
+.temp-main-unit{font-size:34px;line-height:1.05;letter-spacing:-.4px;padding-top:8px}
 .night-mode .temp-main{color:#E8F0FF}
 .temp-right{padding:10px 12px 10px 14px;border-radius:20px;background:rgba(255,255,255,0.64);border:1px solid rgba(255,255,255,0.8);box-shadow:0 8px 20px rgba(0,0,0,0.03);position:relative;z-index:1}
 .temp-feels{font-size:12px;color:var(--coral-dark);font-weight:700;margin-bottom:4px;white-space:nowrap}
@@ -85,17 +107,19 @@ body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text
 .trend-headline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;position:relative;z-index:1}
 .trend-label{font-size:12px;font-weight:700;color:var(--text-sub)}
 .trend-now{font-size:11px;font-weight:700;color:var(--coral-dark);padding:6px 10px;border-radius:999px;background:rgba(255,159,137,0.12);border:1px solid rgba(255,159,137,0.18)}
-.trend-wrap{margin:0;height:68px;position:relative;z-index:1}
+.trend-wrap{margin:0;height:68px;position:relative;z-index:1;touch-action:none;cursor:grab}
 .trend-svg{width:100%;height:100%}
 .trend-times{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding:0 4px;font-size:10px;color:var(--text-light);font-weight:700;letter-spacing:.2px}
-.trend-time{flex:1;text-align:center;white-space:nowrap}
+.trend-time{flex:1;text-align:center;white-space:nowrap;transition:color .2s ease}
+.trend-time.active{color:var(--coral-dark)}
+.trend-detail{margin-top:8px;font-size:11px;line-height:1.6;color:var(--text-sub);font-weight:700;text-align:center}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .stat-card{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--card-border);box-shadow:var(--shadow);padding:14px 12px;text-align:center}
 .stat-icon{font-size:18px;margin-bottom:4px}
 .stat-val{font-size:17px;font-weight:700;color:var(--text-main)}
 .stat-lbl{font-size:11px;color:var(--text-sub);font-weight:600;margin-top:2px}
 .insight-card{background:linear-gradient(135deg,rgba(255,159,137,0.12),rgba(255,212,203,0.08));border:1px solid rgba(255,159,137,0.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
-.insight-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.insight-icon{width:8px;height:8px;border-radius:50%;background:var(--coral-dark);box-shadow:0 0 0 5px rgba(255,159,137,0.12);flex-shrink:0;margin-top:7px}
 .insight-text{font-size:13px;line-height:1.7;color:var(--text-main);font-weight:500}
 .outfit-decision{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:var(--radius);border:1px solid var(--card-border);box-shadow:var(--shadow);padding:22px 20px 18px;margin-bottom:14px}
 .outfit-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px}
@@ -288,6 +312,7 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 .auth-primary,.auth-secondary{width:100%;border:none;border-radius:16px;padding:13px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .auth-primary{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;box-shadow:0 10px 24px rgba(255,159,137,0.25)}
 .auth-secondary{margin-top:10px;background:rgba(255,255,255,0.72);color:var(--text-main);border:1px solid rgba(0,0,0,0.06)}
+.auth-primary:disabled,.auth-secondary:disabled,.weather-inline-btn:disabled{opacity:.58;cursor:default;pointer-events:none}
 .account-card{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .account-meta{display:flex;align-items:center;gap:12px}
 .account-avatar{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--coral),var(--coral-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;box-shadow:0 10px 24px rgba(255,159,137,0.24)}
@@ -365,14 +390,21 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
       <div class="hero" id="heroCard" data-sky="sunny">
         <div class="hero-atmos" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="hero-top">
-          <div class="location-row"><div class="location-dot"></div><span id="cityName">定位中…</span></div>
+          <div class="location-stack loading" id="locationStack">
+            <div class="location-row"><div class="location-dot"></div><span id="cityName">定位中…</span></div>
+            <div class="weather-inline-status loading" id="weatherInlineStatus">
+              <span class="weather-inline-dot" aria-hidden="true"></span>
+              <span class="weather-inline-text" id="weatherInlineText">正在同步实时天气</span>
+              <button class="weather-inline-btn" id="weatherInlineBtn" onclick="retryWeather()" aria-label="重新同步天气" title="重新同步天气">⟳</button>
+            </div>
+          </div>
           <div class="hero-top-right">
             <div class="date-str" id="dateStr"></div>
-            <div class="hero-status" id="heroStatus"><span class="hero-status-dot"></span><span id="heroStatusText">正在同步天气</span></div>
+            <div class="hero-status" id="heroStatus"><span class="hero-status-dot"></span><span id="heroStatusText">实时感知</span></div>
           </div>
         </div>
         <div class="temp-block">
-          <div class="temp-main" id="tempMain">--°</div>
+          <div class="temp-main" id="tempMain"><span class="temp-main-value" id="tempMainValue">--</span><span class="temp-main-unit">°</span></div>
           <div class="temp-right">
             <div class="temp-feels" id="tempFeels">体感 --°</div>
             <div class="weather-icon-big" id="weatherIcon">⛅</div>
@@ -380,7 +412,7 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
         </div>
         <div class="condition-text" id="conditionText">加载中…</div>
         <div class="insight-card hero-insight">
-          <div class="insight-icon">✨</div>
+          <div class="insight-icon" aria-hidden="true"></div>
           <div class="insight-text" id="insightText">正在分析今日气候特征…</div>
         </div>
         <div class="alert-chips" id="alertChips"></div>
@@ -391,6 +423,7 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
           </div>
           <div class="trend-wrap"><svg class="trend-svg" id="trendSvg" viewBox="0 0 340 68" preserveAspectRatio="none"></svg></div>
           <div class="trend-times" id="trendTimes"></div>
+          <div class="trend-detail" id="trendDetail">轻触或滑动曲线，查看具体时刻温度</div>
         </div>
       </div>
       <div class="welcome-card" id="welcomeCard"></div>
@@ -443,7 +476,6 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
         <button class="add-btn" onclick="openCameraModal()">📷 拍照收纳</button>
       </div>
       <div class="tool-row">
-        <button class="mini-btn soft" onclick="openImportWardrobe()">导入备份</button>
         <button class="mini-btn primary" onclick="seedStarterWardrobe()">一键生成灵感衣橱</button>
       </div>
       <div class="wardrobe-grid" id="wardrobeGrid">
@@ -554,8 +586,6 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
 
 <!-- 拍照弹窗 -->
 <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
-<input type="file" id="importWardrobeInput" accept="application/json" hidden/>
-
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
     <div class="auth-logo" aria-hidden="true">
@@ -624,7 +654,7 @@ input[type=range].body-slider::-webkit-slider-runnable-track{height:12px;border-
     <div id="stepProcessing" style="display:none">
       <div class="processing-wrap">
         <div class="processing-spinner"></div>
-        <div class="processing-text">智能抠图处理中…</div>
+        <div class="processing-text">正在准备照片预览…</div>
       </div>
     </div>
     <div id="stepPreview" style="display:none">
@@ -740,6 +770,7 @@ const STORAGE_KEYS={
   wardrobe:'wardrobe',
   feedbackCount:'feedbackCount',
   outfitLogs:'outfitLogs',
+  insightTrail:'insightTrail',
   users:'weatherUsers',
   session:'weatherSession',
   activeTab:'activeTab',
@@ -799,6 +830,8 @@ function persistOffset(){writeScopedString(STORAGE_KEYS.userOffset,S.tempOffset.
 function persistFeedbackCount(){writeScopedString(STORAGE_KEYS.feedbackCount,String(S.feedbackCount));}
 function readOutfitLogs(){return readScopedJSON(STORAGE_KEYS.outfitLogs,[STORAGE_KEYS.outfitLogs],[]);}
 function persistOutfitLogs(logs){writeScopedString(STORAGE_KEYS.outfitLogs,JSON.stringify((logs||[]).slice(0,30)));}
+function readInsightTrail(){return readScopedJSON(STORAGE_KEYS.insightTrail,[STORAGE_KEYS.insightTrail],[]);}
+function persistInsightTrail(trail){writeScopedString(STORAGE_KEYS.insightTrail,JSON.stringify((trail||[]).slice(0,8)));}
 function readActiveTab(){return storageGet(STORAGE_KEYS.activeTab) || 'home';}
 function persistActiveTab(tab){storageSet(STORAGE_KEYS.activeTab,tab);}
 function isGuideDismissed(){return readScopedString(STORAGE_KEYS.onboardingHidden,[])==='1';}
@@ -812,6 +845,11 @@ function showToast(message,tone='default'){
   stack.appendChild(toast);
   setTimeout(()=>{toast.style.opacity='0';toast.style.transform='translateY(8px)';},2200);
   setTimeout(()=>toast.remove(),2600);
+}
+function setAuthBusy(isBusy){
+  document.querySelectorAll('.auth-primary,.auth-secondary').forEach(button=>{
+    button.disabled=Boolean(isBusy);
+  });
 }
 function getStarterWardrobe(){
   return [
@@ -839,6 +877,10 @@ const S={
   feedbackCount:Math.max(0,Math.floor(toNum(readScopedString(STORAGE_KEYS.feedbackCount,[STORAGE_KEYS.feedbackCount]),0))),
   wardrobe:readScopedJSON(STORAGE_KEYS.wardrobe,[STORAGE_KEYS.wardrobe],[]),
   weather:null,
+  weatherState:'loading',
+  weatherUpdatedAt:'',
+  isFetchingWeather:false,
+  lastWeatherFetchAt:0,
   hourly:[],
   daily:[],
   uvIndex:null,
@@ -853,6 +895,8 @@ const S={
   editPhotoData:null,
   pendingFeedbackDir:0,
   activeRecommendationIds:[],
+  trendFocusIndex:0,
+  insightCache:{signature:'',text:'',at:0},
   mediaStream:null,
   recognition:null,
   isRecording:false,
@@ -1013,15 +1057,112 @@ function renderOutfitSection(feels){
   wrap.innerHTML=`${summary}<div class="outfit-tags">${rec.items.map(item=>`<div class="outfit-tag">${item}</div>`).join('')}</div>`;
 }
 
-function generateInsight(tempMax,tempMin,windScale,pop,uvIndex){
-  const insights=[];
+const INSIGHT_LIBRARY={
+  freezing:[
+    ({temp})=>`空气很冷，白天也只有 ${Math.round(temp)}° 左右，出门别省内搭，贴身保暖层会比单纯加外套更舒服。`,
+    ({tempMin})=>`低温很有存在感，早段体感会压得更低，像 ${Math.round(tempMin)}° 这样的时段更适合把领口和脚踝一起顾住。`,
+    ({feels})=>`体感已经压到 ${Math.round(feels)}° 左右，今天更适合把保暖做满一点，别给冷风留空隙。`
+  ],
+  cool:[
+    ({temp})=>`空气偏凉，${Math.round(temp)}° 这一档最适合用一件有挡风感的外层把舒适度稳住。`,
+    ({feels})=>`体感落在 ${Math.round(feels)}° 左右，单穿会有点空，带层次的穿法会更从容。`,
+    ({tempMax,tempMin})=>`今天不是刺骨冷，但凉意会慢慢往身上爬，尤其从 ${Math.round(tempMin)}° 过渡到 ${Math.round(tempMax)}° 的时段，最好保留可穿脱空间。`
+  ],
+  mild:[
+    ({temp})=>`今天温度很友好，${Math.round(temp)}° 附近穿搭自由度高，选一套轻松有层次的组合就会很好看。`,
+    ({feels})=>`体感维持在 ${Math.round(feels)}° 左右，整体是舒服区间，带一件薄外层会更有安全感。`,
+    ()=>`今天属于不太挑衣服的一天，重点放在面料和层次感，整个人会更显轻盈。`
+  ],
+  warm:[
+    ({temp})=>`白天暖意已经起来了，${Math.round(temp)}° 这一档更适合轻盈面料，厚实单品会让人很快有闷感。`,
+    ({feels})=>`体感偏暖，${Math.round(feels)}° 左右穿得太满会有负担，建议把层数收一收。`,
+    ()=>`今天更适合轻薄、透气、能灵活应对室内外温差的搭配。`
+  ],
+  hot:[
+    ({temp})=>`热感已经很直接了，${Math.round(temp)}° 以上尽量把重点放在透气、排汗和轻量面料上。`,
+    ({feels})=>`体感偏高，${Math.round(feels)}° 左右容易越穿越闷，利落单层会更舒服。`,
+    ()=>`今天不太适合做复杂叠穿，把清爽和散热感放在第一位会更轻松。`
+  ],
+  rain:[
+    ({pop})=>`降雨概率大约 ${Math.round(pop)}%，伞最好随手带上，鞋子也尽量避开容易吃水的材质。`,
+    ({pop})=>`雨意比较明确，${Math.round(pop)}% 的降水概率已经值得提前准备，通勤路上别让裤脚拖地。`,
+    ()=>`今天更建议选不怕潮的外层和好打理的鞋履，回家也会省心很多。`
+  ],
+  wind:[
+    ({windScale})=>`风力来到 ${Math.round(windScale)} 级，体感会被再往下拉一点，领口和袖口收住会舒服很多。`,
+    ()=>`今天风感偏明显，轻飘裙摆和过薄外层会有点难控，穿搭上更适合稳一点。`,
+    ()=>`出门时记得考虑挡风感，尤其头颈和腰腹位置，处理好会比多穿一层更有效。`
+  ],
+  uv:[
+    ({uvIndex})=>`紫外线来到 ${Math.round(uvIndex)} 级，今天别忽略防晒，墨镜、帽檐或轻薄防晒层都很加分。`,
+    ()=>`日照强度不低，皮肤和眼周都值得多照顾一下，外出时尽量给自己留点遮挡。`,
+    ()=>`今天更适合兼顾好看和防晒，轻薄防晒衫会比硬扛太阳舒服很多。`
+  ],
+  diff:[
+    ({diff})=>`早晚温差接近 ${Math.round(diff)}°，同一套穿搭最好能留出加减空间，晚些时候会更从容。`,
+    ({diff})=>`温差有 ${Math.round(diff)}° 左右，上午和晚上不像同一种体感，包里备一层会更稳。`,
+    ()=>`今天的重点不是单纯冷或热，而是温差变化，能穿脱的层次会更实用。`
+  ],
+  humidity:[
+    ({humidity})=>`湿度来到 ${Math.round(humidity)}%，贴身面料尽量选透气一点，整天都会更轻松。`,
+    ()=>`空气里带着一点潮意，今天穿搭更适合亲肤、透气、不容易闷住的面料。`
+  ],
+  calm:[
+    ()=>`天气整体很平稳，按今天的推荐厚度穿就会比较舒服。`,
+    ()=>`今天属于好安排的一天，不需要太紧张，保持轻盈和层次感就够了。`,
+    ()=>`整体条件比较友好，穿搭可以更偏向你喜欢的风格表达。`
+  ]
+};
+function hashString(value){
+  let hash=0;
+  for(let i=0;i<String(value).length;i+=1){hash=((hash<<5)-hash)+String(value).charCodeAt(i);hash|=0;}
+  return Math.abs(hash);
+}
+function pickInsightVariant(poolKey,payload,seed){
+  const pool=INSIGHT_LIBRARY[poolKey]||[];
+  if(!pool.length)return'';
+  const trail=readInsightTrail();
+  const recent=new Set(trail.slice(0,4).map(item=>item.id));
+  const built=pool.map((builder,index)=>({id:`${poolKey}-${index}`,text:builder(payload)}));
+  const available=built.filter(item=>!recent.has(item.id));
+  const source=available.length?available:built;
+  const selected=source[hashString(`${seed}:${poolKey}`)%source.length];
+  trail.unshift({id:selected.id,at:Date.now()});
+  persistInsightTrail(trail);
+  return selected.text;
+}
+function getTempInsightKey(temp){
+  if(temp<=2)return'freezing';
+  if(temp<=14)return'cool';
+  if(temp<=23)return'mild';
+  if(temp<=29)return'warm';
+  return'hot';
+}
+function generateInsight({temp,tempMax,tempMin,windScale,pop,uvIndex,humidity,feels}){
   const diff=toNum(tempMax)-toNum(tempMin);
-  if(diff>=10)insights.push(`今日温差达 ${Math.round(diff)}°C，像换了个季节，早晚出门务必带件薄外套。`);
-  if(toNum(windScale)>=4)insights.push('风力较大，不建议穿易飘起的裙装，注意头部防风。');
-  if(toNum(pop)>=40)insights.push('今天有降水概率，出门记得带上一把伞。');
-  if(toNum(uvIndex)>=6)insights.push('紫外线较强，请做好物理防晒或涂抹防晒霜。');
-  if(!insights.length)return '今天天气比较平稳，按推荐的厚度穿搭刚刚好。';
-  return insights.join(' ');
+  const payload={temp:toNum(temp),tempMax:toNum(tempMax),tempMin:toNum(tempMin),windScale:toNum(windScale),pop:toNum(pop),uvIndex:toNum(uvIndex),humidity:toNum(humidity),feels:toNum(feels),diff};
+  const signature=[
+    getTempInsightKey(payload.temp),
+    payload.pop>=40?'rain':'dry',
+    payload.windScale>=4?'windy':'calm',
+    payload.uvIndex>=6?'uv':'soft',
+    diff>=9?'swing':'steady',
+    payload.humidity>=75?'humid':'normal',
+    Math.round(payload.temp/2)
+  ].join('|');
+  if(S.insightCache.signature===signature && Date.now()-S.insightCache.at<20*60*1000 && S.insightCache.text){
+    return S.insightCache.text;
+  }
+  const parts=[pickInsightVariant(getTempInsightKey(payload.temp),payload,signature)];
+  if(payload.pop>=40)parts.push(pickInsightVariant('rain',payload,`${signature}:rain`));
+  if(payload.windScale>=4)parts.push(pickInsightVariant('wind',payload,`${signature}:wind`));
+  if(payload.uvIndex>=6)parts.push(pickInsightVariant('uv',payload,`${signature}:uv`));
+  if(diff>=9)parts.push(pickInsightVariant('diff',payload,`${signature}:diff`));
+  if(parts.length<2 && payload.humidity>=75)parts.push(pickInsightVariant('humidity',payload,`${signature}:humidity`));
+  if(parts.length===1)parts.push(pickInsightVariant('calm',payload,`${signature}:calm`));
+  const text=parts.slice(0,3).join(' ');
+  S.insightCache={signature,text,at:Date.now()};
+  return text;
 }
 
 function handleUserFeedback(feedbackType){
@@ -1030,8 +1171,6 @@ function handleUserFeedback(feedbackType){
     S.tempOffset=clamp(S.tempOffset-1,-3,3);
   }else if(feedbackType==='hotter'){
     S.tempOffset=clamp(S.tempOffset+1,-3,3);
-  }else if(feedbackType==='ok'){
-    console.log('当前校准值完美匹配！');
   }
   persistOffset();
   persistFeedbackCount();
@@ -1056,14 +1195,6 @@ function getIcon(code,night){
   if(code<=213)return'🌧️';if(code<=220)return'⛈️';if(code<=404)return'❄️';return'🌫️';
 }
 function getBg(code,night){if(night)return'night';if(code<=101)return'sunny';if(code<=104)return'cloudy';return'rainy'}
-function getHeroStatus(code,night){
-  if(night)return'夜色轻柔模式';
-  if(code<=100)return'晴光在线';
-  if(code<=104)return'云层轻覆';
-  if(code<=220)return'雨意明显';
-  if(code<=404)return'空气偏冷';
-  return'实时感知中';
-}
 function createTrendTag(x,y,text,fill,textColor){
   const width=Math.max(30,text.length*7.2+12);
   const left=Math.max(2,Math.min(338-width,x-width/2));
@@ -1071,17 +1202,20 @@ function createTrendTag(x,y,text,fill,textColor){
 }
 function drawTrend(hourly){
   const svg=document.getElementById('trendSvg');if(!hourly||hourly.length<2)return;
-  const W=340,H=68,PAD=8,temps=hourly.slice(0,24).map(h=>parseFloat(h.temp));
+  const W=340,H=68,PAD=8,list=hourly.slice(0,24),temps=list.map(h=>parseFloat(h.temp));
   const mn=Math.min(...temps),mx=Math.max(...temps),rng=mx-mn||1;
   const pts=temps.map((t,i)=>[PAD+(i/(temps.length-1))*(W-PAD*2),H-PAD-((t-mn)/rng)*(H-PAD*2-22)]);
   let d=`M ${pts[0][0]} ${pts[0][1]}`;
   for(let i=1;i<pts.length;i++){const cx=(pts[i-1][0]+pts[i][0])/2;d+=` C ${cx} ${pts[i-1][1]} ${cx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`}
   const fd=d+` L ${pts[pts.length-1][0]} ${H} L ${pts[0][0]} ${H} Z`,mi=temps.indexOf(mn),xi=temps.indexOf(mx);
-  const ci=0;
+  const ci=clamp(toNum(S.trendFocusIndex,0),0,temps.length-1);
+  S.trendFocusIndex=ci;
   const current=pts[ci];
   const min=pts[mi];
   const max=pts[xi];
-  svg.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF9F89" stop-opacity="0.24"/><stop offset="100%" stop-color="#FF9F89" stop-opacity="0"/></linearGradient><filter id="trendGlow"><feGaussianBlur stdDeviation="4.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="${fd}" fill="url(#tg)"/><path d="${d}" fill="none" stroke="rgba(255,159,137,0.22)" stroke-width="7" stroke-linecap="round" filter="url(#trendGlow)"/><path d="${d}" fill="none" stroke="#FF9F89" stroke-width="2.6" stroke-linecap="round"/><line x1="${current[0]}" y1="8" x2="${current[0]}" y2="${H-6}" stroke="rgba(255,159,137,0.18)" stroke-dasharray="3 4"/><circle cx="${min[0]}" cy="${min[1]}" r="3.4" fill="#FFFFFF" stroke="#C7C7C7" stroke-width="2"/><circle cx="${max[0]}" cy="${max[1]}" r="3.6" fill="#FFFFFF" stroke="#FF9F89" stroke-width="2.2"/><circle cx="${current[0]}" cy="${current[1]}" r="5.3" fill="#FFFFFF" stroke="#FF9F89" stroke-width="3"/><circle cx="${current[0]}" cy="${current[1]}" r="10" fill="rgba(255,159,137,0.14)"/>${createTrendTag(min[0],min[1],`最低 ${mn.toFixed(0)}°`,'rgba(255,255,255,0.96)','#8F8F8F')}${createTrendTag(max[0],max[1]-8,`最高 ${mx.toFixed(0)}°`,'rgba(255,159,137,0.16)','#D56652')}${createTrendTag(current[0],current[1]-18,`现在 ${temps[0].toFixed(0)}°`,'rgba(255,255,255,0.98)','#D56652')}`;
+  const focusLabel=`${formatTrendHour(list[ci],ci)} ${temps[ci].toFixed(0)}°`;
+  svg.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF9F89" stop-opacity="0.24"/><stop offset="100%" stop-color="#FF9F89" stop-opacity="0"/></linearGradient><filter id="trendGlow"><feGaussianBlur stdDeviation="4.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="${fd}" fill="url(#tg)"/><path d="${d}" fill="none" stroke="rgba(255,159,137,0.22)" stroke-width="7" stroke-linecap="round" filter="url(#trendGlow)"/><path d="${d}" fill="none" stroke="#FF9F89" stroke-width="2.6" stroke-linecap="round"/><line x1="${current[0]}" y1="8" x2="${current[0]}" y2="${H-6}" stroke="rgba(255,159,137,0.18)" stroke-dasharray="3 4"/><circle cx="${min[0]}" cy="${min[1]}" r="3.4" fill="#FFFFFF" stroke="#C7C7C7" stroke-width="2"/><circle cx="${max[0]}" cy="${max[1]}" r="3.6" fill="#FFFFFF" stroke="#FF9F89" stroke-width="2.2"/><circle cx="${current[0]}" cy="${current[1]}" r="5.3" fill="#FFFFFF" stroke="#FF9F89" stroke-width="3"/><circle cx="${current[0]}" cy="${current[1]}" r="10" fill="rgba(255,159,137,0.14)"/>${createTrendTag(min[0],min[1],`最低 ${mn.toFixed(0)}°`,'rgba(255,255,255,0.96)','#8F8F8F')}${createTrendTag(max[0],max[1]-8,`最高 ${mx.toFixed(0)}°`,'rgba(255,159,137,0.16)','#D56652')}${createTrendTag(current[0],current[1]-18,focusLabel,'rgba(255,255,255,0.98)','#D56652')}`;
+  updateTrendDetail(list,temps,ci);
 }
 
 function formatTrendHour(entry,index){
@@ -1102,7 +1236,57 @@ function renderTrendTimes(hourly){
     return;
   }
   const marks=[0,6,12,18,23].filter((idx,pos,arr)=>idx<list.length&&arr.indexOf(idx)===pos);
-  holder.innerHTML=marks.map(idx=>`<span class="trend-time">${formatTrendHour(list[idx],idx)}</span>`).join('');
+  holder.innerHTML=marks.map(idx=>`<span class="trend-time ${Math.abs(idx-S.trendFocusIndex)<=1?'active':''}">${formatTrendHour(list[idx],idx)}</span>`).join('');
+}
+function updateTrendDetail(list,temps,index){
+  const detail=document.getElementById('trendDetail');
+  const now=document.getElementById('trendNow');
+  if(!detail || !now || !list?.length)return;
+  const safeIndex=clamp(toNum(index,0),0,list.length-1);
+  const timeLabel=formatTrendHour(list[safeIndex],safeIndex);
+  const tempLabel=`${temps[safeIndex].toFixed(1)}°`;
+  now.textContent=`${timeLabel} · ${tempLabel}`;
+  detail.textContent=safeIndex===0?`当前时段体感约 ${tempLabel}，轻触或滑动曲线可查看之后的变化。`:`${timeLabel} 左右体感约 ${tempLabel}，拖动曲线可以继续查看前后时段。`;
+}
+function setTrendFocus(index){
+  const list=(S.hourly||[]).slice(0,24);
+  if(list.length<2)return;
+  const next=clamp(toNum(index,0),0,list.length-1);
+  if(next===S.trendFocusIndex && document.getElementById('trendDetail')?.textContent)return;
+  S.trendFocusIndex=next;
+  drawTrend(S.hourly);
+  renderTrendTimes(S.hourly);
+}
+function updateTrendFocusFromClientX(clientX){
+  const svg=document.getElementById('trendSvg');
+  const list=(S.hourly||[]).slice(0,24);
+  if(!svg || list.length<2)return;
+  const rect=svg.getBoundingClientRect();
+  if(!rect.width)return;
+  const ratio=clamp((clientX-rect.left)/rect.width,0,1);
+  setTrendFocus(Math.round(ratio*(list.length-1)));
+}
+function bindTrendInteraction(){
+  const svg=document.getElementById('trendSvg');
+  if(!svg || svg.dataset.bound==='1')return;
+  svg.dataset.bound='1';
+  let dragging=false;
+  const stopDrag=(event)=>{
+    dragging=false;
+    if(event?.pointerId!==undefined && svg.hasPointerCapture?.(event.pointerId)){
+      try{svg.releasePointerCapture(event.pointerId);}catch{}
+    }
+  };
+  svg.addEventListener('pointerdown',(event)=>{
+    dragging=true;
+    if(event.pointerId!==undefined && svg.setPointerCapture)svg.setPointerCapture(event.pointerId);
+    updateTrendFocusFromClientX(event.clientX);
+  });
+  svg.addEventListener('pointermove',(event)=>{if(dragging)updateTrendFocusFromClientX(event.clientX);});
+  svg.addEventListener('click',(event)=>updateTrendFocusFromClientX(event.clientX));
+  svg.addEventListener('pointerup',stopDrag);
+  svg.addEventListener('pointercancel',stopDrag);
+  svg.addEventListener('pointerleave',(event)=>{if(dragging)stopDrag(event);});
 }
 
 function renderAlertChips({pop,windScale,uvIndex,tempMax,tempMin}){
@@ -1115,6 +1299,50 @@ function renderAlertChips({pop,windScale,uvIndex,tempMax,tempMin}){
   if(toNum(uvIndex)>=6)chips.push({cls:'uv',icon:'☀️',label:`紫外线 <b>${Math.round(uvIndex)}级</b>`});
   if(diff>=10)chips.push({cls:'temp',icon:'🧥',label:`温差 <b>${Math.round(diff)}°</b>`});
   holder.innerHTML=chips.map(chip=>`<div class="alert-chip ${chip.cls}"><span>${chip.icon}</span><span>${chip.label}</span></div>`).join('');
+}
+function formatWeatherUpdate(value){
+  if(!value)return '';
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime()))return '';
+  return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+}
+function renderWeatherState(){
+  const stack=document.getElementById('locationStack');
+  const card=document.getElementById('weatherInlineStatus');
+  const text=document.getElementById('weatherInlineText');
+  const btn=document.getElementById('weatherInlineBtn');
+  if(!stack || !card || !text || !btn)return;
+  const status=S.weatherState || 'loading';
+  const offline=typeof navigator!=='undefined' && navigator.onLine===false;
+  stack.className=`location-stack ${status}`;
+  card.className=`weather-inline-status ${status}`;
+  btn.textContent='⟳';
+  btn.classList.toggle('is-spinning',status==='loading');
+  btn.disabled=Boolean(S.isFetchingWeather);
+  if(status==='live'){
+    text.textContent=offline ? '当前离线 · 展示最近一次同步天气' : (S.weatherUpdatedAt ? `实时天气已连接 · ${S.weatherUpdatedAt}` : '实时天气已连接');
+    btn.setAttribute('aria-label','重新同步天气');
+    btn.title='重新同步天气';
+    return;
+  }
+  if(status==='mock'){
+    text.textContent=offline ? '当前离线 · 使用示例数据' : '当前使用示例数据';
+    btn.setAttribute('aria-label','重试天气请求');
+    btn.title='重试天气请求';
+    return;
+  }
+  text.textContent=offline ? '当前离线，等待恢复网络' : '正在同步实时天气';
+  btn.setAttribute('aria-label','刷新天气状态');
+  btn.title='刷新天气状态';
+}
+function refreshWeatherOnResume(){
+  if(document.hidden || S.isFetchingWeather)return;
+  if(!S.lastWeatherFetchAt){
+    fetchWeather();
+    return;
+  }
+  const stale=Date.now()-S.lastWeatherFetchAt>15*60*1000;
+  if(stale)fetchWeather();
 }
 
 function normalizeAccountId(value){return String(value||'').trim().toLowerCase();}
@@ -1197,7 +1425,7 @@ function renderGuideCard(){
     return;
   }
   const points=S.wardrobe.length
-    ? ['首页会优先从你的衣橱里组合穿搭。','点“有点冷/热”后，我会立刻重算推荐。','设置页可以导出备份，便于演示交付。']
+    ? ['首页会优先从你的衣橱里组合穿搭。','点“有点冷/热”后，我会立刻重算推荐。','设置页可以导出当前衣橱，方便留存和演示。']
     : ['先往衣橱里放 3-5 件高频单品。','之后首页推荐会从你的衣服中自动组合。','也可以先点“一键生成灵感衣橱”快速预览完整效果。'];
   holder.innerHTML=`<div class="guide-card"><div class="guide-head"><div><div class="guide-title">3 步进入最佳体验</div><div class="guide-desc">这是一张首次使用提示卡，帮你更快把界面跑到最完整的产品状态。</div></div><button class="guide-close" onclick="dismissGuide()">我知道了</button></div><div class="guide-points">${points.map(item=>`<div class="guide-point">${item}</div>`).join('')}</div></div>`;
 }
@@ -1213,7 +1441,7 @@ function renderDeliveryCheck(){
     {label:'实时天气已接入',ok:Boolean(S.weather) && !S.error,okText:'已同步',warnText:'示例数据'},
     {label:'私人衣橱基础数据',ok:S.wardrobe.length>=3,okText:`${S.wardrobe.length} 件`,warnText:`仅 ${S.wardrobe.length} 件`},
     {label:'体感反馈闭环',ok:S.feedbackCount>=1,okText:`已反馈 ${S.feedbackCount} 次`,warnText:'待体验'},
-    {label:'备份导入导出能力',ok:true,okText:'已具备',warnText:'已具备'},
+    {label:'本地衣橱备份导出',ok:true,okText:'已具备',warnText:'已具备'},
   ];
   holder.innerHTML=checks.map(item=>`<div class="delivery-item"><div class="delivery-copy">${item.label}</div><div class="delivery-state ${item.ok?'ok':'warn'}">${item.ok?item.okText:item.warnText}</div></div>`).join('');
 }
@@ -1221,6 +1449,7 @@ function loadSessionData(){
   S.tempOffset=readStoredOffset();
   S.feedbackCount=Math.max(0,Math.floor(toNum(readScopedString(STORAGE_KEYS.feedbackCount,[STORAGE_KEYS.feedbackCount]),0)));
   S.wardrobe=readScopedJSON(STORAGE_KEYS.wardrobe,[STORAGE_KEYS.wardrobe],[]).map(normalizeWardrobeItem);
+  S.insightCache={signature:'',text:'',at:0};
   persistWardrobe();
   const slider=document.getElementById('bodySlider');
   if(slider)slider.value=Math.round(S.tempOffset);
@@ -1301,6 +1530,7 @@ function openCalibrationTab(){
 }
 function submitLogin(){
   try{
+    setAuthBusy(true);
     const account=normalizeAccountId(document.getElementById('loginAccount')?.value);
     const password=String(document.getElementById('loginPassword')?.value||'').trim();
     if(!account || !password){setAuthMessage('先输入账号和密码，我们再继续。');return;}
@@ -1311,10 +1541,13 @@ function submitLogin(){
     console.error('login failed',err);
     setAuthMessage('登录时出了点问题，请再试一次。');
     showToast('登录失败，请再试一次','warn');
+  }finally{
+    setAuthBusy(false);
   }
 }
 function registerAccount(){
   try{
+    setAuthBusy(true);
     const name=String(document.getElementById('registerName')?.value||'').trim();
     const account=normalizeAccountId(document.getElementById('registerAccount')?.value);
     const password=String(document.getElementById('registerPassword')?.value||'').trim();
@@ -1335,15 +1568,20 @@ function registerAccount(){
     console.error('register failed',err);
     setAuthMessage('创建账号时出了点问题，请再试一次。');
     showToast('创建账号失败，请再试一次','warn');
+  }finally{
+    setAuthBusy(false);
   }
 }
 function continueAsGuest(){
   try{
+    setAuthBusy(true);
     setSession({id:`guest-${Date.now()}`,name:'访客',account:'游客模式',isGuest:true,createdAt:Date.now()});
   }catch(err){
     console.error('continueAsGuest failed',err);
     setAuthMessage('游客模式进入失败，请再试一次。');
     showToast('游客模式进入失败','warn');
+  }finally{
+    setAuthBusy(false);
   }
 }
 function logout(){
@@ -1429,6 +1667,7 @@ function clearWardrobe(){
 
 function updateUI(){
   const w=S.weather;if(!w)return;
+  renderWeatherState();
   const temp=toNum(w.temp),hum=toNum(w.humidity),wind=toNum(w.windSpeed),night=new Date().getHours()>=20||new Date().getHours()<6;
   S.feels=calculatePerceivedTemp(temp,hum,wind);
   const windScale=toNum(w.windScale,deriveWindScale(wind));
@@ -1439,11 +1678,11 @@ function updateUI(){
   document.getElementById('bgCanvas').className='bg-canvas '+sky;
   document.getElementById('heroCard').dataset.sky=sky;
   document.getElementById('app').classList.toggle('night-mode',night);
-  document.getElementById('tempMain').textContent=`${Math.round(temp)}°`;
+  document.getElementById('tempMainValue').textContent=String(Math.round(temp));
   document.getElementById('tempFeels').textContent=`体感 ${S.feels.toFixed(1)}°`;
   document.getElementById('weatherIcon').textContent=getIcon(parseInt(w.icon||100,10),night);
   document.getElementById('conditionText').textContent=w.text||'晴';
-  document.getElementById('heroStatusText').textContent=getHeroStatus(parseInt(w.icon||100,10),night);
+  document.getElementById('heroStatusText').textContent='实时感知';
   document.getElementById('cityName').textContent=w.city||S.cityName;
   document.getElementById('humidity').textContent=`${Math.round(hum)}%`;
   document.getElementById('windSpeed').textContent=`${Math.round(wind)} km/h`;
@@ -1451,7 +1690,7 @@ function updateUI(){
   document.getElementById('trendNow').textContent=`当前体感 ${S.feels.toFixed(1)}°`;
   const now=new Date(),days=['周日','周一','周二','周三','周四','周五','周六'];
   document.getElementById('dateStr').textContent=`${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}`;
-  const insightText=generateInsight(tempMax,tempMin,windScale,pop,S.uvIndex);
+  const insightText=generateInsight({temp,tempMax,tempMin,windScale,pop,uvIndex:S.uvIndex,humidity:hum,feels:S.feels});
   document.getElementById('insightText').textContent=S.error?`${S.error} ${insightText}`:insightText;
   renderAlertChips({pop,windScale,uvIndex:S.uvIndex,tempMax,tempMin});
   renderWelcomeCard();
@@ -1464,50 +1703,87 @@ function updateUI(){
 }
 
 // ── 天气API ──
-async function fetchQWeather(path){
-  const url=`${S.apiHost}${path}?location=${S.locationId}&key=${S.apiKey}&lang=zh`;
+async function fetchQWeather(path,extraParams={}){
+  const [pathname,query='']=String(path||'').split('?');
+  const params=new URLSearchParams(query);
+  params.set('location',S.locationId);
+  params.set('key',S.apiKey);
+  params.set('lang','zh');
+  Object.entries(extraParams||{}).forEach(([key,value])=>{
+    if(value!==undefined && value!==null && value!=='')params.set(key,String(value));
+  });
+  const url=`${S.apiHost}${pathname}?${params.toString()}`;
   const res=await fetch(url);
   const data=await res.json();
   if(!res.ok||data?.code!=='200')throw new Error(`qweather ${path} ${data?.code||res.status}`);
   return data;
 }
-async function fetchWeather(){
+async function fetchWeather(options={}){
+  const manual=Boolean(options.manual);
+  const revealLoader=Boolean(options.revealLoader);
+  if(S.isFetchingWeather)return;
+  if(revealLoader){
+    const loading=document.getElementById('loading');
+    if(loading){
+      loading.style.display='flex';
+      requestAnimationFrame(()=>loading.classList.remove('hidden'));
+    }
+  }
   try{
+    S.isFetchingWeather=true;
     S.error='';
-    const [nd,hd,dd,idata]=await Promise.all([
+    S.weatherState='loading';
+    renderWeatherState();
+    const [nd,hd,dd,indicesResult]=await Promise.allSettled([
       fetchQWeather('/v7/weather/now'),
       fetchQWeather('/v7/weather/24h'),
       fetchQWeather('/v7/weather/3d'),
-      fetchQWeather('/v7/indices/1d&type=0'),
+      fetchQWeather('/v7/indices/1d',{type:'0'}),
     ]);
-    const uv=(idata.daily||[]).find(item=>String(item.name||'').includes('紫外线'));
-    S.weather={...nd.now,city:S.cityName};
-    S.hourly=hd.hourly||[];
-    S.daily=dd.daily||[];
+    if(nd.status!=='fulfilled' || hd.status!=='fulfilled' || dd.status!=='fulfilled'){
+      throw new Error('core weather request failed');
+    }
+    const idata=indicesResult.status==='fulfilled' ? indicesResult.value : null;
+    const uv=(idata?.daily||[]).find(item=>String(item.name||'').includes('紫外线'));
+    S.weather={...nd.value.now,city:S.cityName};
+    S.weatherState='live';
+    S.weatherUpdatedAt=formatWeatherUpdate(nd.value.updateTime || nd.value.now?.obsTime);
+    S.lastWeatherFetchAt=Date.now();
+    S.trendFocusIndex=0;
+    S.hourly=hd.value.hourly||[];
+    S.daily=dd.value.daily||[];
     S.uvIndex=uv?toNum(uv.level,null):null;
     S.pop=Math.max(0,...S.hourly.slice(0,12).map(h=>toNum(h.pop,0)));
     updateUI();
   }catch(err){
     console.warn('Weather fetch failed, using mock data',err);
-    useMockData();
+    useMockData({manual});
+  }finally{
+    S.isFetchingWeather=false;
+    renderWeatherState();
   }
   hideLoading();
 }
 function retryWeather(){
+  if(S.isFetchingWeather)return;
   showToast('正在重新同步天气…');
-  fetchWeather();
+  fetchWeather({manual:true});
 }
-function useMockData(){
+function useMockData(options={}){
+  const manual=Boolean(options.manual);
   S.error='天气服务暂时有点慢，我先用示例数据把页面撑起来。';
+  S.weatherState='mock';
+  S.weatherUpdatedAt='';
+  S.trendFocusIndex=0;
   S.weather={temp:'18',humidity:'65',windSpeed:'12',windScale:'3',icon:'100',text:'晴',city:S.cityName};
   S.hourly=Array.from({length:24},(_,i)=>({temp:String(15+Math.sin(i/4)*5+Math.random()*1.5),pop:i>10&&i<15?'45':'10'}));
   S.daily=[{tempMax:'22',tempMin:'11'}];
   S.uvIndex=6;
   S.pop=45;
   updateUI();
-  showToast('天气服务暂时较慢，先用示例天气保证界面可预览','warn');
+  if(manual || !S.lastWeatherFetchAt)showToast('天气服务暂时较慢，先用示例天气保证界面可预览','warn');
 }
-function initLocation(){fetchWeather();}
+function initLocation(){fetchWeather({revealLoader:true});}
 function hideLoading(){setTimeout(()=>{document.getElementById('loading').classList.add('hidden');setTimeout(()=>document.getElementById('loading').style.display='none',500);},800);}
 
 // ── 体感反馈 → 语音弹窗 ──
@@ -1629,59 +1905,25 @@ function capturePhoto(){
 function handleFile(file){const r=new FileReader();r.onload=e=>{S.photoData=e.target.result;processPhoto(S.photoData)};r.readAsDataURL(file);}
 function retakePhoto(){showStep('Camera');startCamera();document.getElementById('cameraTitle').textContent='拍摄衣物';}
 
-// 抠图算法（边缘背景色采样 + 颜色距离阈值 + 形态学噪点去除）
+// 保留原始照片，仅做预览与推荐初始化
 async function processPhoto(dataUrl){
   showStep('Processing');
   await new Promise(r=>setTimeout(r,200));
-  const img=new Image();
-  img.onload=()=>{
-    const MAX=640,scale=Math.min(MAX/img.width,MAX/img.height,1),w=Math.round(img.width*scale),h=Math.round(img.height*scale);
-    const src=document.createElement('canvas');src.width=w;src.height=h;
-    const sCtx=src.getContext('2d');sCtx.drawImage(img,0,0,w,h);
-    const id=sCtx.getImageData(0,0,w,h),d=id.data;
-    // 边缘采样
-    const edge=Math.max(4,Math.floor(Math.min(w,h)*0.05)),bg=[];
-    for(let x=0;x<w;x++)for(let y=0;y<edge;y++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
-    for(let x=0;x<w;x++)for(let y=h-edge;y<h;y++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
-    for(let y=0;y<h;y++)for(let x=0;x<edge;x++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
-    for(let y=0;y<h;y++)for(let x=w-edge;x<w;x++){const i=(y*w+x)*4;bg.push([d[i],d[i+1],d[i+2]])}
-    const bgR=bg.reduce((s,c)=>s+c[0],0)/bg.length,bgG=bg.reduce((s,c)=>s+c[1],0)/bg.length,bgB=bg.reduce((s,c)=>s+c[2],0)/bg.length;
-    const bgVar=bg.reduce((s,c)=>s+Math.pow(c[0]-bgR,2)+Math.pow(c[1]-bgG,2)+Math.pow(c[2]-bgB,2),0)/bg.length;
-    const thr=Math.min(65,Math.max(22,Math.sqrt(bgVar)*1.9));
-    const out=document.createElement('canvas');out.width=w;out.height=h;
-    const oCtx=out.getContext('2d');oCtx.fillStyle='#FFFFFF';oCtx.fillRect(0,0,w,h);
-    const od=oCtx.getImageData(0,0,w,h),o=od.data;
-    for(let i=0;i<d.length;i+=4){
-      const dr=d[i]-bgR,dg=d[i+1]-bgG,db=d[i+2]-bgB,dist=Math.sqrt(dr*dr+dg*dg+db*db);
-      if(dist>thr){o[i]=d[i];o[i+1]=d[i+1];o[i+2]=d[i+2];o[i+3]=255;}
-    }
-    // 去噪
-    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
-      const ci=(y*w+x)*4;
-      if(o[ci+3]>0){const nb=[[-1,0],[1,0],[0,-1],[0,1]].filter(([dx,dy])=>o[((y+dy)*w+(x+dx))*4+3]>0);if(!nb.length){o[ci]=o[ci+1]=o[ci+2]=255;o[ci+3]=255;}}
-    }
-    oCtx.putImageData(od,0,0);
-    S.processedPhoto=out.toDataURL('image/png');
-    document.getElementById('processedPreview').src=S.processedPhoto;
-    document.getElementById('cameraTitle').textContent='确认单品';
-    const recommendation=getClothingRecommendation(S.feels || 18);
-    const suggestedType=recommendation.level>=7?'外套':recommendation.level>=3?'上衣':'上衣';
-    const suggestedWarmth=recommendation.level>=9?5:recommendation.level>=7?4:recommendation.level>=5?3:recommendation.level>=3?2:1;
-    document.getElementById('itemType').value=suggestedType;
-    document.getElementById('itemName').value=TYPE_DEFAULT_NAMES[suggestedType];
-    document.querySelectorAll('.warmth-opt').forEach(b=>b.classList.remove('selected'));
-    document.querySelector(`.warmth-opt[data-val="${suggestedWarmth}"]`)?.classList.add('selected');
-    S.selectedWarmth=suggestedWarmth;
-    showStep('Preview');
-  };
-  img.src=dataUrl;
+  S.processedPhoto=dataUrl;
+  document.getElementById('processedPreview').src=dataUrl;
+  document.getElementById('cameraTitle').textContent='确认单品';
+  const recommendation=getClothingRecommendation(S.feels || 18);
+  const suggestedType=recommendation.level>=7?'外套':recommendation.level>=3?'上衣':'上衣';
+  const suggestedWarmth=recommendation.level>=9?5:recommendation.level>=7?4:recommendation.level>=5?3:recommendation.level>=3?2:1;
+  document.getElementById('itemType').value=suggestedType;
+  document.getElementById('itemName').value=TYPE_DEFAULT_NAMES[suggestedType];
+  document.querySelectorAll('.warmth-opt').forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`.warmth-opt[data-val="${suggestedWarmth}"]`)?.classList.add('selected');
+  S.selectedWarmth=suggestedWarmth;
+  showStep('Preview');
 }
 
 // ── 衣橱 ──
-function openImportWardrobe(){
-  if(!S.session){syncAuthState();return;}
-  document.getElementById('importWardrobeInput')?.click();
-}
 function seedStarterWardrobe(){
   if(!S.session){syncAuthState();return;}
   if(S.wardrobe.length && !confirm('灵感衣橱会追加到现有衣橱中，继续吗？'))return;
@@ -1692,34 +1934,6 @@ function seedStarterWardrobe(){
   renderWelcomeCard();
   if(S.weather)updateUI();
   showToast('已经为你放入一组高频搭配单品','success');
-}
-function importWardrobeFile(event){
-  if(!S.session){syncAuthState();return;}
-  const file=event?.target?.files?.[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    try{
-      const parsed=JSON.parse(String(e.target?.result||'{}'));
-      const source=Array.isArray(parsed) ? parsed : parsed.wardrobe;
-      if(!Array.isArray(source) || !source.length)throw new Error('empty');
-      const imported=source.map(normalizeWardrobeItem);
-      S.wardrobe=imported;
-      persistWardrobe();
-      renderWardrobe();
-      renderAccountSection();
-      renderWelcomeCard();
-      renderGuideCard();
-      renderDeliveryCheck();
-      if(S.weather)updateUI();
-      showToast(`已导入 ${imported.length} 件单品`, 'success');
-    }catch{
-      showToast('这个备份文件暂时无法识别，请换一个 JSON 试试','warn');
-    }finally{
-      event.target.value='';
-    }
-  };
-  reader.readAsText(file,'utf-8');
 }
 function renderEditPreview(photo,type){
   const preview=document.getElementById('editPreview');
@@ -1795,7 +2009,7 @@ function renderWardrobe(){
   const grid=document.getElementById('wardrobeGrid'),count=S.wardrobe.length;
   document.getElementById('wardrobeCount').textContent=`共 ${count} 件单品`;
   document.getElementById('totalItems').textContent=count;
-  if(!count){grid.innerHTML=`<div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">先收纳几件常穿单品，推荐就会更像你的私人穿搭顾问</div><div class="tool-row" style="justify-content:center;margin-top:16px"><button class="mini-btn soft" onclick="openImportWardrobe()">导入备份</button><button class="mini-btn primary" onclick="seedStarterWardrobe()">一键生成灵感衣橱</button></div></div>`;return;}
+  if(!count){grid.innerHTML=`<div class="empty-wardrobe"><div class="empty-icon">👗</div><div class="empty-text">先收纳几件常穿单品，推荐就会更像你的私人穿搭顾问</div><div class="tool-row" style="justify-content:center;margin-top:16px"><button class="mini-btn primary" onclick="seedStarterWardrobe()">一键生成灵感衣橱</button></div></div>`;return;}
   grid.innerHTML=S.wardrobe.map((item,i)=>`
     <div class="wardrobe-item ${S.activeRecommendationIds.includes(item.id)?'recommended':''}">
       <div class="item-tools">
@@ -1820,7 +2034,11 @@ function syncItemNameSuggestion(){
 }
 function saveItem(){
   const inputType=document.getElementById('itemType').value;
-  const inputName=document.getElementById('itemName').value.trim() || TYPE_DEFAULT_NAMES[inputType];
+  const inputName=(document.getElementById('itemName').value.trim() || TYPE_DEFAULT_NAMES[inputType]).slice(0,20);
+  if(!S.processedPhoto && !S.photoData){
+    showToast('请先拍照或选择一张单品照片','warn');
+    return;
+  }
   S.wardrobe.push(normalizeWardrobeItem({id:Date.now(),name:inputName,type:inputType,warmth:S.selectedWarmth,photo:S.processedPhoto||S.photoData,addedAt:Date.now()}));
   persistWardrobe();closeCameraModal();renderWardrobe();renderAccountSection();updateUI();
   showToast('新单品已经收纳进衣橱','success');
@@ -1843,13 +2061,29 @@ function switchPage(name,btn){
 }
 function onSliderChange(val){if(!S.session){syncAuthState();return;}S.tempOffset=clamp(parseInt(val,10),-3,3);persistOffset();updateSliderLabel(S.tempOffset);renderAccountSection();updateUI();}
 function updateSliderLabel(val){document.getElementById('sliderCurrent').textContent=BODY_LABELS[val+3];}
+function bindAuthShortcuts(){
+  [['loginAccount',submitLogin],['loginPassword',submitLogin],['registerName',registerAccount],['registerAccount',registerAccount],['registerPassword',registerAccount]].forEach(([id,handler])=>{
+    const input=document.getElementById(id);
+    if(!input)return;
+    input.addEventListener('keydown',(event)=>{
+      if(event.key!=='Enter')return;
+      event.preventDefault();
+      handler();
+    });
+  });
+}
 
 // ── 初始化 ──
 function init(){
   document.getElementById('itemType').addEventListener('change',syncItemNameSuggestion);
-  document.getElementById('importWardrobeInput')?.addEventListener('change',importWardrobeFile);
   document.getElementById('editPhotoInput')?.addEventListener('change',handleEditPhoto);
   document.getElementById('editItemType')?.addEventListener('change',syncEditTypePreview);
+  window.addEventListener('online',refreshWeatherOnResume);
+  window.addEventListener('offline',renderWeatherState);
+  document.addEventListener('visibilitychange',refreshWeatherOnResume);
+  bindAuthShortcuts();
+  bindTrendInteraction();
+  renderWeatherState();
   syncAuthState();
   if(S.session)loadSessionData();
   else{
